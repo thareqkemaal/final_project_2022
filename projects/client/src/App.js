@@ -1,25 +1,21 @@
-import axios from "axios";
-import logo from "./logo.svg";
-import "./App.css";
-import { useEffect, useState } from "react";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from '../src/components/NavbarComponent'
+import Footer from '../src/components/FooterComponent'
+import LandingPages from '../src/pages/LandingPages.jsx'
+
+
 
 function App() {
-  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/greetings`
-      );
-      setMessage(data?.message || "");
-    })();
-  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        {message}
-      </header>
+    <div>
+      <Navbar/>
+      <Routes>
+        <Route path='/' element={<LandingPages/>}/>
+      </Routes>
+      <Footer/>
+
     </div>
   );
 }
