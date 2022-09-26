@@ -10,6 +10,7 @@ import gopay from '../assets/Logo GoPay (PNG-1080p) - FileVector69.png'
 import ovo from '../assets/ovo.png'
 import shoppe from '../assets/ShopeePay Logo (PNG-1080p) - Vector69Com.png'
 
+
 const LandingPages = () => {
   return (
     <div>

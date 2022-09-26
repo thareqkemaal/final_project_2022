@@ -1,8 +1,10 @@
 import React from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
+import { useNavigate } from 'react-router';
 
 const NavbarComponent = () => {
+  const navigate = useNavigate()
   return (
     <div>
       <div className='shadow-md'>
@@ -20,8 +22,8 @@ const NavbarComponent = () => {
               </div>
             <div className='flex-none'>
               <div className='flex '>
-                <button className='transition mr-4 text-teal-500 border-2 border-teal-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-slate-100'>Sign In</button>
-                <button className='transition mr-4 text-white bg-teal-500 border-2 border-teal-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-teal-600 hover:border-teal-600' >Sign Up</button>
+                <button className='transition mr-4 text-teal-500 border-2 border-teal-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-slate-100' onClick={()=>navigate('/login')}>Sign In</button>
+                <button className='transition mr-4 text-white bg-teal-500 border-2 border-teal-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-teal-600 hover:border-teal-600' onClick={()=>navigate('/register')} >Sign Up</button>
               </div>
             </div>
           </div>
