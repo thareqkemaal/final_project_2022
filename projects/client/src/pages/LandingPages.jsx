@@ -9,21 +9,14 @@ import bni from '../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png'
 import gopay from '../assets/Logo GoPay (PNG-1080p) - FileVector69.png'
 import ovo from '../assets/ovo.png'
 import shoppe from '../assets/ShopeePay Logo (PNG-1080p) - Vector69Com.png'
+import Carousel from '../components/Carousel'
 
 
 const LandingPages = () => {
   return (
     <div>
             <div className='h-56 sm:h-64 md:h-[500px] xl:h-[650px]'>
-              <div className='h-56 sm:h-64 md:h-[500px] xl:h-[650px] bg-cover bg-center' style={{backgroundImage:'url(https://images.unsplash.com/photo-1576091358783-a212ec293ff3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1025&q=80)'}}>
-                <div className='container mx-auto'>
-                  <div className='grid grid-cols-2 gap-4 place-content-end '>
-                    <div className='text-xs mt-32 md:mt-72 lg:mt-96 backdrop-blur-sm bg-white/30 lg:text-3xl text-center max-w-xs py-5 text-blue-900 '>
-                      Memenuhi kebutuhan untuk kesehatan anda
-                      </div>
-                  </div>
-                </div>
-              </div>
+              <Carousel/>
             </div>
             <div className='grid grid-cols-2 my-3 w-full  py-10 shadow-lg bg-gradient-to-tr from-sky-500 to-white rounded-lg'>
               <div clas className=''>

@@ -1,7 +1,7 @@
 import React from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const NavbarComponent = () => {
   const navigate = useNavigate()
@@ -11,7 +11,7 @@ const NavbarComponent = () => {
         <div className='container md:px-14 md:mx-auto'>
           <div className='flex py-3 justify-between'>
             <div className='flex-none'>
-              <div className='hidden sm:flex'>
+              <div className='hidden sm:flex' onClick={()=>navigate('/')}>
                 <img src={logo} className='h-9' alt='medcare.com'/>
                 <span className='text-sm bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-extrabold bg-clip-text mt-2'>MedCare</span>
               </div>

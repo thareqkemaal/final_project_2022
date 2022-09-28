@@ -4,6 +4,7 @@ require('dotenv').config({ path: join(__dirname, '../.env') });
 const express = require("express");
 const cors = require("cors");
 
+
 const PORT = process.env.PORT || 8000;
 const app = express();
 app.use(cors());
@@ -22,7 +23,13 @@ app.use(express.json());
 app.use("/", express.static(__dirname + "/public"));
 
 // DB Check Connection
-
+const { dbConf } = require('./config/db')
+dbConf.getConnection((err, connection) => {
+  if (err) {
+    console.log('Error MYSQL', err.sqlMessage);
+  }
+  console.log(`connect: ${connection.threadId}`);
+})
 
 //#region API ROUTES
 
