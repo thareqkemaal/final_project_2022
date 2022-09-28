@@ -3,6 +3,7 @@ const { join } = require("path");
 require('dotenv').config({ path: join(__dirname, '../.env') });
 const express = require("express");
 const cors = require("cors");
+const bearerToken = require('express-bearer-token')
 
 
 const PORT = process.env.PORT || 8000;
@@ -21,6 +22,8 @@ app.use(express.json());
 
 // #destination file storage(image/pdf/document)
 app.use("/", express.static(__dirname + "/public"));
+
+app.use(bearerToken())
 
 // DB Check Connection
 const { dbConf } = require('./config/db')

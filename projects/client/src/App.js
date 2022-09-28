@@ -6,6 +6,7 @@ import Footer from '../src/components/FooterComponent'
 import LandingPages from '../src/pages/LandingPages.jsx'
 import Register from './pages/Register';
 import 'react-phone-number-input/style.css'
+import Verified from './pages/user/Verified';
 
 
 
@@ -17,6 +18,7 @@ function App() {
         <Routes>
           <Route path='/' element={<LandingPages/>}/>
           <Route path='/register' element={<Register/>}/>
+          <Route path='/verification/:token' element={<Verified/>}/>
         </Routes>
       <Footer/>
 
