@@ -2,43 +2,51 @@ import React from 'react'
 import {Carousel} from 'flowbite-react'
 
 const CarouselComponent = () => {
+  let dataImage = [
+    {
+      image: 'https://images.unsplash.com/photo-1576091358783-a212ec293ff3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1025&q=80',
+      text: "Memenuhi kebutuhan untuk kesehatan anda",
+      position:'bg-top'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1577368211130-4bbd0181ddf0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80',
+      text: "Terpercaya dengan terdaftarnya kami di BPOM",
+      position:'bg-center'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1584988299603-3ab9216625bf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1174&q=80',
+      text: "Berikan resep anda dan kami akan menyediakannya",
+      position:'bg-center'
+    },
+  ]
   return (
-    <div>
-      <div className=''>
-        <div className="h-56 sm:h-64 md:h-[500px] xl:h-[650px]">
+        <div className="h-40 lg:h-80 lg:px-0 lg:w-full mx-auto my-10">
           <Carousel>
-            <div className='h-56 sm:h-64 md:h-[500px] xl:h-[650px] bg-cover bg-center' style={{backgroundImage:'url(https://images.unsplash.com/photo-1576091358783-a212ec293ff3?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1025&q=80)'}}>
-              <div className='container mx-auto'>
-                <div className='grid grid-cols-2 gap-4 place-content-end '>
-                  <div className='text-xs mt-32 md:mt-72 lg:mt-96 backdrop-blur-sm bg-white/30 lg:text-3xl text-center max-w-xs py-5 text-blue-900 '>
-                    Memenuhi kebutuhan untuk kesehatan anda
+            {
+              dataImage.map(data=>(
+                <div 
+                key={data.text}
+                >
+                  <div className='grid grid-cols-7 h-[500px]'>
+                    <div className='col-span-2'>
+                      <div className='bg-[#92C3D1] w-full h-full'>
+                        <h1 className='text-xs backdrop-blur-sm lg:text-2xl font-semibold text-[#213360] py-56 mx-4 font-Public'> {data.text} </h1>
+                      </div>
                     </div>
-                </div>
-              </div>
-            </div>
-            <div className='h-56 sm:h-64 md:h-[500px] xl:h-[650px] bg-cover bg-center' style={{backgroundImage:'url(https://images.unsplash.com/photo-1577368211130-4bbd0181ddf0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80)'}}>
-              <div className='container mx-auto'>
-                <div className='grid grid-cols-2 gap-4 place-content-end '>
-                  <div className='text-xs mt-32 md:mt-72 lg:mt-96 backdrop-blur-sm bg-white/30 lg:text-3xl px-2 max-w-sm py-5 text-blue-900 '>
-                   Terpercaya dengan terdaftarnya kami di BPOM
+                    <div className='col-span-5'>
+                      <div
+                        className={`w-full h-full grayscale-[20%] ${data.position}`}
+                        style={{
+                          backgroundImage: `url(${data.image})`
+                        }} 
+                      />
                     </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className='h-56 sm:h-64 md:h-[500px] xl:h-[650px] bg-cover bg-center' style={{backgroundImage:'url(https://images.unsplash.com/photo-1584988299603-3ab9216625bf?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1174&q=80)'}}>
-              <div className='container mx-auto'>
-                <div className='grid grid-cols-2 gap-4 place-content-end '>
-                  <div className='text-xs mt-32 md:mt-72 lg:mt-96 backdrop-blur-sm bg-white/30 lg:text-3xl px-2 max-w-sm py-5 text-blue-900 '>
-                    Berikan resep anda dan kami akan menyediakannya
-                    </div>
-                </div>
-              </div>
-            </div>
+              ))
+            }
           </Carousel>
         </div>
-      </div>
-      
-    </div>
   )
 }
 
