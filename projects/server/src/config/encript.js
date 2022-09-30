@@ -16,7 +16,7 @@ module.exports={
         console.log('data token', req.token)
         jwt.verify(req.token,'medcare',(err,decode)=>{
             if(err){
-                return res.statu(401).send({
+                return res.status(401).send({
                     message:'Authenticate error'
                 })
             }

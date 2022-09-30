@@ -5,7 +5,12 @@ module.exports = {
     '../../node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily:{
+        'Inter':['Inter', 'sans-serif'],
+        'Public':['Public Sans', 'sans-serif']
+      },
+    },
     colors: {
       'main': {
         100: '#7dfff6',
@@ -18,6 +23,7 @@ module.exports = {
         800: '#004f4a',
         900: '#003f3b',
       },
+
     }
   },
   plugins: [
