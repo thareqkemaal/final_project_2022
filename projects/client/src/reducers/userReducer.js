@@ -12,8 +12,6 @@ const INITIAL_STATE={
     cart:[],
     address:[],
     transaction:[]
-
-
 }
 
 

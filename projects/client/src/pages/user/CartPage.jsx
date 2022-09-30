@@ -10,7 +10,6 @@ const UserCart = (props) => {
 
     // NOTE PROBLEM
     // 1. perlu get data produk untuk dapat stocknya? => fungsi onInc
-    // 2. fungsi checkboxall belum berfungsi
 
     const [cartData, setCartData] = React.useState([]);
     const [modalDelete, setModalDelete] = React.useState(0);

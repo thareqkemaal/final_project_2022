@@ -29,7 +29,7 @@ function App() {
       role: userReducer.role
     }
   })
-  console.log(role)
+  //console.log(role)
 
   const keepLogin =()=>{
     let medcarelog = localStorage.getItem('medcarelog')

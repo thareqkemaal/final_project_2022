@@ -21,7 +21,7 @@ const NavbarComponent = (props) => {
       role: state.userReducer.role,
     }
   })
-  console.log(role)
+  //console.log(role)
 
   const onLogout = ()=>{
       dispatch(logoutAction())
