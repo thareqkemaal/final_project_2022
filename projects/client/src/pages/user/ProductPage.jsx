@@ -134,17 +134,25 @@ const ProductPage = (props) => {
         getCategory()
     }, [])
 
+    const onResetFilter = () => {
+        setLoading(false);  
+        setSort(''); 
+        setDefaultSort('Terpopuler'); 
+        setFilterName(''); 
+        setQuery(10) 
+    }
+
     const printCategory = () => {
         return category.map((val, idx) => {
             if (val.idcategory != idPage) {
                 return <div key={val.idcategory}>
                     {/* Desktop */}
-                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setLoading(false); setIdPage(val.idcategory); setSort(''); setDefaultSort('Terpopuler'); setFilterName(''); setQuery(10) }} className="hidden md:flex text-md mb-2 text-txt-500">
+                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter()}} className="hidden md:flex text-md mb-2 text-txt-500">
                         {val.category_name}
                     </button>
                     {/* Mobile */}
                     <li class="mr-2 md:hidden">
-                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setLoading(false); setIdPage(val.idcategory); setSort(''); setDefaultSort('Terpopuler'); setFilterName(''); setQuery(10) }} class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter()}} class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
                             {val.category_name}
                         </button>
                     </li>
@@ -152,12 +160,12 @@ const ProductPage = (props) => {
             } else {
                 return <div key={val.idcategory}>
                     {/* Desktop */}
-                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setLoading(false); setIdPage(val.idcategory); setSort(''); setDefaultSort('Terpopuler'); setFilterName(''); setQuery(10) }} className="hidden md:flex font-bold text-md mb-2 text-btn-500">
+                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="hidden md:flex font-bold text-md mb-2 text-btn-500">
                         {val.category_name}
                     </button>
                     {/* Mobile */}
                     <li class="mr-2 md:hidden">
-                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setLoading(false); setIdPage(val.idcategory); setSort(''); setDefaultSort('Terpopuler'); setFilterName(''); setQuery(10) }} class="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} class="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
                             {val.category_name}
                         </button>
                     </li>
@@ -170,7 +178,7 @@ const ProductPage = (props) => {
 
         <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
             <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
-            <button className="flex-none" onClick={() => { navigate('/product'); setIdPage(''); setSort(''); setFilterName(''); setQuery(10) }}>Obat</button>
+            <button className="flex-none" onClick={() => { setIdPage(undefined); navigate('/product');  onResetFilter() }}>Obat</button>
         </div>
 
         <div className="grid grid-flow-col gap-4">
@@ -181,7 +189,7 @@ const ProductPage = (props) => {
                         <form className="mb-5">
                             <div className="flex">
                                 <div className="relative w-full">
-                                    <input id="searchsm" onChange={(e) => { setFilterName(e.target.value); localStorage.setItem('filterName', e.target.value) }} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
+                                    <input id="searchsm" onChange={(e) => setFilterName(e.target.value)} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
                                     <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                         <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         <span className="sr-only">Search</span>
@@ -195,11 +203,11 @@ const ProductPage = (props) => {
                     <div className="px-4 py-4">
                         <div className="font-bold text-md mb-4 text-txt-500">KATEGORI</div>
                         {idPage == undefined ?
-                            <button onClick={() => { setLoading(false); setDefaultSort('Terpopuler'); setIdPage(undefined); navigate('/product'); setSort(''); setFilterName(''); setQuery(10) }} className="font-bold text-md mb-2 text-btn-500">
+                            <button onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="font-bold text-md mb-2 text-btn-500">
                                 Semua Produk
                             </button>
                             :
-                            <button onClick={() => { setLoading(false); setDefaultSort('Terpopuler'); setIdPage(undefined); navigate('/product'); setSort(''); setFilterName(''); setQuery(10) }} className="text-md mb-2">
+                            <button onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="text-md mb-2">
                                 Semua Produk
                             </button>
                         }
@@ -211,18 +219,18 @@ const ProductPage = (props) => {
             <div className="col-span-4 ml-5">
                 <div className="grid grid-cols-1 justify-between">
 
-                    {/* Print category mobile */}
+                    {/* Mobile category */}
                     <div class="md:hidden text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
                         <ul class="flex flex-wrap -mb-px">
                             {idPage == undefined ?
                                 <li class="mr-2">
-                                    <button type="button" onClick={() => { setLoading(false); setDefaultSort('Terpopuler'); setIdPage(undefined); navigate('/product'); setSort(''); setFilterName(''); setQuery(10) }} class="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                                    <button type="button" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} class="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
                                         Semua Produk
                                     </button>
                                 </li>
                                 :
                                 <li class="mr-2">
-                                    <button type="button" onClick={() => { setLoading(false); setDefaultSort('Terpopuler'); setIdPage(undefined); navigate('/product'); setSort(''); setFilterName(''); setQuery(10) }} class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                                    <button type="button" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
                                         Semua Produk
                                     </button>
                                 </li>
@@ -231,12 +239,12 @@ const ProductPage = (props) => {
                         </ul>
                     </div>
 
-                    {/* Print search & sort mobile */}
+                    {/* Mobile search & sort */}
                     <div className="md:hidden flex justify-between mt-3 mr-5">
                         <form>
                             <div className="flex">
                                 <div className="relative w-full">
-                                    <input id="search" onChange={(e) => { setFilterName(e.target.value); localStorage.setItem('filterName', e.target.value) }} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
+                                    <input id="search" onChange={(e) => setFilterName(e.target.value) } type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
                                     <button onClick={() => { setLoading(false); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                         <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         <span className="sr-only">Search</span>
@@ -266,6 +274,7 @@ const ProductPage = (props) => {
                         </div>
                     </div>
 
+                    {/* Desktop sort */}
                     <div className="hidden md:flex justify-between items-center">
                         <p className="text-2xl font-bold mt-5 mb-3 text-txt-500">OBAT</p>
                         <div className="flex items-center">
