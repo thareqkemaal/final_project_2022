@@ -8,5 +8,7 @@ route.post('/register',userController.register)
 route.post('/login',userController.login)
 route.get('/keeplogin',readToken,userController.keepLogin)
 route.patch('/updateverif',readToken,userController.verification)
+route.get('/getaddress', userController.getaddress);
+
 
 module.exports=route

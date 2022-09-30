@@ -26,13 +26,13 @@ app.use("/", express.static(__dirname + "/public"));
 app.use(bearerToken())
 
 // DB Check Connection
-const { dbConf } = require('./config/db')
-dbConf.getConnection((err, connection) => {
-  if (err) {
-    console.log('Error MYSQL', err.sqlMessage);
-  }
-  console.log(`connect: ${connection.threadId}`);
-})
+// const { dbConf } = require('./config/db')
+// dbConf.getConnection((err, connection) => {
+//   if (err) {
+//     console.log('Error MYSQL', err.sqlMessage);
+//   }
+//   console.log(`connect: ${connection.threadId}`);
+// })
 
 //#region API ROUTES
 
