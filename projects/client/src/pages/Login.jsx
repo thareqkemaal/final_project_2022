@@ -4,7 +4,7 @@ import regisImg from '../assets/undraw_medicine_b-1-ol.svg'
 import { BsEye, BsEyeSlash } from 'react-icons/bs';
 import axios from 'axios'
 import { API_URL } from '../helper';
-import { useDispatch} from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { loginAction } from '../action/useraction';
 
 const Login = () => {
@@ -15,16 +15,24 @@ const Login = () => {
   const [email,setEmail]=useState('')
   const [password, setPassword]=useState('')
 
+
+
   const onLogin=()=>{
     axios.post(API_URL+'/api/user/login',{
       email,
       password
     })
     .then((res)=>{
+      console.log(res)
       localStorage.setItem('medcarelog',res.data.token)
       delete res.data.token
+      console.log(res.data.role)
       dispatch(loginAction(res.data))
-      navigate('/',{replace:true})
+      if(res.data.role === 'User'){
+        navigate('/',{replace:true})
+      }else if(res.data.role === 'Admin'){
+        navigate('/admin/dashboard',{replace:true})
+      }
     }).catch((err)=>{
       console.log(err)
     })

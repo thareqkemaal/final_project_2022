@@ -10,12 +10,39 @@ import gopay from '../assets/Logo GoPay (PNG-1080p) - FileVector69.png'
 import ovo from '../assets/ovo.png'
 import shoppe from '../assets/ShopeePay Logo (PNG-1080p) - Vector69Com.png'
 import Carousel from '../components/Carousel'
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { API_URL } from '../helper';
 
 
 const LandingPages = () => {
+
+  const {email,status}=useSelector((state)=>{
+    return{
+      email:state.userReducer.email,
+      status:state.userReducer.status_name
+    }
+  })
+
+  console.log(status)
+
+  const resendVerif = async ()=>{
+    try {
+      await axios.get(`${API_URL}/api/user/resendverif?email=${email}`)
+      .then((res)=>{
+        console.log(res)
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
   return (
     <div>
       <div className='px-3 lg:px-[9.5rem]'>
+        {
+          status === 'Unverified'&&
+          <button className='text-red-500 font-Public' onClick={resendVerif}>Click to verified your account</button>
+        }
       <Carousel/>
             <div className='grid grid-cols-2 my-3 w-full  py-10 shadow-lg bg-gradient-to-tr from-blue-500 to-white rounded-lg'>
               <div clas className=''>

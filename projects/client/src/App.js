@@ -10,10 +10,10 @@ import Verified from './pages/user/Verified';
 import Login from './pages/Login';
 import axios from 'axios';
 import { API_URL } from './helper';
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
-import Dashboard from './pages/admin/Dashboard';
+import DashboardPage from './pages/admin/DashboardPage.jsx';
 
 
 
@@ -21,12 +21,11 @@ function App() {
   const dispatch = useDispatch()
   const [loading, setLoading]=useState(true)
 
-  const { role } = (({ userReducer }) => {
+  const { role } = useSelector(({ userReducer }) => {
     return {
       role: userReducer.role
     }
   })
-  console.log(role)
 
   const keepLogin =()=>{
     let medcarelog = localStorage.getItem('medcarelog')
@@ -59,14 +58,34 @@ function App() {
 
   return (
     <div>
-      <Navbar loading={loading}/>
+      <div>
+        <Navbar loading={loading}/>
+      </div>
         <Routes>
           <Route path='/' element={<LandingPages/>}/>
-          <Route path='/register' element={<Register/>}/> 
+          {
+            localStorage.getItem('medcarelog')?
+            <>
+            {
+            role === 'Admin'?
+            <>
+              <Route path='/admin/dashboard' element={<DashboardPage/>}/>
+              <Route path='/profile' element={<EditProfile/>}/>
+            </>
+            :
+            <>
+              <Route path='/profile' element={<EditProfile/>}/>
+            </>
+            }
+            </>
+            :
+            <>
+              <Route path='/register' element={<Register/>}/> 
+              <Route path='/login' element={<Login/>}/>
+            </>
+          }
           <Route path='/verification/:token' element={<Verified/>}/>
-          <Route path='/login' element={<Login/>}/>
-          <Route path='/profile' element={<EditProfile/>}/>
-          <Route path='/dashboard' element={<Dashboard/>}/>
+  
         </Routes>
       <Footer/>
 
