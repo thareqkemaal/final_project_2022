@@ -14,14 +14,12 @@ const NavbarComponent = (props) => {
 
   const[dropdown, setDropdown]=useState(false)
   
-  let {username,status,role}=useSelector((state)=>{
+  let {username,role}=useSelector((state)=>{
     return{
       username: state.userReducer.username,
-      status: state.userReducer.status,
       role: state.userReducer.role,
     }
   })
-  console.log(role)
 
   const onLogout = ()=>{
       dispatch(logoutAction())
