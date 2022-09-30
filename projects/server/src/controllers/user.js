@@ -552,5 +552,18 @@ module.exports={
     }
 
     
+    getaddress: async (req, res) => {
+        try {
+            // butuh authorization token
+            // sementara pakai manual data iduser = 2;
 
+            let getSql = await dbQuery(`SELECT * FROM address a JOIN status s ON a.status_id = s.idstatus WHERE a.user_id = 2;`)
+
+            res.status(200).send(getSql)
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    }
 }

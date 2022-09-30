@@ -9,5 +9,6 @@ route.post('/login',userController.login)
 route.get('/keeplogin',readToken,userController.keepLogin)
 route.patch('/updateverif',readToken,userController.verification)
 route.get('/resendverif',userController.resendVerif)
+route.get('/getaddress', userController.getaddress);
 
 module.exports=route

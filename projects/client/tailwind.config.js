@@ -11,8 +11,8 @@ module.exports = {
         'Public':['Public Sans', 'sans-serif']
       },
     },
-    colors:{
-        main: {
+    colors: {
+      'main': {
         100: '#7dfff6',
         200: '#31fff0',
         300: '#00f3e1',
@@ -23,7 +23,7 @@ module.exports = {
         800: '#004f4a',
         900: '#003f3b',
       },
-    
+
     }
   },
   plugins: [

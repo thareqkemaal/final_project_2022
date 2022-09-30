@@ -1,9 +1,9 @@
 import './App.css'
 import React, { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Navbar from '../src/components/NavbarComponent'
-import Footer from '../src/components/FooterComponent'
-import LandingPages from '../src/pages/LandingPages.jsx'
+import Navbar from '../src/components/NavbarComponent';
+import Footer from '../src/components/FooterComponent';
+import LandingPages from '../src/pages/LandingPages.jsx';
 import Register from './pages/Register';
 import 'react-phone-number-input/style.css'
 import Verified from './pages/user/Verified';
@@ -14,6 +14,8 @@ import {useDispatch, useSelector} from 'react-redux'
 import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
+import UserCart from './pages/user/CartPage';
+import Checkout from './pages/user/CheckoutPage';
 
 
 
@@ -85,10 +87,13 @@ function App() {
             </>
           }
           <Route path='/verification/:token' element={<Verified/>}/>
-  
+          <Route path='/login' element={<Login/>}/>
+          <Route path='/profile' element={<EditProfile/>}/>
+          <Route path='/cart' element={<UserCart />} />
+          <Route path='/checkout' element={<Checkout />} />
+          <Route path='/dashboard' element={<Dashboard/>}/>
         </Routes>
       <Footer/>
-
     </div>
   );
 }
