@@ -88,7 +88,7 @@ const UserCart = (props) => {
                                 </button>
                                 {
                                     modalDelete === val.idcart ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
                                             <div className="relative p-4 w-full max-w-md h-full md:h-auto">
                                                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                     <div className="p-6 text-center">

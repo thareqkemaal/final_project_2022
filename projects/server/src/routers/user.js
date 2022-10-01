@@ -8,7 +8,8 @@ route.post('/register',userController.register);
 route.post('/login',userController.login);
 route.get('/keeplogin',readToken,userController.keepLogin);
 route.patch('/updateverif',readToken,userController.verification);
-route.get('/getaddress', userController.getaddress);
+route.get('/getaddress', userController.getAddress);
+route.post('/addaddress', userController.addAddress);
 route.patch('/updateaddress', userController.updateAddress);
 
 // RAJAONGKIR

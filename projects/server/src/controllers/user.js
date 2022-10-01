@@ -4,7 +4,7 @@ const { hashPassword, createToken } = require('../config/encript')
 const axios = require("axios");
 
 axios.defaults.baseURL = 'https://api.rajaongkir.com/starter';
-axios.defaults.headers.common['key'] = process.env.RO_API_KEY2;
+axios.defaults.headers.common['key'] = `${process.env.RO_API_KEY2}`;
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 
@@ -359,7 +359,7 @@ module.exports = {
 
   },
 
-  getaddress: async (req, res) => {
+  getAddress: async (req, res) => {
     try {
       // butuh authorization token
       // sementara pakai manual data iduser = 2;
@@ -374,14 +374,48 @@ module.exports = {
     }
   },
 
+  addAddress: async (req, res) => {
+    try {
+      // ada authorization
+      // sementara user id pakai manual = 2;
+
+      // console.log(req.body.data)
+      const { full_address, district, city, city_id, province, province_id, postal_code } = req.body.data;
+
+      await dbQuery(`INSERT INTO address (full_address, district, city, city_id, province, province_id, postal_code, user_id) VALUES
+      (${dbConf.escape(full_address)}, ${dbConf.escape(district)}, ${dbConf.escape(city)}, ${dbConf.escape(city_id)}, ${dbConf.escape(province)}, ${dbConf.escape(province_id)}, ${dbConf.escape(postal_code)}, 2);`)
+
+      res.status(200).send({
+        success: true,
+        message: "Address Added Success"
+      })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error)
+    }
+  },
+
   updateAddress: async (req, res) => {
     try {
       // butuh iduser
       // sementara pakai manual data iduser = 2;
       console.log(req.body)
-      if (req.body.selected){
+      if (req.body.selected) {
         await dbQuery(`UPDATE address SET selected='false' WHERE user_id = 2;`);
         await dbQuery(`UPDATE address SET selected=${dbConf.escape(req.body.selected)} WHERE idaddress = ${dbConf.escape(req.body.idaddress)};`);
+      } else if (req.body.dataEdit) {
+        let data = req.body.dataEdit;
+
+        let temp = [];
+        for (let key in data){
+          console.log(key, data[key]);
+          if (data[key] != 0 || data[key] != ''){
+            temp.push(`${key} = ${dbConf.escape(data[key])}`)
+          }
+        }
+        console.log(temp.join(' , '));
+
+        await dbQuery(`UPDATE address SET ${temp.join(' , ')} WHERE idaddress = ${dbConf.escape(req.body.idaddress)} AND user_id = 2;`);
       }
 
       res.status(200).send({
@@ -398,11 +432,9 @@ module.exports = {
   getProvince: async (req, res) => {
     try {
       let getData = await axios.get('/province');
-      // console.log(getData.data.rajaongkir.results)
-      if (getData.data.length > 0){
-        let dataProvince = getData.data.rajaongkir.results;
-        res.status(200).send(dataProvince);
-      }
+      //console.log(getData.data.rajaongkir.results)
+      let dataProvince = getData.data.rajaongkir.results;
+      res.status(200).send(dataProvince);
 
     } catch (error) {
       //console.log(error)
@@ -414,10 +446,8 @@ module.exports = {
     try {
       let getData = await axios.get('/city')
       //console.log(getData.data.rajaongkir.results)
-      if (getData.data.length > 0){
-        let dataCity = getData.data.rajaongkir.results;
-        res.status(200).send(dataCity);
-      }
+      let dataCity = getData.data.rajaongkir.results;
+      res.status(200).send(dataCity);
     } catch (error) {
       //console.log(error)
       res.status(500).send(error)
