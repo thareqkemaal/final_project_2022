@@ -18,7 +18,7 @@ const LandingPages = () => {
       <div className='px-3 lg:px-[9.5rem]'>
       <Carousel/>
             <div className='grid grid-cols-2 my-3 w-full  py-10 shadow-lg bg-gradient-to-tr from-blue-500 to-white rounded-lg'>
-              <div clas className=''>
+              <div className=''>
                 <img className='h-24 lg:h-52 lg:mx-auto' src={image} alt='medcare.com' />
               </div>
               <div className='mx-auto py-2 lg:mx-1 lg:py-4  md:flex justify-around md:mt-10 lg:mt-10'>

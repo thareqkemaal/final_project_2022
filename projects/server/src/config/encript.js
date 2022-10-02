@@ -13,14 +13,14 @@ module.exports={
     },
 
     readToken:(req,res,next)=>{
-        console.log('data token', req.token)
+        //console.log('data token', req.token)
         jwt.verify(req.token,'medcare',(err,decode)=>{
             if(err){
                 return res.status(401).send({
                     message:'Authenticate error'
                 })
             }
-            console.log('Translate token',decode);
+            //console.log('Translate token',decode);
             req.dataToken = decode
             next()  
         })
