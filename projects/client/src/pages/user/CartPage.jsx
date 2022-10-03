@@ -25,8 +25,12 @@ const UserCart = (props) => {
 
     const getCartData = async () => {
         try {
-            // harus ditambah header authorization
-            let getCart = await axios.get(API_URL + '/api/product/getcartdata');
+            let userToken = localStorage.getItem('medcarelog');
+            let getCart = await axios.get(API_URL + '/api/product/getcartdata', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
             console.log('user cart', getCart.data);
             setCartData(getCart.data);
 
@@ -48,7 +52,7 @@ const UserCart = (props) => {
                 }
             });
 
-            if (temp.length === getCart.data.length){
+            if (temp.length === getCart.data.length && getCart.data.length !== 0) {
                 setIsCheckAll('true')
             } else {
                 setIsCheckAll('false')
@@ -127,8 +131,12 @@ const UserCart = (props) => {
 
     const onCheckboxAll = async (e) => {
         try {
-            // harus pake iduser
-            let checkAll = await axios.patch(API_URL + '/api/product/updatecart', { iduser: true, selected: `${e.target.checked}` })
+            let userToken = localStorage.getItem('medcarelog');
+            let checkAll = await axios.patch(API_URL + '/api/product/updatecart', { selectAll: true, selected: `${e.target.checked}` }, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            })
 
             if (checkAll.data.success) {
                 getCartData();
@@ -140,26 +148,44 @@ const UserCart = (props) => {
     }
 
     const onCheckbox = async (e) => {
-        if (e.target.checked) {
-            //console.log("checked", e.target.value)
-            let selected = await axios.patch(API_URL + `/api/product/updatecart`, { selected: 'true', idcart: e.target.value })
-            if (selected.data.success) {
-                getCartData();
-            };
-        } else {
-            //console.log("unchecked", e.target.value)
-            let selected = await axios.patch(API_URL + `/api/product/updatecart`, { selected: 'false', idcart: e.target.value })
-            if (selected.data.success) {
-                getCartData();
-            };
+        try {
+            let userToken = localStorage.getItem('medcarelog');
+            if (e.target.checked) {
+                //console.log("checked", e.target.value)
+                let selected = await axios.patch(API_URL + `/api/product/updatecart`, { selected: 'true', idcart: e.target.value }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                })
+                if (selected.data.success) {
+                    getCartData();
+                };
+            } else {
+                //console.log("unchecked", e.target.value)
+                let selected = await axios.patch(API_URL + `/api/product/updatecart`, { selected: 'false', idcart: e.target.value }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                })
+                if (selected.data.success) {
+                    getCartData();
+                };
+            }
+        } catch (error) {
+            console.log(error)
         }
     };
 
     const onInc = async (quantity, idcart) => {
         try {
             // belum ditambah kondisi ketika sudah mencapai stok maximum
+            let userToken = localStorage.getItem('medcarelog');
             let newQty = quantity + 1;
-            let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart });
+            let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
             if (inc.data.success) {
                 getCartData();
             }
@@ -170,9 +196,14 @@ const UserCart = (props) => {
 
     const onDec = async (quantity, idcart) => {
         try {
+            let userToken = localStorage.getItem('medcarelog');
             if (quantity > 1) {
                 let newQty = quantity - 1;
-                let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart });
+                let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                });
                 if (inc.data.success) {
                     getCartData();
                 }
@@ -186,7 +217,7 @@ const UserCart = (props) => {
 
     const onDeleteItem = async (id) => {
         try {
-            let del = await axios.delete(API_URL + `/api/product/deletecart?idcart=${id}`);
+            let del = await axios.delete(API_URL + `/api/product/deletecart/${id}`);
 
             if (del.data.success) {
                 toast.error('Item Removed', {
@@ -216,7 +247,7 @@ const UserCart = (props) => {
         //console.log(selected, totalPrice);
 
         if (selected.length === 0 || totalPrice === 0) {
-            toast.error('Anda belum memilih barang', {
+            toast.error('You have not choose any product!', {
                 theme: "colored",
                 position: "top-center",
                 autoClose: 2000,
@@ -239,7 +270,7 @@ const UserCart = (props) => {
         <div className='container mx-auto py-5'>
             <div className='mx-9'>
                 <div className='text-xl font-bold px-3 text-main-600'>
-                    Keranjang Saya
+                    My Cart
                 </div>
                 <div className='flex flex-row mt-2'>
                     <div className='basis-7/12'>
@@ -248,7 +279,7 @@ const UserCart = (props) => {
                                 <input type='checkbox' className='ml-2 w-4 h-4 text-main-600 bg-gray-100 rounded border-gray-300 focus:ring-main-500'
                                     onClick={onCheckboxAll} defaultChecked={isCheckAll} checked={isCheckAll === 'true' ? true : false}
                                 />
-                                <span className='font-medium p-2'>Pilih Semua</span>
+                                <span className='font-medium p-2'>Select All</span>
                             </div>
                             <div>
                                 {printCart()}
@@ -257,20 +288,20 @@ const UserCart = (props) => {
                     </div>
                     <div className='basis-5/12'>
                         <div className='border m-2 p-3 shadow-md rounded-md'>
-                            <p className='font-bold text-xl text-main-500 mb-3'>Ringkasan Belanja</p>
+                            <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
-                                <p>Sub Total Harga ({countItem} Barang)</p>
+                                <p>Sub Total Price ({countItem} Item(s))</p>
                                 <p>Rp. {totalPrice.toLocaleString('id')}</p>
                             </div>
                             <div className='flex justify-between my-4'>
-                                <p className='font-bold text-2xl text-main-500'>Total Harga</p>
+                                <p className='font-bold text-2xl text-main-500'>Total Price</p>
                                 <p className='font-bold text-2xl text-main-500'>Rp. {totalPrice.toLocaleString('id')}</p>
                             </div>
                             <div>
                                 <button type='button'
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
-                                    onClick={onPay}>Bayar ({countItem})</button>
+                                    onClick={onPay}>Pay ({countItem})</button>
                             </div>
                         </div>
                     </div>

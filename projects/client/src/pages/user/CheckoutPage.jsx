@@ -80,8 +80,12 @@ const Checkout = (props) => {
 
     const getAddress = async () => {
         try {
-            // harus ditambah header authorization
-            let getAddress = await axios.get(API_URL + '/api/user/getaddress');
+            let userToken = localStorage.getItem('medcarelog');
+            let getAddress = await axios.get(API_URL + '/api/user/getaddress', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
             //console.log('user address', getAddress.data);
             setAllAddress(getAddress.data);
 
@@ -106,8 +110,12 @@ const Checkout = (props) => {
 
     const onSelectAddress = async (id) => {
         try {
-            // butuh iduser
-            let select = await axios.patch(API_URL + '/api/user/updateaddress', { selected: 'true', idaddress: id })
+            let userToken = localStorage.getItem('medcarelog');
+            let select = await axios.patch(API_URL + '/api/user/updateaddress', { selected: 'true', idaddress: id }, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            })
 
             if (select.data.success) {
                 getAddress();
@@ -233,6 +241,7 @@ const Checkout = (props) => {
 
     const onSaveNewAddress = async () => {
         try {
+            let userToken = localStorage.getItem('medcarelog');
             // console.log("full", inputFullAddress); string
             // console.log("district", inputDistrict); string
             // console.log("postal", inputPostalCode); number
@@ -272,7 +281,11 @@ const Checkout = (props) => {
                 }
 
                 // pakai authorization
-                let add = await axios.post(API_URL + '/api/user/addaddress', { data })
+                let add = await axios.post(API_URL + '/api/user/addaddress', { data }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                })
 
                 if (add.data.success) {
                     getAddress();
@@ -311,12 +324,13 @@ const Checkout = (props) => {
 
     const onSaveEditAddress = async () => {
         try {
-            console.log("full", inputEditFullAddress);
-            console.log("district", inputEditDistrict);
-            console.log("postal", inputEditPostalCode);
-            console.log("cityID", selectedEditCityID);
-            console.log("provinceID", selectedEditProvinceID);
-            console.log(selectedEdit)
+            let userToken = localStorage.getItem('medcarelog');
+            // console.log("full", inputEditFullAddress);
+            // console.log("district", inputEditDistrict);
+            // console.log("postal", inputEditPostalCode);
+            // console.log("cityID", selectedEditCityID);
+            // console.log("provinceID", selectedEditProvinceID);
+            // console.log(selectedEdit)
 
             let searchData = dataProvince.find(val => val.province_id === selectedEditProvinceID);
             let searchCity = filterCity.find(val => val.city_id === selectedEditCityID);
@@ -349,7 +363,11 @@ const Checkout = (props) => {
             if (tempProvince !== '' && tempCity === '') {
                 setCheckEditCity('show');
             } else {
-                let edit = await axios.patch(API_URL + '/api/user/updateaddress', { dataEdit, idaddress: selectedEdit.idaddress })
+                let edit = await axios.patch(API_URL + '/api/user/updateaddress', { dataEdit, idaddress: selectedEdit.idaddress }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                })
 
                 if (edit.data.success) {
                     getAddress();
