@@ -10,9 +10,6 @@ import bri from '../../assets/bri.png';
 
 const Checkout = (props) => {
 
-    // NOTE PROBLEM
-    // 1. PERLU PERBAIKAN DI DELIVERY KETIKA ADDRESS DIGANTI, CHECK DAN TES ULANG! RAJAONGKIR KENA LIMIT DAILY
-
     const [checkoutData, setCheckoutData] = React.useState([]);
     const [allAddress, setAllAddress] = React.useState([]);
     const [selectedAddress, setSelectedAddress] = React.useState({});
@@ -130,8 +127,8 @@ const Checkout = (props) => {
             return (
                 <div key={val.idaddress} className={selectedAddress === val ? 'border-2 rounded-lg flex my-3 bg-teal-50' : 'border-2 rounded-lg flex my-3'}>
                     <div key={val.idaddress} className='flex flex-col items-start p-3 w-3/4'>
-                        <p className='text-red-500'>disini username</p>
-                        <p className='text-red-500'>disini phone number</p>
+                        <p className='text-main-500 font-semibold'>{val.fullname}</p>
+                        <p>{val.phone_number}</p>
                         <p className='text-transform: capitalize'>{val.full_address}</p>
                         <p className='text-transform: capitalize'>Kecamatan {val.district}, {val.city}, {val.province}, {val.postal_code}</p>
                         <button type='button' className='text-main-600 hover:underline' onClick={() => { setShowEditAddressModal('show'); setSelectedEdit(val); setShowAddressModal('') }}>Edit Address</button>
@@ -451,7 +448,6 @@ const Checkout = (props) => {
                         <div className='border m-2 p-3 shadow-md rounded-md'>
                             {/* tunggu nama address dari api */}
                             <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Address</p>
-                            <p className='text-red-500'>nama user dari reducer</p>
                             <div className='my-2'>
                                 {printSelectedAddress()}
                             </div>
@@ -837,7 +833,7 @@ const Checkout = (props) => {
                                 }
                             </div>
                             <div className='flex justify-between my-4'>
-                                <p className='font-bold text-2xl text-main-500'>Total Harga</p>
+                                <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
                                 <p className='font-bold text-2xl text-main-500'>Rp {totalDelivery.toLocaleString('id')}</p>
                             </div>
                             <div>
@@ -862,16 +858,16 @@ const Checkout = (props) => {
                                                         </div>
                                                         <div className='border-2 rounded-lg border-main-600 p-3 my-3'>
                                                             <div className='flex w-full items-center justify-start my-1'>
-                                                                <input type='radio' value='manual' onChange={(e) => { setPaymentMethod(e.target.value); console.log(paymentMethod) }} />
+                                                                <input type='radio' value='manual' onChange={(e) => { setPaymentMethod(e.target.value); console.log(e.target.value) }} />
                                                                 <span className='ml-2'>Bank Transfer (Manual Verification)</span>
                                                             </div>
                                                         </div>
                                                         <div className='w-full flex justify-center'>
                                                             <div className='w-1/2 flex justify-evenly items-center'>
-                                                                <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 "
-                                                                    onClick={() => setShowPaymentModal('')}>Pay</button>
+                                                                <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
+                                                                    onClick={() => setShowPaymentModal('')} disabled={paymentMethod === '' ? true : false}>Pay</button>
                                                                 <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
-                                                                    onClick={() => setShowPaymentModal('')}>Cancel</button>
+                                                                    onClick={() => {setShowPaymentModal(''); setPaymentMethod('')}}>Cancel</button>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -17,6 +17,8 @@ import DashboardPage from './pages/admin/DashboardPage.jsx';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
+import Prescription from './pages/user/PrescriptionPage';
+import UploadSuccess from './pages/user/UploadSuccessPage';
 
 
 
@@ -93,6 +95,8 @@ function App() {
         <Route path='/product' element={<ProductPage />} />
         <Route path='/cart' element={<UserCart />} />
         <Route path='/checkout' element={<Checkout />} />
+        <Route path='/prescription' element={<Prescription />} />
+        <Route path='/prescription/success' element={<UploadSuccess />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
       </Routes>
       <Footer />
