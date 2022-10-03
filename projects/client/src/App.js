@@ -93,7 +93,7 @@ function App() {
         <Route path='/product' element={<ProductPage />} />
         <Route path='/cart' element={<UserCart />} />
         <Route path='/checkout' element={<Checkout />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        {/* <Route path='/dashboard' element={<Dashboard />} /> */}
       </Routes>
       <Footer />
     </div>
