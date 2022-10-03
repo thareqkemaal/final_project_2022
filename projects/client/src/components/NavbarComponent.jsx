@@ -3,10 +3,12 @@ import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Avatar, Spinner } from 'flowbite-react';
+import { Spinner } from 'flowbite-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
+import Avatar from './Avatar';
+import { API_URL } from '../helper';
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
@@ -14,10 +16,11 @@ const NavbarComponent = (props) => {
 
   const[dropdown, setDropdown]=useState(false)
   
-  let {username,role}=useSelector((state)=>{
+  let {username,role, profil_pict}=useSelector((state)=>{
     return{
       username: state.userReducer.username,
       role: state.userReducer.role,
+      profil_pict: state.userReducer.profil_pict,
     }
   })
 
@@ -49,7 +52,16 @@ const NavbarComponent = (props) => {
                 />)
                 :username && !props.loading ?(
                 <div className='relative'>
-                  <Avatar rounded={true} onClick={()=>setDropdown(!dropdown)}/>
+                  <Avatar
+                    onClick={()=>setDropdown(!dropdown)}
+                    src={API_URL + profil_pict}
+                    w={10}
+                    h={10}
+                    b={1}
+                    width={3}
+                    height={3}
+                  />
+                  
                   {
                     dropdown &&
                     <div>
