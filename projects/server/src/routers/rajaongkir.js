@@ -7,6 +7,4 @@ route.get('/province', rajaOngkirController.getProvince);
 route.get('/city', rajaOngkirController.getCity);
 route.get('/delivery/:origin/:destination/:weight/:courier', rajaOngkirController.getDelivery);
 
-
-
 module.exports = route
