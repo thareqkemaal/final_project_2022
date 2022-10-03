@@ -2,7 +2,8 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
-    '../../node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
+    '../../node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}',
+    'node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}'
   ],
   theme: {
     extend: {
@@ -23,7 +24,9 @@ module.exports = {
         800: '#004f4a',
         900: '#003f3b',
       },
-
+      "btn-500": "#009B90", //secondary color (clicked) or btn bg color
+      "btn-600": "#008076", //hover color
+      "txt-500": "#213360" //main color
     }
   },
   plugins: [
