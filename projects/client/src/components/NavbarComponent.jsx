@@ -18,11 +18,10 @@ const NavbarComponent = (props) => {
   let { username, status, role } = useSelector((state) => {
     return {
       username: state.userReducer.username,
-      status: state.userReducer.status,
+       status: state.userReducer.status,
       role: state.userReducer.role,
     }
   })
-  //console.log(role)
 
   const onLogout = () => {
     dispatch(logoutAction())
