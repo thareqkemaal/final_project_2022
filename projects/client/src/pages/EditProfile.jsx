@@ -135,7 +135,7 @@ const EditProfile = () => {
 
     const getDataProvince = async () => {
         try {
-            let province = await axios.get(API_URL + '/api/user/province');
+            let province = await axios.get(API_URL + '/api/rajaongkir/province');
 
             //console.log(province.data)
             setDataProvince(province.data)
@@ -146,7 +146,7 @@ const EditProfile = () => {
 
     const getDataCity = async () => {
         try {
-            let city = await axios.get(API_URL + '/api/user/city');
+            let city = await axios.get(API_URL + '/api/rajaongkir/city');
 
             //console.log(city.data)
             setDataCity(city.data)

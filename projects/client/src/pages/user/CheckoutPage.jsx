@@ -206,7 +206,7 @@ const Checkout = (props) => {
 
     const getDataProvince = async () => {
         try {
-            let province = await axios.get(API_URL + '/api/user/province');
+            let province = await axios.get(API_URL + '/api/rajaongkir/province');
 
             //console.log(province.data)
             setDataProvince(province.data)
@@ -217,7 +217,7 @@ const Checkout = (props) => {
 
     const getDataCity = async () => {
         try {
-            let city = await axios.get(API_URL + '/api/user/city');
+            let city = await axios.get(API_URL + '/api/rajaongkir/city');
 
             //console.log(city.data)
             setDataCity(city.data)
@@ -405,7 +405,7 @@ const Checkout = (props) => {
         try {
             if (courier != '') {
                 setLoadDelivery(true);
-                let getDeliv = await axios.get(API_URL + `/api/user/delivery/${origin}/${selectedAddress.city_id}/${weight}/${courier}`)
+                let getDeliv = await axios.get(API_URL + `/api/rajaongkir/delivery/${origin}/${selectedAddress.city_id}/${weight}/${courier}`)
 
                 console.log(getDeliv.data);
                 if (getDeliv.data.length > 0) {
