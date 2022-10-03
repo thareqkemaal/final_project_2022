@@ -1,39 +1,43 @@
 const { transport } = require('../config/nodemailer');
-const {dbConf, dbQuery}=require('../config/db');
-const {hashPassword, createToken}=require('../confiG/encript')
+const { dbConf, dbQuery } = require('../config/db');
+const { hashPassword, createToken } = require('../config/encript')
+const axios = require("axios");
 
+axios.defaults.baseURL = 'https://api.rajaongkir.com/starter';
+axios.defaults.headers.common['key'] = `${process.env.RO_API_KEY2}`;
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
-module.exports={
-    getData:async(req,res)=>{
-        try {
-            let dataUser = await dbQuery( `Select * from user u JOIN status s on u.status_id = s.idstatus`)
-            res.status(200).send(dataUser)
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
-        }
-    },
+module.exports = {
+  getData: async (req, res) => {
+    try {
+      let dataUser = await dbQuery(`Select * from user u JOIN status s on u.status_id = s.idstatus`)
+      res.status(200).send(dataUser)
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
 
-    register : async (req,res)=>{
-        try {
-            let {fullname, username, email, phone_number, password}= req.body;
+  register: async (req, res) => {
+    try {
+      let { fullname, username, email, phone_number, password } = req.body;
 
-            //Get email from database
-            const availableEmail = await dbQuery (`Select email from user where email = ${dbConf.escape(email)}`)
-            const availableUsername = await dbQuery (`Select username from user where username = ${dbConf.escape(username)}`)
-            if(availableUsername.length <= 0){
-                if(availableEmail.length <= 0){
-                    let sqlInsert = await dbQuery(`INSERT INTO USER (fullname,username, email, phone_number, password)values(${dbConf.escape(fullname)}, ${dbConf.escape(username)}, ${dbConf.escape(email)},${dbConf.escape(phone_number)},${dbConf.escape(hashPassword(password))})`)
-                    if(sqlInsert.insertId){
-                        let sqlGet = await dbQuery(`Select iduser, email, status_id from user where iduser=${sqlInsert.insertId}`)
-                        let token = createToken({...sqlGet[0]},'1h')
-    
-                        // Send Email
-                        await transport.sendMail({
-                            from:'MEDCARE ADMIN',
-                            to:sqlGet[0].email,
-                            subject:'verification account',
-                            html:`<div>
+      //Get email from database
+      const availableEmail = await dbQuery(`Select email from user where email = ${dbConf.escape(email)}`)
+      const availableUsername = await dbQuery(`Select username from user where username = ${dbConf.escape(username)}`)
+      if (availableUsername.length <= 0) {
+        if (availableEmail.length <= 0) {
+          let sqlInsert = await dbQuery(`INSERT INTO USER (fullname,username, email, phone_number, password)values(${dbConf.escape(fullname)}, ${dbConf.escape(username)}, ${dbConf.escape(email)},${dbConf.escape(phone_number)},${dbConf.escape(hashPassword(password))})`)
+          if (sqlInsert.insertId) {
+            let sqlGet = await dbQuery(`Select iduser, email, status_id from user where iduser=${sqlInsert.insertId}`)
+            let token = createToken({ ...sqlGet[0] }, '1h')
+
+            // Send Email
+            await transport.sendMail({
+              from: 'MEDCARE ADMIN',
+              to: sqlGet[0].email,
+              subject: 'verification account',
+              html: `<div>
                             <body style="width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;padding:0;Margin:0"> 
                             <div class="es-wrapper-color" style="background-color:#EEEEEE"><!--[if gte mso 9]>
                                       <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -196,117 +200,114 @@ module.exports={
                             </div>  
                           </body>
                             </div>`
-                        })
-                        res.status(200).send({
-                            success :true,
-                            message:'Register Success',
-                            token
-                        })
-                    }
-                }
-                else{
-                    res.status(401).send({
-                        success:false,
-                        message:'Email is used',
-                        error:'email'
-                    })
-                }
-            }else{
-              res.status(401).send({
-                  success:false,
-                  message:'Username is used',
-                  error:'username'
-              })
+            })
+            res.status(200).send({
+              success: true,
+              message: 'Register Success',
+              token
+            })
           }
-        } catch (error) {
-            console.log('Error query SQL :', error);
-            res.status(500).send({
-              success:false,
-              message:'error query',error
-            });
         }
-    },
+        else {
+          res.status(401).send({
+            success: false,
+            message: 'Email is used',
+            error: 'email'
+          })
+        }
+      } else {
+        res.status(401).send({
+          success: false,
+          message: 'Username is used',
+          error: 'username'
+        })
+      }
+    } catch (error) {
+      console.log('Error query SQL :', error);
+      res.status(500).send({
+        success: false,
+        message: 'error query', error
+      });
+    }
+  },
 
-    login : async (req,res)=>{
-        try {
-            let {email,password}=req.body
-            let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
-            WHERE ${dbConf.escape(email).includes('.co')?`u.email=${dbConf.escape(email)}`:
-            `u.username=${dbConf.escape(email)}`}
+  login: async (req, res) => {
+    try {
+      let { email, password } = req.body
+      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            WHERE ${dbConf.escape(email).includes('.co') ? `u.email=${dbConf.escape(email)}` :
+          `u.username=${dbConf.escape(email)}`}
             and u.password=${dbConf.escape(hashPassword(password))}`)
-            console.log(loginUser[0])
-            if(loginUser.length >0){
-                let token = createToken({...loginUser[0]})
-                if(loginUser[0].status_name === 'Verified'){
-                    let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
+      console.log(loginUser[0])
+      if (loginUser.length > 0) {
+        let token = createToken({ ...loginUser[0] })
+        if (loginUser[0].status_name === 'Verified') {
+          let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
                     p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
                     c.prescription_id, c.product_id, c. quantity, p.price*c.quantity as total_price, c.unit from user u
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
 
-                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(loginUser[0].iduser)}`)
-
-                    let transactionUser= await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
-                    res. status(200).send({
-                        ...loginUser[0],
-                        cart:cartUser,
-                        address:addressUser,
-                        token
-                    })
-                }else{
-                  await dbQuery(`UPDATE user set token=${dbConf.escape(token)} WHERE iduser=${dbConf.escape(loginUser[0].iduser)}`)
-                    res.status(200).send({
-                        status:'Unverified',
-                        ...loginUser[0],
-                        token
-                    })
-                }
-            }else{
-                res.status(500).send({
-                    status:false,
-                    message:`The username you entered doesn't belong to an account. Please check your username and try again.`
-                })
-            }
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
+          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(loginUser[0].iduser)}`)
+          let transactionUser = await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
+          res.status(200).send({
+            ...loginUser[0],
+            cart: cartUser,
+            address: addressUser,
+            transaction: transactionUser,
+            token
+          })
+        } else {
+          res.status(200).send({
+            status: 'Unverified',
+            ...loginUser[0],
+            token
+          })
         }
-    },
-
+      } else {
+        res.status(500).send({
+          status: false,
+          message: `The username you entered doesn't belong to an account. Please check your username and try again.`
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
     keepLogin : async (req,res)=>{
         try {
             let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
-            if(resultUser.length>0){
+      if (resultUser.length > 0) {
 
-                let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
+        let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
                     p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
-                    c.prescription_id, c.product_id, c. quantity, p.price*c.quantity as total_price, c.unit from user u
+                    c.product_id, c. quantity, p.price*c.quantity as total_price from user u
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
-                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(resultUser[0].iduser)}`)
+        let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
 
-                    let transactionUser= await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(resultUser[0].iduser)} `)
+        let transactionUser = await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(resultUser[0].iduser)} `)
 
-                    let token = createToken({...resultUser[0]})
-                    res.status(200).send({
-                        ...resultUser[0],
-                        cart:cartUser,
-                        address:addressUser,
-                        token
-                    })
-                
-            }
-        } catch (error) {
-            console.log('ERROR QUERY SQL :', error);
-            res.status(500).send(error)
-            
-        }
+        let token = createToken({ ...resultUser[0] })
+        res.status(200).send({
+          ...resultUser[0],
+          cart: cartUser,
+          address: addressUser,
+          transaction: transactionUser,
+          token
+        })
+      }
+    } catch (error) {
+      console.log('ERROR QUERY SQL :', error);
+      res.status(500).send(error)
+    }
 
-    },
+  },
 
-    verification : async (req,res)=>{
+   verification : async (req,res)=>{
       let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
       try {
             if(isToken.length > 0){
@@ -367,7 +368,10 @@ module.exports={
         }
     },
 
-    resendVerif : async (req,res)=>{
+  resendEmail: async (req, res) => {
+
+  },
+resendVerif : async (req,res)=>{
       try {
         let sqlInsert =  await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
         await transport.sendMail({
@@ -546,8 +550,7 @@ module.exports={
         console.log(error)
       }
     },
-
-    editProfile : async (req,res)=>{
+       editProfile : async (req,res)=>{
       try {
         let data=JSON.parse(req.body.data)
         let availableUsername = await dbQuery(`Select username from user where username = ${dbConf.escape(data.username)}`)
@@ -593,8 +596,136 @@ module.exports={
           message: error
         })
       }
+    },
+
+  getAddress: async (req, res) => {
+    try {
+      //console.log(req.dataToken);
+      let getSql = await dbQuery(`SELECT a.*, s.*, u.fullname, u.phone_number FROM address a 
+      JOIN status s ON a.status_id = s.idstatus 
+      JOIN user u ON u.iduser = a.user_id 
+      WHERE a.user_id = ${req.dataToken.iduser};`)
+
+      res.status(200).send(getSql);
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+
     }
+  },
+  addAddress: async (req, res) => {
+    try {
+      // ada authorization
+      // sementara user id pakai manual = 2;
 
-    
+      // console.log(req.body.data)
+      const { full_address, district, city, city_id, province, province_id, postal_code } = req.body.data;
 
+      await dbQuery(`INSERT INTO address (full_address, district, city, city_id, province, province_id, postal_code, user_id) VALUES
+      (${dbConf.escape(full_address)}, ${dbConf.escape(district)}, ${dbConf.escape(city)}, ${dbConf.escape(city_id)}, ${dbConf.escape(province)}, ${dbConf.escape(province_id)}, ${dbConf.escape(postal_code)}, ${dbConf.escape(req.dataToken.iduser)});`)
+
+      res.status(200).send({
+        success: true,
+        message: "Address Added Success"
+      })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error)
+    }
+  },
+
+  updateAddress: async (req, res) => {
+    try {
+      //console.log(req.body)
+      if (req.body.selected) {
+        await dbQuery(`UPDATE address SET selected='false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+        await dbQuery(`UPDATE address SET selected=${dbConf.escape(req.body.selected)} WHERE idaddress = ${dbConf.escape(req.body.idaddress)};`);
+      } else if (req.body.dataEdit) {
+        let data = req.body.dataEdit;
+
+        let temp = [];
+        for (let key in data){
+          console.log(key, data[key]);
+          if (data[key] != 0 || data[key] != ''){
+            temp.push(`${key} = ${dbConf.escape(data[key])}`)
+          }
+        }
+        console.log(temp.join(' , '));
+
+        await dbQuery(`UPDATE address SET ${temp.join(' , ')} WHERE idaddress = ${dbConf.escape(req.body.idaddress)} AND user_id = ${req.dataToken.iduser};`);
+      } else if (req.body.setPrimary) {
+        await dbQuery(`UPDATE address SET status_id=11 WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+        await dbQuery(`UPDATE address SET status_id=10 WHERE idaddress = ${dbConf.escape(req.body.setPrimary)};`);
+      }
+
+      res.status(200).send({
+        success: true,
+        message: "Address Updated"
+      })
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
+
+  deleteAddress: async (req, res) => {
+    try {
+      //console.log(req.params);
+      await dbQuery(`DELETE from address WHERE idaddress = ${dbConf.escape(req.params.idaddress)};`);
+
+      res.status(200).send({
+        success: true,
+        message: "Address Deleted"
+      })
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+    }
+  },
+
+  getProvince: async (req, res) => {
+    try {
+      let getData = await axios.get('/province');
+      //console.log(getData.data.rajaongkir.results)
+      let dataProvince = getData.data.rajaongkir.results;
+      res.status(200).send(dataProvince);
+
+    } catch (error) {
+      //console.log(error)
+      res.status(500).send(error)
+    }
+  },
+
+  getCity: async (req, res) => {
+    try {
+      let getData = await axios.get('/city')
+      //console.log(getData.data.rajaongkir.results)
+      let dataCity = getData.data.rajaongkir.results;
+      res.status(200).send(dataCity);
+    } catch (error) {
+      //console.log(error)
+      res.status(500).send(error)
+    }
+  },
+
+  getDelivery: async (req, res) => {
+    try {
+      //console.log(req.params)
+
+      if (req.params.courier !== 'none'){
+        let get = await axios.post('/cost', {
+          origin: req.params.origin,
+          destination: req.params.destination,
+          weight: req.params.weight,
+          courier: req.params.courier
+        })
+        //console.log(get.data.rajaongkir.results[0]);
+        res.status(200).send(get.data.rajaongkir.results[0].costs);
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
