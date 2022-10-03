@@ -3,23 +3,27 @@ import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Avatar, Spinner } from 'flowbite-react';
+import { Spinner } from 'flowbite-react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
+import Avatar from './Avatar';
+import { API_URL } from '../helper';
 import { RiShoppingCartLine } from "react-icons/ri";
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const [dropdown, setDropdown] = useState(false)
+  const[dropdown, setDropdown]=useState(false)
+  
+  let {username, status, role, profil_pict}=useSelector((state)=>{
+    return{
 
-  let { username, status, role } = useSelector((state) => {
-    return {
       username: state.userReducer.username,
        status: state.userReducer.status,
       role: state.userReducer.role,
+      profil_pict: state.userReducer.profil_pict,
     }
   })
 
@@ -55,7 +59,15 @@ const NavbarComponent = (props) => {
                       <button type='button' onClick={() => navigate('/cart')}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
                       </button>
-                      <Avatar rounded={true} onClick={() => setDropdown(!dropdown)} />
+                       <Avatar
+                      onClick={()=>setDropdown(!dropdown)}
+                      src={API_URL + profil_pict}
+                      w={10}
+                      h={10}
+                      b={1}
+                     width={3}
+                      height={3}
+                    />
                       {
                         dropdown &&
                         <div>

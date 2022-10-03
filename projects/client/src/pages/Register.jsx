@@ -15,7 +15,7 @@ const Register = () => {
     const [mediumPass, setMediumPass] = useState(false)
     const [strongPass, setStrongPass] = useState(false)
     const [visible,setVisible]=useState('password')
-    const [phone_number, setPhone_Number] = useState('+62')
+    // const [phone_number, setPhone_Number] = useState('')
     const [toast, setToast]=useState(false)
     const [agree, setAgree]=useState(false)
     const [avalaibleUsername, setAvalaibleUsername]=useState(false)
@@ -27,8 +27,10 @@ const Register = () => {
         fullname:'',
         username:'',
         email:'',
-        password:''
+        password:'',
+        phone_number:'',
     })
+
 
 
     const onChange =(event)=>{
@@ -68,13 +70,14 @@ const Register = () => {
 
     const onSubmit = ()=>{
         setLoading(true)
-        let {fullname,username,email,password}=input
+        let {fullname,username,email,password,phone_number}=input
         axios.post(API_URL + '/api/user/register',{
             fullname,
             username,
             email,
             phone_number,
-            password
+            password,
+            phone_number
         })
         .then((res)=>{
             setLoading(false)
@@ -86,9 +89,10 @@ const Register = () => {
                     fullname:'',
                     username:'',
                     email:'',
-                    password:''
+                    password:'',
+                    phone_number:''
                 })
-                setPhone_Number('+62')
+                // setPhone_Number('+62')
                 setAgree(false)
                 setWeakPass(false)
                 setMediumPass(false)
@@ -123,13 +127,13 @@ const Register = () => {
                     <div className='px-16 py-4 lg:px-10 xl:px-5 '>
                         <div className='font-bold text-2xl font-Public'>Let Started</div>
                         <div className=' flex justify-start'>
-                            <div className='text-sm font-extralight text-gray-400 font-Public'>Sudah punya akun ?</div>
-                            <div className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/login')}>Masuk</div>
+                            <div className='text-sm font-extralight text-gray-400 font-Public'>Have account ?</div>
+                            <div className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/login')}>Log in</div>
                         </div>
                         <div className='flex justify-evenly lg:justify-around pt-4'>
                             <div className='border border-gray-400 rounded-lg w-32 hover:bg-gray-300 h-12 lg:w-48'>
                                 <div className='py-3 flex justify-center'>
-                                    <FcGoogle className='' size={20}/>
+                                    <FcGoogle size={20}/>
                                     <div className='text-sm font-bold '><span className='hidden lg:inline-flex font-Public'>Daftar dengan </span> Google</div>
                                 </div>
                             </div>
@@ -159,7 +163,7 @@ const Register = () => {
                                 <span className="block text-sm font-medium text-gray-700 after:content-['*'] after:text-red-500 after:ml-0.5 font-Public" >
                                     Username
                                 </span>
-                                <input requried value={input.username} id='username' name='username' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="JohnDoe"/>
+                                <input requried value={input.username} type='text' id='username' name='username' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="JohnDoe"/>
                                 {
                                     avalaibleUsername &&
                                     <p className='text-red-600 text-xs font-Public'>Username is used</p>
@@ -180,7 +184,7 @@ const Register = () => {
                                 <span className='block text-sm font-medium text-gray-700 font-Public'>
                                 Phone Number<span className='text-red-500'>*</span>
                                 </span>
-                                <PhoneInput international defaultCountry='RU' value={phone_number} id='phone' name='phone_number' onChange={setPhone_Number} placeholder='081234566'/>
+                                <PhoneInput international defaultCountry='ID' value={input.phone_number} id='phone' name='phone_number' onChange={(a)=>setInput({...input, phone_number:a})} placeholder='081234566'/>
                             </label>
                             <label for='password' className='block'>
                                 <span className='block text-sm font-medium text-gray-700 font-Public'>
@@ -227,7 +231,7 @@ const Register = () => {
                                 <div className='ml-1 text-teal-500 font-bold font-Public'>ketentuan</div>
                             </div>
                         </div>
-                            <button className={`text-white rounded-md bg-teal-600 hover:bg-teal-700 w-full py-2 my-7 disabled:cursor-not-allowed disabled:hover:bg-teal-600 font-Public`} disabled={ input.fullname.length>0 && input.username.length>0 && phone_number.length>3 && input.email.includes('@') && input.email.includes('.co') && weakPass && agree ? false : true} onClick={onSubmit}>Register</button>
+                            <button className={`text-white rounded-md bg-teal-600 hover:bg-teal-700 w-full py-2 my-7 disabled:cursor-not-allowed disabled:hover:bg-teal-600 font-Public`} disabled={ input.fullname.length>0 && input.username.length>0 && input.phone_number.length>0 && input.email.includes('@') && input.email.includes('.co') && weakPass && agree ? false : true} onClick={onSubmit}>Register</button>
                 </div>
                 </div>
             </div>
