@@ -312,80 +312,81 @@ module.exports = {
 
   },
 
-   verification : async (req,res)=>{
-      let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
-      console.log(isToken)
-      console.log('===============================')
-      try {
-            if(isToken.length > 0){
-                if(req.dataToken.iduser){
-                    await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-                    //. proses login 
-                    let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+  verification: async (req, res) => {
+    let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
+    console.log(isToken)
+    console.log('===============================')
+    try {
+      if (isToken.length > 0) {
+        if (req.dataToken.iduser) {
+          await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+          //. proses login 
+          let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
                     join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-                    if(resultUser.length > 0){
-                        // login berhasil
-                        let token = createToken({...resultUser[0]})
-                        res.status(200).send({
-                            success:true,
-                            message: 'Verify Success',
-                            dataLogin :{
-                                ...resultUser[0],
-                                token
-                            },
-                            error:''
-                        })
-                    }
-                }
-            }else{
-              await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-              //. proses login 
-              let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
-              join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-              if(resultUser[0].token){
-                res.status(500).send({
-                    success: false,
-                    message: "Email has been expired",
-                    code:'EMAIL_EXPIRED'
-                });
-            }else{
-                if(resultUser.length > 0){
-                    // 3. login berhasil, maka buar token baru
-                    let token = createToken({...resultUser[0]})
-                    res.status(200).send({
-                        success :true,
-                        message:'Verified Success',
-                        dataLogin :{
-                            ...resultUser[0],
-                            token
-                        },
-                        error:''
-                    })
-                }
-            }
-            }
-        } catch (error) {
-            console.log(error)
-            res.status(500).send({
-                success:false,
-                message:'Failed',
-                error
+          if (resultUser.length > 0) {
+            // login berhasil
+            let token = createToken({ ...resultUser[0] })
+            res.status(200).send({
+              success: true,
+              message: 'Verify Success',
+              dataLogin: {
+                ...resultUser[0],
+                token
+              },
+              error: ''
             })
-            
+          }
         }
-    },
+      } else {
+        await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        //. proses login 
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+              join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        if (resultUser[0].token) {
+          res.status(500).send({
+            success: false,
+            message: "Email has been expired",
+            code: 'EMAIL_EXPIRED'
+          });
+        } else {
+          if (resultUser.length > 0) {
+            // 3. login berhasil, maka buar token baru
+            let token = createToken({ ...resultUser[0] })
+            res.status(200).send({
+              success: true,
+              message: 'Verified Success',
+              dataLogin: {
+                ...resultUser[0],
+                token
+              },
+              error: ''
+            })
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).send({
+        success: false,
+        message: 'Failed',
+        error
+      })
+
+    }
+  },
 
   resendEmail: async (req, res) => {
 
   },
-resendVerif : async (req,res)=>{
-      try {
-        let sqlInsert =  await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
-        await transport.sendMail({
-          from:'MEDCARE ADMIN',
-          to:sqlInsert[0].email,
-          subject:'verification account',
-          html:`<div>
+
+  resendVerif: async (req, res) => {
+    try {
+      let sqlInsert = await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
+      await transport.sendMail({
+        from: 'MEDCARE ADMIN',
+        to: sqlInsert[0].email,
+        subject: 'verification account',
+        html: `<div>
           <body style="width:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;font-family:'open sans', 'helvetica neue', helvetica, arial, sans-serif;padding:0;Margin:0"> 
           <div class="es-wrapper-color" style="background-color:#EEEEEE"><!--[if gte mso 9]>
                     <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -550,95 +551,11 @@ resendVerif : async (req,res)=>{
           </div>`
       })
       res.status(200).send({
-        success:true,
-        message:'Register Success'
+        success: true,
+        message: 'Register Success'
       })
-      } catch (error) {
-        console.log(error)
-      }
-   },
-  getAddress: async (req, res) => {
-    try {
-      //console.log(req.dataToken);
-      let getSql = await dbQuery(`SELECT a.*, s.*, u.fullname, u.phone_number FROM address a 
-      JOIN status s ON a.status_id = s.idstatus 
-      JOIN user u ON u.iduser = a.user_id 
-      WHERE a.user_id = ${req.dataToken.iduser};`)
-
-      res.status(200).send(getSql);
     } catch (error) {
       console.log(error)
-      res.status(500).send(error)
-    }
-  },
-  addAddress: async (req, res) => {
-    try {
-      // ada authorization
-      // sementara user id pakai manual = 2;
-
-      // console.log(req.body.data)
-      const { full_address, district, city, city_id, province, province_id, postal_code } = req.body.data;
-
-      await dbQuery(`INSERT INTO address (full_address, district, city, city_id, province, province_id, postal_code, user_id) VALUES
-      (${dbConf.escape(full_address)}, ${dbConf.escape(district)}, ${dbConf.escape(city)}, ${dbConf.escape(city_id)}, ${dbConf.escape(province)}, ${dbConf.escape(province_id)}, ${dbConf.escape(postal_code)}, ${dbConf.escape(req.dataToken.iduser)});`)
-
-      res.status(200).send({
-        success: true,
-        message: "Address Added Success"
-      })
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error)
-    }
-  },
-
-  updateAddress: async (req, res) => {
-    try {
-      //console.log(req.body)
-      if (req.body.selected) {
-        await dbQuery(`UPDATE address SET selected='false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
-        await dbQuery(`UPDATE address SET selected=${dbConf.escape(req.body.selected)} WHERE idaddress = ${dbConf.escape(req.body.idaddress)};`);
-      } else if (req.body.dataEdit) {
-        let data = req.body.dataEdit;
-
-        let temp = [];
-        for (let key in data){
-          console.log(key, data[key]);
-          if (data[key] != 0 || data[key] != ''){
-            temp.push(`${key} = ${dbConf.escape(data[key])}`)
-          }
-        }
-        console.log(temp.join(' , '));
-
-        await dbQuery(`UPDATE address SET ${temp.join(' , ')} WHERE idaddress = ${dbConf.escape(req.body.idaddress)} AND user_id = ${req.dataToken.iduser};`);
-      } else if (req.body.setPrimary) {
-        await dbQuery(`UPDATE address SET status_id=11 WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
-        await dbQuery(`UPDATE address SET status_id=10 WHERE idaddress = ${dbConf.escape(req.body.setPrimary)};`);
-      }
-
-      res.status(200).send({
-        success: true,
-        message: "Address Updated"
-      })
-
-    } catch (error) {
-      console.log(error)
-      res.status(500).send(error)
-    }
-  },
-
-  deleteAddress: async (req, res) => {
-    try {
-      //console.log(req.params);
-      await dbQuery(`DELETE from address WHERE idaddress = ${dbConf.escape(req.params.idaddress)};`);
-
-      res.status(200).send({
-        success: true,
-        message: "Address Deleted"
-      })
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
     }
   },
 
@@ -671,7 +588,7 @@ resendVerif : async (req,res)=>{
     try {
       //console.log(req.params)
 
-      if (req.params.courier !== 'none'){
+      if (req.params.courier !== 'none') {
         let get = await axios.post('/cost', {
           origin: req.params.origin,
           destination: req.params.destination,
@@ -685,5 +602,14 @@ resendVerif : async (req,res)=>{
     } catch (error) {
       console.log(error)
     }
-  }
+  },
+
+  addPrescription: async (req, res) => {
+    try {
+
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error)
+    }
+  },
 }

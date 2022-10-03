@@ -66,7 +66,7 @@ const EditProfile = () => {
     const getAddress = async () => {
         try {
             let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + '/api/user/getaddress', {
+            let get = await axios.get(API_URL + '/api/address/get', {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -227,7 +227,7 @@ const EditProfile = () => {
                 }
 
                 // pakai authorization
-                let add = await axios.post(API_URL + '/api/user/addaddress', { data }, {
+                let add = await axios.post(API_URL + '/api/address/add', { data }, {
                     headers: {
                         'Authorization' : `Bearer ${userToken}`
                     }
@@ -307,7 +307,7 @@ const EditProfile = () => {
             if (tempProvince !== '' && tempCity === '') {
                 setCheckEditCity('show');
             } else {
-                let edit = await axios.patch(API_URL + '/api/user/updateaddress', { dataEdit, idaddress: selectedEdit.idaddress }, {
+                let edit = await axios.patch(API_URL + '/api/address/update', { dataEdit, idaddress: selectedEdit.idaddress }, {
                     headers: {
                         'Authorization' : `Bearer ${userToken}`
                     }
@@ -346,7 +346,7 @@ const EditProfile = () => {
 
     const onDeleteAddress = async (id) => {
         try {
-            let del = await axios.delete(API_URL + `/api/user/deleteaddress/${id}`);
+            let del = await axios.delete(API_URL + `/api/address/delete/${id}`);
 
             if (del.data.success) {
                 setModalDelete(0);

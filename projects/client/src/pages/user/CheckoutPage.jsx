@@ -81,7 +81,7 @@ const Checkout = (props) => {
     const getAddress = async () => {
         try {
             let userToken = localStorage.getItem('medcarelog');
-            let getAddress = await axios.get(API_URL + '/api/user/getaddress', {
+            let getAddress = await axios.get(API_URL + '/api/address/get', {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -281,7 +281,7 @@ const Checkout = (props) => {
                 }
 
                 // pakai authorization
-                let add = await axios.post(API_URL + '/api/user/addaddress', { data }, {
+                let add = await axios.post(API_URL + '/api/address/add', { data }, {
                     headers: {
                         'Authorization': `Bearer ${userToken}`
                     }
@@ -363,7 +363,7 @@ const Checkout = (props) => {
             if (tempProvince !== '' && tempCity === '') {
                 setCheckEditCity('show');
             } else {
-                let edit = await axios.patch(API_URL + '/api/user/updateaddress', { dataEdit, idaddress: selectedEdit.idaddress }, {
+                let edit = await axios.patch(API_URL + '/api/address/update', { dataEdit, idaddress: selectedEdit.idaddress }, {
                     headers: {
                         'Authorization': `Bearer ${userToken}`
                     }
