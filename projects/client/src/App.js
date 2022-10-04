@@ -17,6 +17,8 @@ import DashboardPage from './pages/admin/DashboardPage.jsx';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
+import ProductDetail from './pages/user/ProductDetail'
+import ProductCategory from './pages/user/ProductCategory';
 
 
 
@@ -87,12 +89,15 @@ function App() {
               <Route path='/login' element={<Login />} />
             </>
         }
+        
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<EditProfile />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/cart' element={<UserCart />} />
         <Route path='/checkout' element={<Checkout />} />
+        <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/category' element={<ProductCategory/>} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
       </Routes>
       <Footer />

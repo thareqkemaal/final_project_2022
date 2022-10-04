@@ -234,7 +234,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       let { email, password } = req.body
-      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE ${dbConf.escape(email).includes('.co') ? `u.email=${dbConf.escape(email)}` :
           `u.username=${dbConf.escape(email)}`}
             and u.password=${dbConf.escape(hashPassword(password))}`)
@@ -248,7 +248,7 @@ module.exports = {
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
 
-          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(loginUser[0].iduser)}`)
+          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(loginUser[0].iduser)}`)
           let transactionUser = await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
           res.status(200).send({
             ...loginUser[0],
@@ -275,9 +275,10 @@ module.exports = {
       res.status(500).send(error)
     }
   },
-    keepLogin : async (req,res)=>{
+
+  keepLogin : async (req,res)=>{
         try {
-            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
       if (resultUser.length > 0) {
 
@@ -314,7 +315,7 @@ module.exports = {
                 if(req.dataToken.iduser){
                     await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
                     //. proses login 
-                    let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+                    let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id from user u
                     join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
                     if(resultUser.length > 0){
                         // login berhasil
@@ -333,7 +334,7 @@ module.exports = {
             }else{
               await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
               //. proses login 
-              let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+              let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profile_pict, u.status_id from user u
               join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
               if(resultUser[0].token){
                 res.status(500).send({
@@ -571,7 +572,7 @@ resendVerif : async (req,res)=>{
             }else{
               await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
             }
-            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
 
             let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
@@ -580,7 +581,7 @@ resendVerif : async (req,res)=>{
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
-                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(resultUser[0].iduser)}`)
+                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
 
                     let token = createToken({...resultUser[0]})
 

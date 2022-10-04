@@ -20,55 +20,11 @@ module.exports = {
     filterProduct: (req, res) => {
         let filterCategory = req.query.category_id;
         let { query, sort, filterName } = req.body;
-
-        // let resultFilter = filterCategory.map((val, idx) => {
-        //     if (idx == 0) {
-        //         if (JSON.stringify(filterName) == '{}') {
-        //             return `where category_id = ${val}`
-        //         } else {
-        //             return `and (category_id = ${val}`
-        //         }
-        //     } else if (idx==(filterCategory.length-1)) {
-        //         if (JSON.stringify(filterName) == '{}') {
-        //             return `or category_id = ${val}`
-        //         } else {
-        //             return `and category_id = ${val})`
-        //         }
-        //     } else {
-        //         if (JSON.stringify(filterName) == '{}') {
-        //             return `or category_id = ${val}`
-        //         } else {
-        //             return `and category_id = ${val}`
-        //         }
-        //     }
-        // })
-
-        // dbConf.query(`Select * from product 
-        //     ${JSON.stringify(filterName) != '{}' ? `where ${filterName.field} like ('%${filterName.value}%')` : ''} 
-        //     ${filterCategory ? resultFilter.join(' ') : ''}
-        //     order by ${sort ? `${sort}` : `idproduct`} asc 
-        //     limit ${dbConf.escape(query)}`,
-        //         (err, results) => {
-        //             if (err) {
-        //                 return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
-        //             }
-
-        //             res.status(200).send(results);
-        //         })
-
         if(JSON.stringify(filterName) != '{}'){
             `and category_id = ${filterCategory}`
         } else {
             `where category_id = ${filterCategory}`
         }
-
-        // let a = `Select * from product 
-        // ${filterCategory ? `where category_id=${filterCategory}` : ''}
-        // ${JSON.stringify(filterName) != '{}' ? `and ${filterName.field} like ('%${filterName.value}%')` : ''} 
-        // order by ${sort ? `${sort}` : `idproduct`} asc 
-        // limit ${dbConf.escape(query)}`
-
-        // console.log(a)
 
         dbConf.query(`Select * from product 
         ${filterCategory ? `where category_id=${filterCategory}` : ''}
@@ -95,10 +51,6 @@ module.exports = {
     },
     getcartdata: async (req, res) => {
         try {
-            // butuh authorization token
-            // sementara pakai manual data iduser = 2;
-            // harus join sm tabel stock juga
-
             let getSql = await dbQuery(`SELECT * FROM cart c 
             JOIN product p ON c.product_id = p.idproduct 
             JOIN stock s ON s.product_id = p.idproduct
@@ -111,7 +63,6 @@ module.exports = {
             res.status(500).send(error)
         }
     },
-
     deletecart: async (req, res) => {
         try {
             await dbQuery(`DELETE FROM cart WHERE idcart=${dbConf.escape(req.params.idcart)};`);
@@ -149,5 +100,5 @@ module.exports = {
             console.log(error)
             res.status(500).send(error)
         }
-    }
+    },
 };

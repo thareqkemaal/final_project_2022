@@ -6,7 +6,6 @@ const { uploader }=require('../config/upload')
 
 const upload = uploader('/img_profile','/IMGPROFILE').array('images',1)
 
-route.get('/getaddress', userController.getaddress);
 route.get('/',userController.getData);
 route.post('/register',userController.register);
 route.post('/login',userController.login);
@@ -19,7 +18,7 @@ route.patch('/editprofile',upload,readToken,userController.editProfile)
 route.get('/getaddress', readToken, userController.getAddress);
 route.post('/addaddress', readToken, userController.addAddress);
 route.patch('/updateaddress', readToken, userController.updateAddress);
-route.delete('/deleteaddress/:idaddress', userController.deleteAddress);
+route.delete('/deleteaddress/:idaddress',userController.deleteAddress);
 
 
 // RAJAONGKIR

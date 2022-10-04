@@ -13,9 +13,12 @@ import Carousel from '../components/Carousel'
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { API_URL } from '../helper';
+import { useNavigate } from 'react-router';
+import ProductCategory from './user/ProductCategory';
 
 
 const LandingPages = () => {
+  const navigate = useNavigate()
 
   const {email,status}=useSelector((state)=>{
     return{
@@ -62,9 +65,9 @@ const LandingPages = () => {
         <div className='py-5'>
             <div className='flex justify-between my-2'>
               <p className='text-sm font-bold text-blue-800 font-Public'>Kategori</p>
-              <p className='text-xs font-bold  text-teal-500 font-Public'>Lihat Semua</p>
+              <p className='text-xs font-bold  text-teal-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
             </div>
-            <div className='flex justify-between mx-auto'>
+            <div className='flex justify-between mx-auto' onClick={()=>navigate('/product')}>
               <div className='w-40 rounded-xl shadow-xl '>
                 <div className='py-3'>
                   <GiMedicines size={50} className='mx-auto fill-red-500'/>
@@ -136,107 +139,12 @@ const LandingPages = () => {
             </div>
             <div className='flex justify-between my-2'>
               <p className='text-sm font-bold text-blue-800 font-Public'>Produk Populer</p>
-              <p className='text-xs font-bold  text-teal-500 font-Public'>Lihat Semua</p>
+              <p className='text-xs font-bold  text-teal-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
             </div>
-            <div className='overflow-x-auto flex no-scrollbar bg-gradient-to-t from-teal-50 to-white'>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/fb9bf376-4df4-4fee-829f-eb9cf9581e11_product_image_url.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Irbesatran 300 mg Box 10 Tablet</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm font-Public'>Rp.65.000<span className='text-sm text-gray-400 font-normal font-Public'>/Strip</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/282287_22-9-2021_10-16-32.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Rhinos Junior Sirup 60 ml</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm'>Rp.62.600<span className='text-sm text-gray-400 font-normal font-Public'>/Bottle</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public '>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/832754_22-9-2021_10-18-52.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Sanadryl DMP Sirup 120 ml</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm font-Public'>Rp.32.400<span className='text-sm text-gray-400 font-normal font-Public'>/Bottle</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/849685_22-9-2021_10-21-15.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm pt-5 font-Public'>Tremenza</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.5.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm font-Public'>Rp.50.000<span className='text-sm text-gray-400 font-normal font-Public'>/Strip</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/176340_10-6-2022_16-17-13.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm pt-5 font-Public'>Sanmol Forte 4 Tablet</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.500</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm'>Rp.2.600<span className='text-sm text-gray-400 font-normal font-Public'>/Tablet</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/317428_22-9-2021_10-57-22.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Paracetamol 500 mg 10 Kaplet</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.6.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm'>Rp.5.200<span className='text-sm text-gray-400 font-normal font-Public'>/Kaplet</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
-              <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-                <img src='https://d2qjkwm11akmwu.cloudfront.net/products/fb9bf376-4df4-4fee-829f-eb9cf9581e11_product_image_url.webp' alt='medcare.com' className='h-28 px-10 object-cover'/>
-                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Irbesatran 300 mg Box 10 Tablet</p>
-                <div className='w-20 py-1 px-5 flex '>
-                  <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                  <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-                </div>
-                <div className='px-5'>
-                  <p className='text-blue-900 font-bold text-sm'>Rp.65.000<span className='text-sm text-gray-400 font-normal font-Public'>/Strip</span></p>
-                </div>
-                <div className='px-5 py-5'>
-                  <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-                </div>
-              </div>
+            <div className='bg-gradient-to-t from-teal-50 to-white'>
+              <ProductCategory
+              id={1}
+              />
             </div>
             <div className='my-3 '>
               <p className='text-sm font-bold text-blue-800 font-Public'>Jaminan Untuk Anda</p>
