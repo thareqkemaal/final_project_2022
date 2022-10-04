@@ -197,23 +197,10 @@ const Prescription = (props) => {
             let userToken = localStorage.getItem('medcarelog');
 
             // INVOICE NUMBER
-            let randomNumber = Math.floor(1000 + Math.random() * 9000);
+            let randomNumber = new Date().getTime();
             let setYear = new Date().getFullYear().toString().split('20')[1];
-            let month = new Date().getMonth().toString().split('');
-            let setMonth = '';
-            if (month.length < 2) {
-                setMonth = '0' + month[0];
-            } else {
-                setMonth = month[0];
-            };
-            let day = new Date().getDay().toString().split('');
-            let setDay = '';
-            if (day.length < 2) {
-                setDay = '0' + day[0];
-            } else {
-                setDay = day[0];
-            };
-            let setInvoice = parseInt('2' + setYear + setMonth + setDay + randomNumber.toString());
+            let presCode = 2; // kode invoice untuk resep
+            let setInvoice = presCode + setYear + '-' + randomNumber;
 
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
@@ -221,10 +208,10 @@ const Prescription = (props) => {
 
             // console.log('iduser', iduser);
             // console.log('fullname', fullname);
-            // console.log('invoice number', 'invoice here');
+            // console.log('invoice number', setInvoice);
             // console.log('selected address', selectedAddress);
             // console.log('weight', weight);
-            // console.log('delivery price', parseInt(selectedDelivery.split(',')[0]).toLocaleString('id'));
+            // console.log('delivery price', parseInt(selectedDelivery.split(',')[0]));
             // console.log('courier', courier);
             // console.log("prescriptionpic", prescriptionPic);
 
@@ -233,7 +220,7 @@ const Prescription = (props) => {
                 invoice: setInvoice,
                 address: setAddress,
                 weight,
-                delivery: parseInt(selectedDelivery.split(',')[0]).toLocaleString('id'),
+                delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier,
             }));
             formPay.append('prescription_pic', prescriptionPic);
@@ -250,7 +237,7 @@ const Prescription = (props) => {
                 setTimeout(() => {
                     setLoading(false);
                     navigate('/prescription/success', { replace: true })
-                }, 1000)
+                }, 10000)
             }
         } catch (error) {
             console.log(error)
