@@ -31,8 +31,10 @@ module.exports = {
             },
             // argumen 2, fileprefix
 
+
             // bila dirubah
             filename: (req, file, cb) => {
+
                 let ext = file.originalname.split('.');
                 // jika tidak ingin di ubah, tidak usah digunakan atau cukup gunakan
                 //cb(null,file.originalname)
@@ -51,6 +53,7 @@ module.exports = {
             if (file.originalname.toLowerCase().match(extFilter)) {
                 cb(null, true)
             } else {
+
                 cb(new Error('Your File ext are denied', false));
             }
 
@@ -58,6 +61,7 @@ module.exports = {
         return multer({
             storage: storageUploader,
             limits: { fileSize: 1048576 },
+
             fileFilter
         })
     }

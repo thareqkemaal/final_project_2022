@@ -59,9 +59,12 @@ const Login = () => {
               </div>
             </div>
             <div className='bg-white drop-shadow-md'>
-              <div className='px-10 py-5 mt-10'>
-                <div className='font-bold text-2xl text-center font-Public'>Login</div>
+              <div className='px-10 py-5 '>
                 <div className='lg:px-10'>
+                <div className='font-bold text-2xl font-Public'>Login</div>
+                <div className='text-sm font-extralight text-gray-400 font-Public'>Don't have account ?
+                <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign In</span>
+                </div>
                   <form>
                     <label className='block mb-3 my-14'>
                       <span className='block text-sm font-medium text-gray-700 font-Public'>
