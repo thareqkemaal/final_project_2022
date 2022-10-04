@@ -12,7 +12,7 @@ const UploadSuccess = (props) => {
     return (
         <div className='container mx-auto py-5 h-screen'>
             <div className='flex flex-col items-center h-screen py-4'>
-                <img src={confirm} className='max-w-xl'/>
+                <img src={confirm} className='max-w-xl' alt='successuploadprescription'/>
                 <p className='font-bold text-4xl text-main-500 my-2'>Upload Prescription Success!</p>
                 <p className='font-bold text-2xl text-main-600 my-2'>Your order will be confirmed by Admin soon.</p>
                 <div className='w-1/2 my-2 flex justify-around'>
