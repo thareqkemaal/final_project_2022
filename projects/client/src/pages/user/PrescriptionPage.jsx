@@ -494,9 +494,9 @@ const Prescription = (props) => {
                                                         <p className='text-2xl font-bold text-main-500'>Select Payment Method</p>
                                                     </div>
                                                     <div className='flex w-full my-4 items-center justify-center'>
-                                                        <img src={bni} className='w-20' />
-                                                        <img src={bca} className='w-20 mx-4' />
-                                                        <img src={bri} className='w-28' />
+                                                        <img src={bni} className='w-20' alt="bnilogo"/>
+                                                        <img src={bca} className='w-20 mx-4' alt="bcalogo"/>
+                                                        <img src={bri} className='w-28' alt="brilogo"/>
                                                     </div>
                                                     <div className='border-2 rounded-lg border-main-600 p-3 my-3'>
                                                         <div className='flex w-full items-center justify-start my-1'>

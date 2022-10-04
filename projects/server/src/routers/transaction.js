@@ -8,5 +8,6 @@ const prescriptionUploader = uploader('/prescription', 'prescription').array('pr
 
 // PRESCRIPTION
 route.post('/addprescription', prescriptionUploader, readToken, transactionController.addTransaction);
+route.post('/add', readToken, transactionController.addTransaction);
 
 module.exports=route

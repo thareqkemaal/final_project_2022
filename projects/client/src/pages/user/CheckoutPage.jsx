@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { API_URL } from '../../helper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -9,8 +9,13 @@ import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../../assets/bri.png';
 import NewAddressComponent from '../../components/NewAddressModalComp';
 import EditAddressComponent from '../../components/EditAddressModalComp';
+import LoadingComponent from '../../components/Loading';
+import success from '../../assets/success.png';
 
 const Checkout = (props) => {
+
+    const [loading, setLoading] = React.useState(false);
+    const [showSuccessPayModal, setShowSuccessPayModal] = React.useState('');
 
     const [checkoutData, setCheckoutData] = React.useState([]);
     const [allAddress, setAllAddress] = React.useState([]);
@@ -35,6 +40,7 @@ const Checkout = (props) => {
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
     const { state } = useLocation();
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         setCheckoutData(state.selected);
@@ -206,6 +212,58 @@ const Checkout = (props) => {
         })
     };
 
+    const onPay = async () => {
+        try {
+            // userid, user_name, invoice_number, status_id = 3, useraddress, 
+            // orderweight, delivery price, shipping courier, prescription pic 
+
+            let userToken = localStorage.getItem('medcarelog');
+
+            // INVOICE NUMBER
+            let randomNumber = new Date().getTime();
+            let setYear = new Date().getFullYear().toString().split('20')[1];
+            let presCode = 1; // kode invoice untuk cart
+            let setInvoice = presCode + setYear + '-' + randomNumber;
+
+            // ADDRESS
+            const { full_address, district, city, province, postal_code } = selectedAddress;
+            let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
+
+            console.log('invoice number', setInvoice);
+            console.log('selected address', setAddress);
+            console.log('weight', weight);
+            console.log('delivery price', parseInt(selectedDelivery.split(',')[0]));
+            console.log('courier', courier);
+            console.log('total price', totalDelivery);
+
+            let formPay = {
+                invoice: setInvoice,
+                address: setAddress,
+                weight,
+                delivery: parseInt(selectedDelivery.split(',')[0]),
+                courier,
+                total: state.totalPrice
+            }
+
+            setLoading(true);
+            setShowPaymentModal('');
+            let res = await axios.post(API_URL + '/api/transaction/add', formPay, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            })
+
+            if (res.data.success) {
+                setTimeout(() => {
+                    setLoading(false);
+                    setShowSuccessPayModal('show');
+                }, 5000)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     return (
         <div className='container mx-auto py-5'>
             <div className='mx-9'>
@@ -337,7 +395,44 @@ const Checkout = (props) => {
                                 <button type='button'
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
-                                    onClick={() => setShowPaymentModal('show')}>Select Payment</button>
+                                    onClick={() => {
+                                        if (selectedAddress === {}) {
+                                            toast.error('Please select an Address', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (courier === '') {
+                                            toast.error('Please Choose Courier', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (selectedDelivery === '') {
+                                            toast.error('Please Choose Delivery', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else {
+                                            setShowPaymentModal('show')
+                                        }
+                                    }}>Select Payment</button>
                                 {/* MODAL SELECT PAYMENT */}
                                 {
                                     showPaymentModal === 'show' ?
@@ -349,9 +444,9 @@ const Checkout = (props) => {
                                                             <p className='text-2xl font-bold text-main-500'>Select Payment Method</p>
                                                         </div>
                                                         <div className='flex w-full my-4 items-center justify-center'>
-                                                            <img src={bni} className='w-20' />
-                                                            <img src={bca} className='w-20 mx-4' />
-                                                            <img src={bri} className='w-28' />
+                                                        <img src={bni} className='w-20' alt="bnilogo"/>
+                                                        <img src={bca} className='w-20 mx-4' alt="bcalogo"/>
+                                                        <img src={bri} className='w-28' alt="brilogo"/>
                                                         </div>
                                                         <div className='border-2 rounded-lg border-main-600 p-3 my-3'>
                                                             <div className='flex w-full items-center justify-start my-1'>
@@ -362,10 +457,39 @@ const Checkout = (props) => {
                                                         <div className='w-full flex justify-center'>
                                                             <div className='w-1/2 flex justify-evenly items-center'>
                                                                 <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
-                                                                    onClick={() => setShowPaymentModal('')} disabled={paymentMethod === '' ? true : false}>Pay</button>
+                                                                    onClick={() => onPay()} disabled={paymentMethod === '' ? true : false}>Pay</button>
                                                                 <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
                                                                     onClick={() => { setShowPaymentModal(''); setPaymentMethod('') }}>Cancel</button>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        :
+                                        ""
+                                }
+                                {/* MODAL SUCCESS */}
+                                {
+                                    showSuccessPayModal === 'show' ?
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                            <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                    <div className='flex flex-col items-center py-10'>
+                                                        <img src={success} className='max-w-xl' alt='successorder'/>
+                                                        <p className='font-bold text-4xl text-main-500 my-2'>Checkout Success!</p>
+                                                        <p className='font-bold text-2xl text-main-600 my-2'>Your order will be process until your payment complete.</p>
+                                                        <div className='w-1/2 my-2 flex justify-around'>
+                                                            <button className='border-2 rounded-lg py-3 px-14 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
+                                                                onClick={() => {
+                                                                    setShowSuccessPayModal('');
+                                                                    setLoading(true);
+                                                                    setTimeout(() => {
+                                                                        setLoading(false);
+                                                                        navigate('/', { replace: true });
+                                                                    }, 3500)
+                                                                }}>Back to Homepage</button>
+                                                            <button className='border-2 rounded-lg py-3 px-14 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -380,6 +504,7 @@ const Checkout = (props) => {
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading} />
         </div>
     )
 };
