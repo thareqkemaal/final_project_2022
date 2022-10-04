@@ -95,9 +95,6 @@ module.exports = {
     },
     getcartdata: async (req, res) => {
         try {
-            // butuh authorization token
-            // sementara pakai manual data iduser = 2;
-            // harus join sm tabel stock juga
 
             let getSql = await dbQuery(`SELECT * FROM cart c 
             JOIN product p ON c.product_id = p.idproduct 
