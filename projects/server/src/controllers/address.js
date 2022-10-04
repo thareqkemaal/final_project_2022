@@ -37,7 +37,7 @@ module.exports = {
 
     updateAddress: async (req, res) => {
         try {
-            //console.log(req.body)
+            console.log(req.body)
             if (req.body.selected) {
                 await dbQuery(`UPDATE address SET selected='false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                 await dbQuery(`UPDATE address SET selected=${dbConf.escape(req.body.selected)} WHERE idaddress = ${dbConf.escape(req.body.idaddress)};`);
@@ -51,7 +51,7 @@ module.exports = {
                         temp.push(`${key} = ${dbConf.escape(data[key])}`)
                     }
                 }
-                console.log(temp.join(' , '));
+                //console.log(temp.join(' , '));
 
                 await dbQuery(`UPDATE address SET ${temp.join(' , ')} WHERE idaddress = ${dbConf.escape(req.body.idaddress)} AND user_id = ${req.dataToken.iduser};`);
             } else if (req.body.setPrimary) {
