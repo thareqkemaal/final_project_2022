@@ -221,20 +221,19 @@ const Checkout = (props) => {
 
             // INVOICE NUMBER
             let randomNumber = new Date().getTime();
-            let setYear = new Date().getFullYear().toString().split('20')[1];
             let presCode = 1; // kode invoice untuk cart
-            let setInvoice = presCode + setYear + '-' + randomNumber;
+            let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
             let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
 
-            console.log('invoice number', setInvoice);
-            console.log('selected address', setAddress);
-            console.log('weight', weight);
-            console.log('delivery price', parseInt(selectedDelivery.split(',')[0]));
-            console.log('courier', courier);
-            console.log('total price', totalDelivery);
+            // console.log('invoice number', setInvoice);
+            // console.log('selected address', setAddress);
+            // console.log('weight', weight);
+            // console.log('delivery price', parseInt(selectedDelivery.split(',')[0]));
+            // console.log('courier', courier);
+            // console.log('total price', totalDelivery);
 
             let formPay = {
                 invoice: setInvoice,
@@ -245,9 +244,19 @@ const Checkout = (props) => {
                 total: state.totalPrice
             }
 
+            // console.log(checkoutData);
+
+            // Data untuk ke transaction_detail
+            // product_name, product_qty, product_qty, product_price, product_image
+            let temp = [];
+            checkoutData.forEach((val, idx) => {
+                temp.push({product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_image: val.picture})
+            });
+            // console.log(temp)
+            
             setLoading(true);
             setShowPaymentModal('');
-            let res = await axios.post(API_URL + '/api/transaction/add', formPay, {
+            let res = await axios.post(API_URL + '/api/transaction/add', {formPay, detail: temp}, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }

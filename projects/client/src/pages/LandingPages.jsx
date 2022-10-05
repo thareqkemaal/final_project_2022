@@ -18,8 +18,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const LandingPages = () => {
   const navigate = useNavigate()
-
-
   const { email, status, iduser } = useSelector((state) => {
     return {
       email: state.userReducer.email,
