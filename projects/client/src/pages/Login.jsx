@@ -6,6 +6,7 @@ import axios from 'axios'
 import { API_URL } from '../helper';
 import { useDispatch } from 'react-redux'
 import { loginAction } from '../action/useraction';
+import ForgotPass from '../components/ForgotPass';
 
 const Login = () => {
   const navigate = useNavigate()
@@ -93,7 +94,9 @@ const Login = () => {
                         <input type={'checkbox'}/>
                         <div className='ml-3 text-sm font-Public'>Remember me</div>
                       </div>
-                      <div className='text-end text-sm hover:underline font-Public'> Forgot password</div>
+                      <div className='text-sm font-Public text-end'>
+                        <ForgotPass />
+                      </div>
                     </div>
                     <button className='text-white rounded-md bg-main-500 hover:bg-main-600 w-full py-2 my-7 font-Public' onClick={onLogin}>Login</button>
 

@@ -13,5 +13,6 @@ route.get('/keeplogin',readToken,userController.keepLogin);
 route.patch('/updateverif',readToken,userController.verification);
 route.get('/resendverif',userController.resendVerif);
 route.patch('/editprofile',upload,readToken,userController.editProfile);
+route.patch('/changepassword',readToken,userController.changePass);
 
 module.exports=route

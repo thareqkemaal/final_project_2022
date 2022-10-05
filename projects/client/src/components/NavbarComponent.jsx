@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
-import { API_URL } from '../helper';
 import { RiShoppingCartLine } from "react-icons/ri";
 
 const NavbarComponent = (props) => {
@@ -17,7 +16,7 @@ const NavbarComponent = (props) => {
 
   const[dropdown, setDropdown]=useState(false)
   
-  let {username, status, role, profile_pic}=useSelector((state)=>{
+  let {username,role, profile_pic}=useSelector((state)=>{
     return{
       username: state.userReducer.username,
        status: state.userReducer.status,
@@ -60,7 +59,7 @@ const NavbarComponent = (props) => {
                       </button>
                        <Avatar
                       onClick={()=>setDropdown(!dropdown)}
-                      src={API_URL + profile_pic}
+                      src={profile_pic}
                       w={10}
                       h={10}
                       b={1}
@@ -74,23 +73,23 @@ const NavbarComponent = (props) => {
                             role === 'User' ?
                               <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                                 <div className="py-1" role="none">
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-0" onClick={() => navigate('/profile')}>Account settings</a>
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-2" onClick={()=>navigate('/product')}>Product</a>
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-2">Transaction</a>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => navigate('/profile')}>Account settings</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={()=>navigate('/product')}>Product</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Transaction</button>
                                   <form method="POST" action="#" role="none">
-                                    <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" role="menuitem" tabIndex={-1} id="menu-item-3" onClick={onLogout}>Sign out</button>
+                                    <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
                                   </form>
                                 </div>
                               </div>
                               :
                               <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                                 <div className="py-1" role="none">
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-0">Account settings</a>
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-2">Add Product</a>
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-1">Product</a>
-                                  <a href="#" className="text-gray-700 block px-4 py-2 text-sm" role="menuitem" tabIndex={-1} id="menu-item-2">Detail Transaction</a>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Account settings</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Add Product</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Product</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Detail Transaction</button>
                                   <form method="POST" action="#" role="none">
-                                    <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" role="menuitem" tabIndex={-1} id="menu-item-3" onClick={onLogout}>Sign out</button>
+                                    <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
                                   </form>
                                 </div>
                               </div>
