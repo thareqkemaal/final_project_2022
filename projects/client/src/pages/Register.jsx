@@ -235,29 +235,11 @@ const Register = () => {
                 </div>
                 </div>
             </div>
-        {
-            toast &&
-            <div className='absolute top-1 left-1'>
-                <div className='relative'>
-                    <div className='flex bg-white h-16 shadow-lg'>
-                        <div className='w-2 bg-emerald-500 '></div>
-                        <div className='flex py-1'>
-                        <HiCheck size={40} className='fill-emerald-500 mt-1 ml-1 border border-emerald-500 rounded-full'/>
-                            <div className='px-5 pt-1'>
-                                <p className='text-gray-700 font-bold'>Register Success</p>
-                                <p className='text-gray-500 text-xs '>please cek your email</p>
-                            </div>
-                        </div>
-                    </div>
-                        <HiX className='absolute top-1 right-1 fill-red-500' onClick={()=>setToast(false)} />
-                </div>
-            </div>
-        }
         </div>
         {
             loading &&
         <div className='absolute top-1/3 right-[45%]'>
-            <Loading/>
+            <Loading loading={loading}/>
         </div>
 
         }

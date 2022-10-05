@@ -12,6 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import AddressComponent from '../components/AdressComponent';
+import ChangePassword from '../components/ChangePassword';
 
 
 const EditProfile = () => {
@@ -42,7 +43,7 @@ const EditProfile = () => {
     })
     const[newProfilPict, setNewProfilPict]=useState('')
 
-    console.log(newProfilPict)
+
     
     useEffect(()=>{
         setInput({
@@ -68,10 +69,28 @@ const EditProfile = () => {
         })
         .then((res)=>{
             dispatch(UpdateProfile(res.data))
-            alert('sukses bosq')
+            toast.success('Success', {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            })
         })
         .catch((err)=>{
-            alert(err.message)
+            toast.error(`${err.response.data.message}`, {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            })
         })
     }
 
@@ -80,7 +99,7 @@ const EditProfile = () => {
         setInput({...input, [name]:value})
     }
 
-    const handleClick = event => {
+    const handleClick = () => {
         hiddenFileInput.current.click();
     };
 
@@ -120,8 +139,9 @@ const EditProfile = () => {
                             />
                             <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} />
                         </div>
-
                         <form>
+                            {/* Tolong pakai yang tidak ada command di atas label nya pak */}
+                            
                             {/* fullname */}
                             <label className=' block mb-3 '>
                                 <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
@@ -157,7 +177,7 @@ const EditProfile = () => {
                                 </select>
                             </label>
                         </form>
-                        <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={UpdateProfile}>Save</button>
+                        <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={updateProfile}>Save</button>
                     </div>
                 </Tabs.Item>
                 <Tabs.Item
@@ -165,29 +185,7 @@ const EditProfile = () => {
                     title="Password"
                     icon={MdDashboard}
                 >
-                    <div className='container mx-auto lg:px-96'>
-                        <label className=' block mb-3 '>
-                            <span className='block text-sm font-medium text-slate-700 mb-1'>Password</span>
-                            <div className=''>
-                                <input className='border border-gray-400 w-full rounded-md px-2' />
-                            </div>
-                        </label>
-                        <label className='block mb-3'>
-                            <span className='block text-sm font-medium text-slate-700 mb-1'>New Password</span>
-                            <div className='relative'>
-                                <input className='border border-gray-400 w-full rounded-md px-2' />
-                                <BsEye className='absolute top-1 right-2' />
-                            </div>
-                        </label>
-                        <label className='block mb-3'>
-                            <span className='block text-sm font-medium text-slate-700 mb-1'>Repeat Password</span>
-                            <div className='relative'>
-                                <input className='border border-gray-400 w-full rounded-md px-2' />
-                                <BsEye className='absolute top-1 right-2' />
-                            </div>
-                        </label>
-                        <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10' onClick={() => updateProfile()}>Save</button>
-                    </div>
+                    <ChangePassword/>
                 </Tabs.Item>
                 {/* KEMAL BAGIAN ADDRESS APKG2-15 */}
                 <Tabs.Item

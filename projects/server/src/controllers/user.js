@@ -1,6 +1,6 @@
 const { transport } = require('../config/nodemailer');
 const { dbConf, dbQuery } = require('../config/db');
-const { hashPassword, createToken } = require('../config/encript');
+const { hashPassword, createToken, decodePassword } = require('../config/encript');
 
 module.exports = {
   getData: async (req, res) => {
@@ -226,50 +226,53 @@ module.exports = {
     }
   },
 
-  login: async (req, res) => {
+  // GUnaka Login terbaru pak
+  login : async (req,res)=>{
     try {
-      let { email, password } = req.body
-      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
-            WHERE ${dbConf.escape(email).includes('.co') ? `u.email=${dbConf.escape(email)}` :
-          `u.username=${dbConf.escape(email)}`}
-            and u.password=${dbConf.escape(hashPassword(password))}`)
-      console.log(loginUser[0])
-      if (loginUser.length > 0) {
-        let token = createToken({ ...loginUser[0] })
-        if (loginUser[0].status_name === 'Verified') {
-          let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
-                    p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
-                    c.product_id, c. quantity, p.price*c.quantity as total_price from user u
-                    JOIN cart c ON u.iduser=c.user_id
-                    JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
+        let {email,password}=req.body
+        let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+        WHERE ${dbConf.escape(email).includes('.co')?`u.email=${dbConf.escape(email)}`:
+        `u.username=${dbConf.escape(email)}`}
+        and u.password=${dbConf.escape(hashPassword(password))}`)
+        console.log(loginUser[0])
+        if(loginUser.length >0){
+            let token = createToken({...loginUser[0]})
+            if(loginUser[0].status_name === 'Verified'){
+                let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
+                p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
+                c.product_id, c. quantity, p.price*c.quantity as total_price from user u
+                JOIN cart c ON u.iduser=c.user_id
+                JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
 
-          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(loginUser[0].iduser)}`)
-          let transactionUser = await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
-          res.status(200).send({
-            ...loginUser[0],
-            cart: cartUser,
-            address: addressUser,
-            transaction: transactionUser,
-            token
-          })
-        } else {
-          res.status(200).send({
-            status: 'Unverified',
-            ...loginUser[0],
-            token
-          })
+                let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(loginUser[0].iduser)}`)
+
+                let transactionUser= await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
+                res. status(200).send({
+                    ...loginUser[0],
+                    cart:cartUser,
+                    address:addressUser,
+                    transaction:transactionUser,
+                    token
+                })
+            }else{
+              await dbQuery(`UPDATE user set token=${dbConf.escape(token)} WHERE iduser=${dbConf.escape(loginUser[0].iduser)}`)
+                res.status(200).send({
+                    status:'Unverified',
+                    ...loginUser[0],
+                    token
+                })
+            }
+        }else{
+            res.status(500).send({
+                status:false,
+                message:`The username you entered doesn't belong to an account. Please check your username and try again.`
+            })
         }
-      } else {
-        res.status(500).send({
-          status: false,
-          message: `The username you entered doesn't belong to an account. Please check your username and try again.`
-        })
-      }
     } catch (error) {
-      console.log(error)
-      res.status(500).send(error)
+        console.log(error)
+        res.status(500).send(error)
     }
-  },
+},
 
   keepLogin : async (req,res)=>{
         try {
@@ -543,7 +546,7 @@ module.exports = {
       } catch (error) {
         console.log(error)
       }
-  },
+    },
 
   editProfile : async (req,res)=>{
       try {
@@ -591,6 +594,31 @@ module.exports = {
           message: error
         })
       }
-  },
+    },
+
+  changePass : async (req,res)=>{
+      try {
+        let {password,newPassword}=req.body
+        userPass = await dbQuery(`Select * from user where password=${dbConf.escape(hashPassword(password))}`)
+        if(userPass.length > 0){
+          await dbQuery(`UPDATE user set password=${dbConf.escape(hashPassword(newPassword))} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+          res.status(200).send({
+            success:true,
+            message:'Change Password Success'
+          })
+        }else{
+          res.status(401).send({
+            success:false,
+            message:'Please Input Correct Password'
+          })
+        }
+      } catch (error) {
+        res.status(500).send({
+          success:false,
+          message:'Change Password Failed'
+        })
+        
+      }
+    }
 
 }
