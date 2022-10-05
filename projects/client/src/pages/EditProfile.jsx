@@ -5,13 +5,14 @@ import { BsFillPencilFill, BsEye } from 'react-icons/bs';
 import { HiUserCircle, HiAdjustments } from 'react-icons/hi';
 import { useSelector, useDispatch } from 'react-redux'
 import { API_URL } from '../helper'
-import axios from 'axios'
 import { UpdateProfile } from '../action/useraction';
 import PhoneInput from 'react-phone-number-input'
 import Avatar from '../components/Avatar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 import AddressComponent from '../components/AdressComponent';
+
 
 const EditProfile = () => {
 
@@ -137,7 +138,6 @@ const EditProfile = () => {
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Email</span>
                                 <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='email' defaultValue={input.email} onChange={onChange} />
-
                             </label>
                             {/* Phone */}
                             <label className='block mb-3'>
@@ -168,7 +168,6 @@ const EditProfile = () => {
                     icon={MdDashboard}
                 >
                     <div className='container mx-auto lg:px-96'>
-
                         <label className=' block mb-3 '>
                             <span className='block text-sm font-medium text-slate-700 mb-1'>Password</span>
                             <div className=''>

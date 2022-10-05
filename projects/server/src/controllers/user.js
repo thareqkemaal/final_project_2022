@@ -229,7 +229,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       let { email, password } = req.body
-      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE ${dbConf.escape(email).includes('.co') ? `u.email=${dbConf.escape(email)}` :
           `u.username=${dbConf.escape(email)}`}
             and u.password=${dbConf.escape(hashPassword(password))}`)
@@ -243,7 +243,7 @@ module.exports = {
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
 
-          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(loginUser[0].iduser)}`)
+          let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(loginUser[0].iduser)}`)
           let transactionUser = await dbQuery(`Select * from transaction t where t.user_id=${dbConf.escape(loginUser[0].iduser)} `)
           res.status(200).send({
             ...loginUser[0],
@@ -270,7 +270,8 @@ module.exports = {
       res.status(500).send(error)
     }
   },
-    keepLogin : async (req,res)=>{
+
+  keepLogin : async (req,res)=>{
         try {
             let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
@@ -364,11 +365,6 @@ module.exports = {
 
     }
   },
-
-  resendEmail: async (req, res) => {
-
-  },
-
   resendVerif: async (req, res) => {
     try {
       let sqlInsert = await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
@@ -578,7 +574,7 @@ module.exports = {
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
-                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.userId=${dbConf.escape(resultUser[0].iduser)}`)
+                    let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
 
                     let token = createToken({...resultUser[0]})
 

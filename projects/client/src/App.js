@@ -17,10 +17,10 @@ import DashboardPage from './pages/admin/DashboardPage.jsx';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
+import ProductDetail from './pages/user/ProductDetail'
+import ProductCategory from './pages/user/ProductCategory';
 import Prescription from './pages/user/PrescriptionPage';
 import UploadSuccess from './pages/user/UploadSuccessPage';
-
-
 
 function App() {
   const dispatch = useDispatch()
@@ -89,12 +89,15 @@ function App() {
               <Route path='/login' element={<Login />} />
             </>
         }
+        
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<EditProfile />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/cart' element={<UserCart />} />
         <Route path='/checkout' element={<Checkout />} />
+        <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/category' element={<ProductCategory/>} />
         <Route path='/prescription' element={<Prescription />} />
         <Route path='/prescription/success' element={<UploadSuccess />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}

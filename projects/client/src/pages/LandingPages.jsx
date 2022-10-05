@@ -13,11 +13,13 @@ import Carousel from '../components/Carousel'
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { API_URL } from '../helper';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
+import ProductCategory from './user/ProductCategory';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LandingPages = () => {
+  const navigate = useNavigate()
 
   const navigate = useNavigate();
 
@@ -83,21 +85,58 @@ const LandingPages = () => {
           </div>
         </div>
         <div className='py-5'>
-          <div className='flex justify-between my-2'>
-            <p className='text-sm font-bold text-blue-800 font-Public'>Kategori</p>
-            <p className='text-xs font-bold  text-teal-500 font-Public'>Lihat Semua</p>
-          </div>
-          <div className='flex justify-between mx-auto'>
-            <div className='w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiMedicines size={50} className='mx-auto fill-red-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public'>Fever</p>
-              </div>
+            <div className='flex justify-between my-2'>
+              <p className='text-sm font-bold text-blue-800 font-Public'>Kategori</p>
+              <p className='text-xs font-bold  text-teal-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
             </div>
-            <div className='w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiChestnutLeaf size={50} className='mx-auto fill-green-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public'>Flu</p>
+            <div className='flex justify-between mx-auto' onClick={()=>navigate('/product')}>
+              <div className='w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiMedicines size={50} className='mx-auto fill-red-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Fever</p>
+                </div>  
+              </div>
+              <div className='w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiChestnutLeaf size={50} className='mx-auto fill-green-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Flu</p>
+                </div>  
+              </div>
+              <div className='w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiShinyApple size={50} className='mx-auto fill-red-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Digestive System</p>
+                </div>  
+              </div>
+              <div className='w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiSquareBottle size={50} className='mx-auto fill-orange-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Eyes</p>
+                </div>  
+              </div>
+              <div className=' hidden md:block w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiBeerBottle size={50} className='mx-auto fill-gray-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Vitamin</p>
+                </div>  
+              </div>
+              <div className='w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiGlassShot size={50} className='mx-auto fill-red-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public' >Asthma</p>
+                </div>  
+              </div>
+              <div className='hidden md:block w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiMedicines size={50} className='mx-auto fill-green-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Hypertension</p>
+                </div>  
+              </div>
+              <div className='hidden md:block w-40 rounded-xl shadow-xl '>
+                <div className='py-3'>
+                  <GiMedicines size={50} className='mx-auto fill-green-500'/>
+                  <p className='text-xs text-center text-blue-900 font-bold font-Public'>Antivirus</p>
+                </div>  
               </div>
             </div>
             <div className='w-40 rounded-xl shadow-xl '>
@@ -112,111 +151,14 @@ const LandingPages = () => {
                 <p className='text-xs text-center text-blue-900 font-bold font-Public'>Eyes</p>
               </div>
             </div>
-            <div className=' hidden md:block w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiBeerBottle size={50} className='mx-auto fill-gray-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public'>Vitamin</p>
-              </div>
+            <div className='flex justify-between my-2'>
+              <p className='text-sm font-bold text-blue-800 font-Public'>Produk Populer</p>
+              <p className='text-xs font-bold  text-teal-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
             </div>
-            <div className='w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiGlassShot size={50} className='mx-auto fill-red-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public' >Asthma</p>
-              </div>
-            </div>
-            <div className='hidden md:block w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiMedicines size={50} className='mx-auto fill-green-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public'>Hypertension</p>
-              </div>
-            </div>
-            <div className='hidden md:block w-40 rounded-xl shadow-xl '>
-              <div className='py-3'>
-                <GiMedicines size={50} className='mx-auto fill-green-500' />
-                <p className='text-xs text-center text-blue-900 font-bold font-Public'>Antivirus</p>
-              </div>
-            </div>
-          </div>
-          <div className='grid md:grid-cols-2 gap-2 mt-5 mx-auto'>
-            <div className='bg-gradient-to-tr from-orange-500 to-white  h-28 rounded-lg lg:h-40'>
-              <div className='mt-2 flex px-5 lg:px-20'>
-                <img src={image2} alt='medcare.com' className='h-24 lg:h-36' />
-                <div className='pt-3 lg:pt-5 lg:pl-10 '>
-                  <p className='text-medium font-bold  text-center text-blue-900 lg:text-2xl font-Public'>Program Hamil</p>
-                  <p className='text-sm text-center  text-blue-900 font-Public'>Rencanakan kelahiran buah hati anda</p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-gradient-to-tr from-blue-500 to-white h-28 rounded-lg lg:h-40'>
-              <div className='mt-2 flex px-5 lg:px-20'>
-                <img src={image3} alt='medcare.com' className='h-24 lg:h-36' />
-                <div className='pt-3 lg:pt-5 lg:pl-10 '>
-                  <p className='text-medium font-bold  text-center text-blue-900 lg:text-2xl font-Public'>10-10 Flash Sale</p>
-                  <p className='text-sm text-center  text-blue-900 font-Public'>Dapatkan diskon besar untuk keperluan anda</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className='flex justify-between my-2'>
-            <p className='text-sm font-bold text-blue-800 font-Public'>Produk Populer</p>
-            <p className='text-xs font-bold  text-teal-500 font-Public'>Lihat Semua</p>
-          </div>
-          <div className='overflow-x-auto flex no-scrollbar bg-gradient-to-t from-teal-50 to-white'>
-            <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-              <img src='https://d2qjkwm11akmwu.cloudfront.net/products/fb9bf376-4df4-4fee-829f-eb9cf9581e11_product_image_url.webp' alt='medcare.com' className='h-28 px-10 object-cover' />
-              <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Irbesatran 300 mg Box 10 Tablet</p>
-              <div className='w-20 py-1 px-5 flex '>
-                <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-              </div>
-              <div className='px-5'>
-                <p className='text-blue-900 font-bold text-sm font-Public'>Rp.65.000<span className='text-sm text-gray-400 font-normal font-Public'>/Strip</span></p>
-              </div>
-              <div className='px-5 py-5'>
-                <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-              </div>
-            </div>
-            <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-              <img src='https://d2qjkwm11akmwu.cloudfront.net/products/282287_22-9-2021_10-16-32.webp' alt='medcare.com' className='h-28 px-10 object-cover' />
-              <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Rhinos Junior Sirup 60 ml</p>
-              <div className='w-20 py-1 px-5 flex '>
-                <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-              </div>
-              <div className='px-5'>
-                <p className='text-blue-900 font-bold text-sm'>Rp.62.600<span className='text-sm text-gray-400 font-normal font-Public'>/Bottle</span></p>
-              </div>
-              <div className='px-5 py-5'>
-                <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public '>Keranjang</button>
-              </div>
-            </div>
-            <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-              <img src='https://d2qjkwm11akmwu.cloudfront.net/products/832754_22-9-2021_10-18-52.webp' alt='medcare.com' className='h-28 px-10 object-cover' />
-              <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>Sanadryl DMP Sirup 120 ml</p>
-              <div className='w-20 py-1 px-5 flex '>
-                <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.65.000</p>
-              </div>
-              <div className='px-5'>
-                <p className='text-blue-900 font-bold text-sm font-Public'>Rp.32.400<span className='text-sm text-gray-400 font-normal font-Public'>/Bottle</span></p>
-              </div>
-              <div className='px-5 py-5'>
-                <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-              </div>
-            </div>
-            <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
-              <img src='https://d2qjkwm11akmwu.cloudfront.net/products/849685_22-9-2021_10-21-15.webp' alt='medcare.com' className='h-28 px-10 object-cover' />
-              <p className=' px-5 text-blue-900 font-bold text-sm pt-5 font-Public'>Tremenza</p>
-              <div className='w-20 py-1 px-5 flex '>
-                <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
-                <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.5.000</p>
-              </div>
-              <div className='px-5'>
-                <p className='text-blue-900 font-bold text-sm font-Public'>Rp.50.000<span className='text-sm text-gray-400 font-normal font-Public'>/Strip</span></p>
-              </div>
-              <div className='px-5 py-5'>
-                <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
-              </div>
+            <div className='bg-gradient-to-t from-teal-50 to-white'>
+              <ProductCategory
+              id={1}
+              />
             </div>
             <div className='w-48 shadow-lg mx-4 my-4 bg-white'>
               <img src='https://d2qjkwm11akmwu.cloudfront.net/products/176340_10-6-2022_16-17-13.webp' alt='medcare.com' className='h-28 px-10 object-cover' />

@@ -14,5 +14,4 @@ route.patch('/updateverif',readToken,userController.verification);
 route.get('/resendverif',userController.resendVerif);
 route.patch('/editprofile',upload,readToken,userController.editProfile);
 
-
 module.exports=route
