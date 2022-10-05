@@ -8,9 +8,6 @@ import { useNavigate } from 'react-router';
 
 const UserCart = (props) => {
 
-    // NOTE PROBLEM
-    // 1. perlu get data produk untuk dapat stocknya? => fungsi onInc
-
     const [cartData, setCartData] = React.useState([]);
     const [modalDelete, setModalDelete] = React.useState(0);
     const [countItem, setCountItem] = React.useState(0);
@@ -80,6 +77,7 @@ const UserCart = (props) => {
                             <div className='w-2/3 pl-3'>
                                 <p className='font-medium'>{val.product_name}</p>
                                 <p className='text-sm'>1 {val.default_unit}</p>
+                                <p className='text-sm'>Available Stock : {val.stock_unit}</p>
                             </div>
                             <div className='w-1/3 text-end pr-3 font-medium'>
                                 Rp {val.price.toLocaleString('id')}
@@ -119,7 +117,7 @@ const UserCart = (props) => {
                                     <div className='w-1/3 text-center mx-1'>
                                         <p>{val.quantity}</p>
                                     </div>
-                                    <button type='button' className='w-1/3 text-center text-lg' onClick={() => onInc(val.quantity, val.idcart)}>+</button>
+                                    <button type='button' className='w-1/3 text-center text-lg' onClick={() => onInc(val.quantity, val.idcart, val.stock_unit)}>+</button>
                                 </div>
                             </div>
                         </div>
@@ -176,18 +174,30 @@ const UserCart = (props) => {
         }
     };
 
-    const onInc = async (quantity, idcart) => {
+    const onInc = async (quantity, idcart, stock) => {
         try {
-            // belum ditambah kondisi ketika sudah mencapai stok maximum
-            let userToken = localStorage.getItem('medcarelog');
-            let newQty = quantity + 1;
-            let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
+            if (quantity < stock){
+                let userToken = localStorage.getItem('medcarelog');
+                let newQty = quantity + 1;
+                let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                });
+                if (inc.data.success) {
+                    getCartData();
                 }
-            });
-            if (inc.data.success) {
-                getCartData();
+            } else if (quantity === stock) {
+                toast.error('Quantity has been reached maximum', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
             }
         } catch (error) {
             console.log(error)

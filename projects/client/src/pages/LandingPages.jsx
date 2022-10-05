@@ -1,8 +1,6 @@
 import React from 'react'
 import image from '../assets/undraw_doctors_hwty.svg'
 import { GiMedicines, GiChestnutLeaf, GiShinyApple, GiBeerBottle, GiSquareBottle, GiGlassShot, GiNotebook, GiShipBow } from 'react-icons/gi';
-import image2 from '../assets/undraw_conference_re_2yld.svg'
-import image3 from '../assets/undraw_shopping_app_flsj.svg'
 import bca from '../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png'
 import bri from '../assets/bri.png'
 import bni from '../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png'
