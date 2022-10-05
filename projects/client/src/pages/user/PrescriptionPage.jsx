@@ -198,9 +198,8 @@ const Prescription = (props) => {
 
             // INVOICE NUMBER
             let randomNumber = new Date().getTime();
-            let setYear = new Date().getFullYear().toString().split('20')[1];
             let presCode = 2; // kode invoice untuk resep
-            let setInvoice = presCode + setYear + '-' + randomNumber;
+            let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
