@@ -17,13 +17,12 @@ const NavbarComponent = (props) => {
 
   const[dropdown, setDropdown]=useState(false)
   
-  let {username, role, profile_pict}=useSelector((state)=>{
+  let {username, status, role, profile_pic}=useSelector((state)=>{
     return{
-
       username: state.userReducer.username,
        status: state.userReducer.status,
       role: state.userReducer.role,
-      profile_pict: state.userReducer.profile_pict,
+      profile_pic: state.userReducer.profile_pic,
     }
   })
 
@@ -61,7 +60,7 @@ const NavbarComponent = (props) => {
                       </button>
                        <Avatar
                       onClick={()=>setDropdown(!dropdown)}
-                      src={API_URL + profile_pict}
+                      src={API_URL + profile_pic}
                       w={10}
                       h={10}
                       b={1}

@@ -7,7 +7,7 @@ const INITIAL_STATE={
     phone_number:'',
     gender:'',
     birthdate:'',
-    profil_pict:'',
+    profile_pic:'',
     status_id:null,
     status_name:'',
     cart:[],
