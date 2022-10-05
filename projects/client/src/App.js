@@ -19,7 +19,6 @@ import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
 import Prescription from './pages/user/PrescriptionPage';
 import UploadSuccess from './pages/user/UploadSuccessPage';
-import Testing from './components/testing';
 
 
 
@@ -99,7 +98,6 @@ function App() {
         <Route path='/prescription' element={<Prescription />} />
         <Route path='/prescription/success' element={<UploadSuccess />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
-        <Route path='/testing' element={<Testing/>} />
       </Routes>
       <Footer />
     </div>
