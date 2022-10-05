@@ -245,8 +245,8 @@ const Prescription = (props) => {
     };
 
     return (
-        <div className='border container mx-auto my-5 p-10 flex flex-col'>
-            <div className='border flex justify-center'>
+        <div className='container mx-auto my-5 p-10 flex flex-col'>
+            <div className='flex justify-center'>
                 <p className='font-bold text-2xl text-main-500 py-2'>UPLOAD PRESCRIPTION</p>
             </div>
             <div className='flex flex-row mt-2'>

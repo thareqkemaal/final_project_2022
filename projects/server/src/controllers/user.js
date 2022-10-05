@@ -239,7 +239,7 @@ module.exports = {
         if (loginUser[0].status_name === 'Verified') {
           let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
                     p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
-                    c.prescription_id, c.product_id, c. quantity, p.price*c.quantity as total_price, c.unit from user u
+                    c.product_id, c. quantity, p.price*c.quantity as total_price from user u
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(loginUser[0].iduser)}`)
 
@@ -272,7 +272,7 @@ module.exports = {
   },
     keepLogin : async (req,res)=>{
         try {
-            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
       if (resultUser.length > 0) {
 
@@ -310,7 +310,7 @@ module.exports = {
         if (req.dataToken.iduser) {
           await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
           //. proses login 
-          let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+          let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id from user u
 
                     join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
           if (resultUser.length > 0) {
@@ -330,7 +330,7 @@ module.exports = {
       } else {
         await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
         //. proses login 
-        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profil_pict, u.status_id from user u
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profile_pic, u.status_id from user u
               join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
         if (resultUser[0].token) {
           res.status(500).send({
@@ -558,7 +558,7 @@ module.exports = {
               dataInput.push(`${key}=${dbConf.escape(data[key])}`)
             }
             if(req.files.length>0){
-              dataInput.push(`profil_pict=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
+              dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
                     try {
                       await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
                     } catch (error) {
@@ -569,12 +569,12 @@ module.exports = {
             }else{
               await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
             }
-            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profil_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
 
             let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
                     p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
-                    c.prescription_id, c.product_id, c. quantity, p.price*c.quantity as total_price, c.unit from user u
+                    c.product_id, c. quantity, p.price*c.quantity as total_price from user u
                     JOIN cart c ON u.iduser=c.user_id
                     JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
@@ -595,40 +595,5 @@ module.exports = {
         })
       }
     },
-
-  getAddress: async (req, res) => {
-    try {
-      //console.log(req.dataToken);
-      let getSql = await dbQuery(`SELECT a.*, s.*, u.fullname, u.phone_number FROM address a 
-      JOIN status s ON a.status_id = s.idstatus 
-      JOIN user u ON u.iduser = a.user_id 
-      WHERE a.user_id = ${req.dataToken.iduser};`)
-
-      res.status(200).send(getSql);
-    } catch (error) {
-      console.log(error)
-      res.status(500).send(error)
-
-    }
-  },
-  addAddress: async (req, res) => {
-    try {
-      // ada authorization
-      // sementara user id pakai manual = 2;
-
-      // console.log(req.body.data)
-      const { full_address, district, city, city_id, province, province_id, postal_code } = req.body.data;
-
-      await dbQuery(`INSERT INTO address (full_address, district, city, city_id, province, province_id, postal_code, user_id) VALUES
-      (${dbConf.escape(full_address)}, ${dbConf.escape(district)}, ${dbConf.escape(city)}, ${dbConf.escape(city_id)}, ${dbConf.escape(province)}, ${dbConf.escape(province_id)}, ${dbConf.escape(postal_code)}, ${dbConf.escape(req.dataToken.iduser)});`)
-
-      res.status(200).send({
-        success: true,
-        message: 'Register Success'
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  },
 
 }

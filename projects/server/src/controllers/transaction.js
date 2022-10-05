@@ -42,4 +42,26 @@ module.exports = {
       res.status(500).send(error)
     }
   },
+
+  updateTransaction: async (req, res) => {
+    try {
+
+      if (req.files){
+
+      let data = JSON.parse(req.body.datatransaction);
+      
+      await dbQuery(`UPDATE transaction SET payment_proof_pic='/paymentproof/${req.files[0].filename}' WHERE idtransaction = ${dbConf.escape(data.transactionId)};`)
+      
+      }
+
+      res.status(200).send({
+        success: true,
+        message: 'Transaction Updated'
+      })
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  }
 }
