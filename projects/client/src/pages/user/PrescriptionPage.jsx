@@ -10,6 +10,7 @@ import bri from '../../assets/bri.png';
 import LoadingComponent from "../../components/Loading";
 import NewAddressComponent from "../../components/NewAddressModalComp";
 import EditAddressComponent from "../../components/EditAddressModalComp";
+import Currency from "../../components/CurrencyComp";
 
 const Prescription = (props) => {
 
@@ -177,11 +178,11 @@ const Prescription = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value}/></option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value}/></option>
                     )
                 }
             }
@@ -417,14 +418,14 @@ const Prescription = (props) => {
                             <p>Delivery</p>
                             {
                                 selectedDelivery ?
-                                    <p>Rp{parseInt(selectedDelivery.split(',')[0]).toLocaleString('id')}</p>
+                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
                                     :
-                                    <p>Rp0</p>
+                                    <p><Currency price={0}/></p>
                             }
                         </div>
                         <div className='flex justify-between my-4'>
                             <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                            <p className='font-bold text-2xl text-main-500'>Rp{totalDelivery.toLocaleString('id')}</p>
+                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
                         </div>
                         <div>
                             <button type='button'

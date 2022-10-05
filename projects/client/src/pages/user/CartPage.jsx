@@ -5,6 +5,7 @@ import { CgTrash } from "react-icons/cg";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router';
+import Currency from '../../components/CurrencyComp';
 
 const UserCart = (props) => {
 
@@ -80,7 +81,7 @@ const UserCart = (props) => {
                                 <p className='text-sm'>Available Stock : {val.stock_unit}</p>
                             </div>
                             <div className='w-1/3 text-end pr-3 font-medium'>
-                                Rp{val.price.toLocaleString('id')}
+                                <Currency price={val.price} />
                             </div>
                         </div>
                         <div className='flex justify-end h-1/3 items-center'>
@@ -176,7 +177,7 @@ const UserCart = (props) => {
 
     const onInc = async (quantity, idcart, stock) => {
         try {
-            if (quantity < stock){
+            if (quantity < stock) {
                 let userToken = localStorage.getItem('medcarelog');
                 let newQty = quantity + 1;
                 let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
@@ -301,11 +302,11 @@ const UserCart = (props) => {
                             <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Sub Total Price ({countItem} Item(s))</p>
-                                <p>Rp{totalPrice.toLocaleString('id')}</p>
+                                <Currency price={totalPrice} />
                             </div>
                             <div className='flex justify-between my-4'>
                                 <p className='font-bold text-2xl text-main-500'>Total Price</p>
-                                <p className='font-bold text-2xl text-main-500'>Rp{totalPrice.toLocaleString('id')}</p>
+                                <p className='font-bold text-2xl text-main-500'><Currency price={totalPrice} /></p>
                             </div>
                             <div>
                                 <button type='button'

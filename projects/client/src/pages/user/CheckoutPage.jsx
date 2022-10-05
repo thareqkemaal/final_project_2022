@@ -11,6 +11,7 @@ import NewAddressComponent from '../../components/NewAddressModalComp';
 import EditAddressComponent from '../../components/EditAddressModalComp';
 import LoadingComponent from '../../components/Loading';
 import success from '../../assets/success.png';
+import Currency from '../../components/CurrencyComp';
 
 const Checkout = (props) => {
 
@@ -164,7 +165,7 @@ const Checkout = (props) => {
                                 <p className='text-transform: capitalize text-sm'>1 {val.default_unit}</p>
                             </div>
                             <div className='w-1/4 text-center pt-1 font-semibold'>
-                                Rp{(val.price * val.quantity).toLocaleString('id')}
+                                <Currency price={(val.price * val.quantity)} />
                             </div>
                         </div>
                     </div>
@@ -201,11 +202,11 @@ const Checkout = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 }
             }
@@ -250,13 +251,13 @@ const Checkout = (props) => {
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_image: val.picture})
+                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_image: val.picture })
             });
             // console.log(temp)
-            
+
             setLoading(true);
             setShowPaymentModal('');
-            let res = await axios.post(API_URL + '/api/transaction/add', {formPay, detail: temp}, {
+            let res = await axios.post(API_URL + '/api/transaction/add', { formPay, detail: temp }, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -335,7 +336,7 @@ const Checkout = (props) => {
                                     Sub Total
                                 </div>
                                 <div className='w-1/5 text-center font-semibold'>
-                                    Rp{state.totalPrice.toLocaleString('id')}
+                                    <Currency price={state.totalPrice} />
                                 </div>
                             </div>
                         </div>
@@ -385,20 +386,20 @@ const Checkout = (props) => {
                             </div>
                             <div className='flex justify-between py-4'>
                                 <p>Sub Total Item(s)</p>
-                                <p>Rp{state.totalPrice.toLocaleString('id')}</p>
+                                <Currency price={state.totalPrice} />
                             </div>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Delivery</p>
                                 {
                                     selectedDelivery ?
-                                        <p>Rp{parseInt(selectedDelivery.split(',')[0]).toLocaleString('id')}</p>
+                                        <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
                                         :
-                                        <p>Rp0</p>
+                                        <p><Currency price={0}/></p>
                                 }
                             </div>
                             <div className='flex justify-between my-4'>
                                 <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                                <p className='font-bold text-2xl text-main-500'>Rp {totalDelivery.toLocaleString('id')}</p>
+                                <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
                             </div>
                             <div>
                                 <button type='button'
@@ -453,9 +454,9 @@ const Checkout = (props) => {
                                                             <p className='text-2xl font-bold text-main-500'>Select Payment Method</p>
                                                         </div>
                                                         <div className='flex w-full my-4 items-center justify-center'>
-                                                        <img src={bni} className='w-20' alt="bnilogo"/>
-                                                        <img src={bca} className='w-20 mx-4' alt="bcalogo"/>
-                                                        <img src={bri} className='w-28' alt="brilogo"/>
+                                                            <img src={bni} className='w-20' alt="bnilogo" />
+                                                            <img src={bca} className='w-20 mx-4' alt="bcalogo" />
+                                                            <img src={bri} className='w-28' alt="brilogo" />
                                                         </div>
                                                         <div className='border-2 rounded-lg border-main-600 p-3 my-3'>
                                                             <div className='flex w-full items-center justify-start my-1'>
@@ -485,7 +486,7 @@ const Checkout = (props) => {
                                             <div className="relative p-4 w-1/2 h-full md:h-auto">
                                                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                     <div className='flex flex-col items-center py-10'>
-                                                        <img src={success} className='max-w-xl' alt='successorder'/>
+                                                        <img src={success} className='max-w-xl' alt='successorder' />
                                                         <p className='font-bold text-4xl text-main-500 my-2'>Checkout Success!</p>
                                                         <p className='font-bold text-2xl text-main-600 my-2'>Your order will be process until your payment complete.</p>
                                                         <div className='w-1/2 my-2 flex justify-around'>

@@ -21,6 +21,7 @@ const ProductCategory = (props) => {
             filterName: ''
         })
             .then((res) => {
+                console.log(res.data)
                 setProductByCategory(res.data)
             })
             .catch((err) => {
