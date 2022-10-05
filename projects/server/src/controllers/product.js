@@ -79,7 +79,7 @@ module.exports = {
 
     updatecart: async (req, res) => {
         try {
-            //console.log(req.body)
+            // console.log(req.body)
             if (req.body.selected){
                 if(req.body.selectAll){
                     // checkbox all
@@ -101,4 +101,23 @@ module.exports = {
             res.status(500).send(error)
         }
     },
+
+    addCart: async (req, res) => {
+        try {
+            // console.log(req.body);
+            // console.log(req.dataToken);
+
+            // single income data
+            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+
+            res.status(200).send({
+                success: true,
+                message: 'Product Added'
+            })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
+        }
+    }
 };

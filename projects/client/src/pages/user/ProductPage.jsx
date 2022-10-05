@@ -67,9 +67,9 @@ const ProductPage = (props) => {
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
-                return <div key={val.idproduct}  className="row-span-3" onClick={()=>navigate(`/product/detail?name:${val.product_name}:${val.category_id}`)}>
-                    <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-72" >
-                        <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct}  />
+                return <div key={val.idproduct}  className="row-span-3">
+                    <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-auto" >
+                        <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} onClick={()=>navigate(`/product/detail?name:${val.product_name}:${val.category_id}`)}/>
                         <div className="" >
                             {val.product_name.length <= 21
                                 ?
@@ -94,9 +94,9 @@ const ProductPage = (props) => {
                         {
                             val.product_name.length <= 21
                                 ? <button type="button" className="mb-3 mt-7 md:mt-9 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center">Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => navigate('/')}>Keranjang</button>
                                 : <button type="button" className="my-3 md:my-5 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center">Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => navigate('/')}>Keranjang</button>
                         }
 
                     </div>
