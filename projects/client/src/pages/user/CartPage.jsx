@@ -80,7 +80,7 @@ const UserCart = (props) => {
                                 <p className='text-sm'>Available Stock : {val.stock_unit}</p>
                             </div>
                             <div className='w-1/3 text-end pr-3 font-medium'>
-                                Rp {val.price.toLocaleString('id')}
+                                Rp{val.price.toLocaleString('id')}
                             </div>
                         </div>
                         <div className='flex justify-end h-1/3 items-center'>
@@ -301,11 +301,11 @@ const UserCart = (props) => {
                             <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Sub Total Price ({countItem} Item(s))</p>
-                                <p>Rp. {totalPrice.toLocaleString('id')}</p>
+                                <p>Rp{totalPrice.toLocaleString('id')}</p>
                             </div>
                             <div className='flex justify-between my-4'>
                                 <p className='font-bold text-2xl text-main-500'>Total Price</p>
-                                <p className='font-bold text-2xl text-main-500'>Rp. {totalPrice.toLocaleString('id')}</p>
+                                <p className='font-bold text-2xl text-main-500'>Rp{totalPrice.toLocaleString('id')}</p>
                             </div>
                             <div>
                                 <button type='button'

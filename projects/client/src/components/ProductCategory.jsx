@@ -73,52 +73,17 @@ const ProductCategory = (props) => {
                 });
                 navigate('/login');
             } else {
-                let find = null;
-                let qty = 0;
-                let idcart = 0;
-                userCartData.forEach((val, idx) => {
-                    if (val.idproduct === id) {
-                        find = true;
-                        qty = val.quantity;
-                        idcart = val.idcart;
-                    } else {
-                        find = false;
-                    }
-                });
 
-                console.log(find);
-                console.log('quantity in cart', qty);
-                console.log('idcart', idcart);
+                let findIndex = userCartData.find(val => val.idproduct === id);
 
-                if (find) {
-                    let data = {
-                        idcart,
-                        newQty: qty + 1
-                    };
+                console.log(findIndex)
 
-                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
-                        headers: {
-                            'Authorization': `Bearer ${userToken}`
-                        }
-                    });
+                if (findIndex === undefined) {
+                    console.log(true);
 
-                    if (res.data.success) {
-                        toast.success('Item Added to Cart', {
-                            theme: "colored",
-                            position: "top-center",
-                            autoClose: 2000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                        });
-                    }
-
-                } else {
                     let data = {
                         idproduct: id,
-                        newQty: qty + 1
+                        newQty: 1
                     };
 
                     let res = await axios.post(API_URL + '/api/product/addcart', data, {
@@ -138,6 +103,36 @@ const ProductCategory = (props) => {
                             draggable: false,
                             progress: undefined,
                         });
+                        getUserCartData();
+                    }
+                } else {
+                    console.log(findIndex.product_name)
+                    console.log(findIndex.quantity)
+                    console.log(findIndex.price)
+
+                    let data = {
+                        idcart: findIndex.idcart,
+                        newQty: findIndex.quantity + 1
+                    };
+
+                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
                     }
                 }
             }
@@ -166,7 +161,7 @@ const ProductCategory = (props) => {
                         </div>
                     </div>
                     <div className='px-5 py-5'>
-                        <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'
+                        <button type='button' className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'
                             onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
                     </div>
                 </div>

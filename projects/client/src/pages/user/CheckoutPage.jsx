@@ -164,7 +164,7 @@ const Checkout = (props) => {
                                 <p className='text-transform: capitalize text-sm'>1 {val.default_unit}</p>
                             </div>
                             <div className='w-1/4 text-center pt-1 font-semibold'>
-                                Rp {(val.price * val.quantity).toLocaleString('id')}
+                                Rp{(val.price * val.quantity).toLocaleString('id')}
                             </div>
                         </div>
                     </div>
@@ -201,11 +201,11 @@ const Checkout = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - Rp {val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - Rp {val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - Rp{val.cost[0].value.toLocaleString('id')}</option>
                     )
                 }
             }
@@ -335,7 +335,7 @@ const Checkout = (props) => {
                                     Sub Total
                                 </div>
                                 <div className='w-1/5 text-center font-semibold'>
-                                    Rp {state.totalPrice.toLocaleString('id')}
+                                    Rp{state.totalPrice.toLocaleString('id')}
                                 </div>
                             </div>
                         </div>
@@ -385,15 +385,15 @@ const Checkout = (props) => {
                             </div>
                             <div className='flex justify-between py-4'>
                                 <p>Sub Total Item(s)</p>
-                                <p>Rp. {state.totalPrice.toLocaleString('id')}</p>
+                                <p>Rp{state.totalPrice.toLocaleString('id')}</p>
                             </div>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Delivery</p>
                                 {
                                     selectedDelivery ?
-                                        <p>Rp {parseInt(selectedDelivery.split(',')[0]).toLocaleString('id')}</p>
+                                        <p>Rp{parseInt(selectedDelivery.split(',')[0]).toLocaleString('id')}</p>
                                         :
-                                        <p>Rp 0</p>
+                                        <p>Rp0</p>
                                 }
                             </div>
                             <div className='flex justify-between my-4'>
