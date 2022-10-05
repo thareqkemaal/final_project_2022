@@ -229,7 +229,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       let { email, password } = req.body
-      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pict, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
             WHERE ${dbConf.escape(email).includes('.co') ? `u.email=${dbConf.escape(email)}` :
           `u.username=${dbConf.escape(email)}`}
             and u.password=${dbConf.escape(hashPassword(password))}`)
@@ -302,10 +302,9 @@ module.exports = {
     }
 
   },
+
   verification: async (req, res) => {
     let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
-    console.log(isToken)
-    console.log('===============================')
     try {
       if (isToken.length > 0) {
         if (req.dataToken.iduser) {
@@ -365,6 +364,7 @@ module.exports = {
 
     }
   },
+
   resendVerif: async (req, res) => {
     try {
       let sqlInsert = await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
@@ -543,8 +543,9 @@ module.exports = {
       } catch (error) {
         console.log(error)
       }
-    },
-       editProfile : async (req,res)=>{
+  },
+
+  editProfile : async (req,res)=>{
       try {
         let data=JSON.parse(req.body.data)
         let availableUsername = await dbQuery(`Select username from user where username = ${dbConf.escape(data.username)}`)
@@ -590,6 +591,6 @@ module.exports = {
           message: error
         })
       }
-    },
+  },
 
 }

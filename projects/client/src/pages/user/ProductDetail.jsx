@@ -5,7 +5,7 @@ import {useLocation} from 'react-router-dom'
 import axios from 'axios'
 import { API_URL } from '../../helper';
 import { Tabs } from 'flowbite-react';
-import ProductCategory from './ProductCategory';
+import ProductCategory from '../../components/ProductCategory';
 
 const ProductDetail = () => {
     const {search} = useLocation()

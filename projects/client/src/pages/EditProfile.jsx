@@ -41,6 +41,8 @@ const EditProfile = () => {
         phone_number: ''
     })
     const[newProfilPict, setNewProfilPict]=useState('')
+
+    console.log(newProfilPict)
     
     useEffect(()=>{
         setInput({
@@ -109,7 +111,7 @@ const EditProfile = () => {
                         <div className='flex justify-center mt-5'>
                             <Avatar
                                 onClick={handleClick}
-                                src={newProfilPict ? URL.createObjectURL(newProfilPict) : API_URL + profile_pic}
+                                src={newProfilPict ? URL.createObjectURL(newProfilPict) : profile_pic}
                                 w={20}
                                 h={20}
                                 b={1}
@@ -124,10 +126,6 @@ const EditProfile = () => {
                             <label className=' block mb-3 '>
                                 <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
                                 <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='fullname' onChange={onChange} defaultValue={input.fullname} />
-                                <label className=' block mb-3 '>
-                                    <spam className='block text-sm font-medium text-slate-700 mb-1'>Name</spam>
-                                    <input className='border border-gray-400 w-full rounded-md px-2' />
-                                </label>
                             </label>
                             {/* Username */}
                             <label className=' block mb-3 '>
