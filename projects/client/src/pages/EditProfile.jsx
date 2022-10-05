@@ -1,23 +1,99 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import { Tabs } from 'flowbite-react'
 import { MdDashboard } from 'react-icons/md';
-import { BsFillPencilFill, BsEye } from 'react-icons/bs';
+import { BsEye } from 'react-icons/bs';
 import { HiUserCircle, HiAdjustments} from 'react-icons/hi';
 import  {useSelector, useDispatch } from 'react-redux'
 import { API_URL } from '../helper'
-import axios from 'axios'
 import { UpdateProfile } from '../action/useraction';
-import { useEffect } from 'react';
 import PhoneInput from 'react-phone-number-input'
 import Avatar from '../components/Avatar';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { HiUserCircle, HiAdjustments } from 'react-icons/hi';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 import AddressComponent from '../components/AdressComponent';
 
+
 const EditProfile = () => {
+
+    // DanielHS APKG2-13 dan APKG2-14
+    const dispatch = useDispatch()
+    const hiddenFileInput = useRef(null)
+    
+    let{fullname,username,email,phone_number, profile_pict, gender, birthdate}=useSelector((state)=>{
+        return{
+            fullname:state.userReducer.fullname,
+            username:state.userReducer.username,
+            email:state.userReducer.email,
+            phone_number:state.userReducer.phone_number,
+            gender:state.userReducer.gender,
+            birthdate:state.userReducer.birthdate,
+            profile_pict:state.userReducer.profile_pict,
+        }
+    })
+
+    const [input, setInput]=useState({
+        fullname:'',
+        username:'',
+        email:'',
+        gender:'',
+        birthdate:'',
+        phone_number: ''
+    })
+    const[newProfilPict, setNewProfilPict]=useState('')
+    
+    useEffect(()=>{
+        setInput({
+            fullname: fullname,
+            username:username,
+            email:email,
+            gender:gender,
+            birthdate:birthdate.split('').splice(0,10).join(''),
+            phone_number: phone_number
+        })
+    },[fullname,username,email,phone_number, gender, birthdate])
+
+    
+    const updateProfile = ()=>{
+        let medcarelog = localStorage.getItem('medcarelog')
+        let formData = new FormData()
+        formData.append('data',JSON.stringify(input))
+        formData.append('images',newProfilPict)
+        axios.patch(API_URL+`/api/user/editprofile`,formData,{
+            headers:{
+                'Authorization': `Bearer ${medcarelog}`
+            }
+        })
+        .then((res)=>{
+            dispatch(UpdateProfile(res.data))
+            alert('sukses bosq')
+        })
+        .catch((err)=>{
+            alert(err.message)
+        })
+    }
+
+    const onChange = (e)=>{
+        const {value,name}=e.target
+        setInput({...input, [name]:value})
+    }
+
+    const handleClick = event => {
+        hiddenFileInput.current.click();
+    };
+
+    const onChangeNewProfilePic = (files) => {
+        if(files.size>=1000000 ){
+            return alert('Size kebesaran')
+        }
+        switch(files.type.split('/')[1].toLowerCase()){
+            case 'jpg':
+                case'png':
+                    case'gif':
+                return setNewProfilPict(files)
+            }
+            return alert('format gagal')
+    }
 
     return (
         <div>
@@ -31,26 +107,22 @@ const EditProfile = () => {
                 >
                     <div className='container mx-auto lg:px-96'>
                         <div className='flex justify-center mt-5'>
-                        <Avatar
-                        onClick={handleClick}
-                        src={newProfilPict ? URL.createObjectURL(newProfilPict): API_URL+ profil_pict}
-                        w={20}
-                        h={20}
-                        b={1}
-                        width={6}
-                        height={6}
-                        />
-                        <input onChange={(e)=>onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{display:'none'}} />
-                         </div>
-                         
+                            <Avatar
+                            onClick={handleClick}
+                            src={newProfilPict ? URL.createObjectURL(newProfilPict): API_URL+ profile_pict}
+                            w={20}
+                            h={20}
+                            b={1}
+                            width={6}
+                            height={6}
+                            />
+                            <input onChange={(e)=>onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{display:'none'}} />
+                        </div>
                         <form>
                         {/* fullname */}
                         <label className=' block mb-3 '>
                             <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
                             <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='fullname' onChange={onChange} defaultValue={input.fullname} />
-                        <label className=' block mb-3 '>
-                            <spam className='block text-sm font-medium text-slate-700 mb-1'>Name</spam>
-                            <input className='border border-gray-400 w-full rounded-md px-2' />
                         </label>
                         {/* Username */}
                         <label className=' block mb-3 '>

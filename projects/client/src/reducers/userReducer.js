@@ -12,7 +12,6 @@ const INITIAL_STATE={
     status_name:'',
     cart:[],
     address:[],
-    transaction:[]
 }
 
 

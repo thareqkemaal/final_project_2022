@@ -18,7 +18,7 @@ route.patch('/editprofile',upload,readToken,userController.editProfile)
 route.get('/getaddress', readToken, userController.getAddress);
 route.post('/addaddress', readToken, userController.addAddress);
 route.patch('/updateaddress', readToken, userController.updateAddress);
-route.delete('/deleteaddress/:idaddress', userController.deleteAddress);
+route.delete('/deleteaddress/:idaddress',userController.deleteAddress);
 
 
 // RAJAONGKIR
