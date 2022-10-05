@@ -11,8 +11,7 @@ import Avatar from '../components/Avatar';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import Address from './Address';
-
+import AddressComponent from '../components/AdressComponent';
 
 
 const EditProfile = () => {
@@ -95,9 +94,6 @@ const EditProfile = () => {
             }
             return alert('format gagal')
     }
-
-
-  
 
     return (
         <div>
@@ -197,7 +193,7 @@ const EditProfile = () => {
                     title="Address"
                     icon={HiAdjustments}
                 >
-                 <Address/> 
+                    <AddressComponent />
                 </Tabs.Item>
             </Tabs.Group>
             <ToastContainer />
@@ -205,4 +201,4 @@ const EditProfile = () => {
     )
 }
 
-export default EditProfile
+export default EditProfile;
