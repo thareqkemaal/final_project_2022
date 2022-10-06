@@ -22,7 +22,13 @@ code {
 .overflow-hide {
   overflow: auto;
   overflow-x: hidden;
-  height: 500px;
+  height: 512px;
+}
+
+.overflow-hide-modal {
+  overflow: auto;
+  overflow-x: hidden;
+  height: 550px;
 }
 
 .scroll::-webkit-scrollbar {

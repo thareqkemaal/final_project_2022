@@ -14,12 +14,12 @@ const NavbarComponent = (props) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const[dropdown, setDropdown]=useState(false)
-  
-  let {username,role, profile_pic}=useSelector((state)=>{
-    return{
+  const [dropdown, setDropdown] = useState(false)
+
+  let { username, role, profile_pic } = useSelector((state) => {
+    return {
       username: state.userReducer.username,
-       status: state.userReducer.status,
+      status: state.userReducer.status,
       role: state.userReducer.role,
       profile_pic: state.userReducer.profile_pic,
     }
@@ -57,15 +57,15 @@ const NavbarComponent = (props) => {
                       <button type='button' onClick={() => navigate('/cart')}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
                       </button>
-                       <Avatar
-                      onClick={()=>setDropdown(!dropdown)}
-                      src={profile_pic}
-                      w={10}
-                      h={10}
-                      b={1}
-                     width={3}
-                      height={3}
-                    />
+                      <Avatar
+                        onClick={() => setDropdown(!dropdown)}
+                        src={profile_pic}
+                        w={10}
+                        h={10}
+                        b={1}
+                        width={3}
+                        height={3}
+                      />
                       {
                         dropdown &&
                         <div>
@@ -74,7 +74,7 @@ const NavbarComponent = (props) => {
                               <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                                 <div className="py-1" role="none">
                                   <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => navigate('/profile')}>Account settings</button>
-                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={()=>navigate('/product')}>Product</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => navigate('/product')}>Product</button>
                                   <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Transaction</button>
                                   <form method="POST" action="#" role="none">
                                     <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
