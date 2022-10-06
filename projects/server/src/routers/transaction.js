@@ -8,10 +8,12 @@ const prescriptionUploader = uploader('/prescription', 'prescription').array('pr
 const paymentProofUploader = uploader('/paymentproof', 'paymentproof').array('paymentproof_pic', 1);
 
 // PRESCRIPTION
+
+route.get('/all', transactionController.getTransaction)
 route.post('/addprescription', prescriptionUploader, readToken, transactionController.addTransaction);
 route.post('/add', readToken, transactionController.addTransaction);
 
 // PAYMENT PROOF
 route.patch('/addproof', paymentProofUploader, readToken, transactionController.updateTransaction);
 
-module.exports=route
+module.exports = route

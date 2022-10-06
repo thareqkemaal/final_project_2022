@@ -18,3 +18,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.overflow-hide {
+  overflow: auto;
+  overflow-x: hidden;
+  height: 500px;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}

@@ -3,6 +3,33 @@ const { dbConf, dbQuery } = require('../config/db');
 
 
 module.exports = {
+  getTransaction: async (req, res) => {
+    try {
+      let filter = [];
+      for (const key in req.query) {
+        if (key == 'end') {
+          filter.push(`date_order < ${dbConf.escape(req.query[key])}`)
+        } else if (key == 'start') {
+          filter.push(`date_order > ${dbConf.escape(req.query[key])}`)
+        } else {
+          filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
+        }
+      }
+      let sqlGet = `Select *,date_format(date_order,'%e %b %Y, %H:%i') as date_order from transaction 
+        ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
+
+      let transaction = await dbQuery(sqlGet);
+      if (transaction) {
+        for (i = 0; i < transaction.length; i++) {
+          transaction[i].detail = await dbQuery(`SELECT * FROM transaction_detail where transaction_id=${transaction[i].idtransaction};`)
+        }
+        await res.status(200).send(transaction)
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
   addTransaction: async (req, res) => {
     try {
       // console.log(req.dataToken)

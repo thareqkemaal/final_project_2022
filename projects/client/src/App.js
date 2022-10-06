@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
+import TransactionPage from './pages/admin/TransactionPage';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
@@ -74,6 +75,7 @@ function App() {
                 role === 'Admin' ?
                   <>
                     <Route path='/admin/dashboard' element={<DashboardPage />} />
+                    <Route path='/admin/transaction' element={<TransactionPage />} />
                     <Route path='/profile' element={<EditProfile />} />
                   </>
                   :
@@ -88,14 +90,14 @@ function App() {
               <Route path='/login' element={<Login />} />
             </>
         }
-        
+
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/login' element={<Login />} />
         <Route path='/profile' element={<EditProfile />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/cart' element={<UserCart />} />
         <Route path='/checkout' element={<Checkout />} />
-        <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/product/detail' element={<ProductDetail />} />
         <Route path='/prescription' element={<Prescription />} />
         <Route path='/prescription/success' element={<UploadSuccess />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
