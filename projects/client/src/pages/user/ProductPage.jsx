@@ -2,6 +2,10 @@ import React from "react";
 import axios from "axios";
 import { API_URL } from "../../helper";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { updateCart } from '../../action/useraction';
+import { useDispatch } from 'react-redux';
 
 const ProductPage = (props) => {
     const [data, setData] = React.useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -20,6 +24,10 @@ const ProductPage = (props) => {
     const [defaultSort, setDefaultSort] = React.useState('Terpopuler');
 
     const [loading, setLoading] = React.useState(false);
+
+    const dispatch = useDispatch();
+
+    const [userCartData, setUserCartData] = React.useState([]);
 
 
     const getProduct = () => {
@@ -63,7 +71,6 @@ const ProductPage = (props) => {
         // sort, query, idPage, loading
     ]);
 
-
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
@@ -94,9 +101,9 @@ const ProductPage = (props) => {
                         {
                             val.product_name.length <= 21
                                 ? <button type="button" className="mb-3 mt-7 md:mt-9 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => navigate('/')}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
                                 : <button type="button" className="my-3 md:my-5 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => navigate('/')}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
                         }
 
                     </div>
@@ -133,7 +140,11 @@ const ProductPage = (props) => {
     }
 
     React.useEffect(() => {
-        getCategory()
+        getCategory();
+        let userToken = localStorage.getItem('medcarelog');
+        if (userToken !== null) {
+            getUserCartData();
+        }
     }, [])
 
     const onResetFilter = () => {
@@ -175,6 +186,108 @@ const ProductPage = (props) => {
             }
         })
     }
+
+    // kemal add to cart APKG2-26
+    const getUserCartData = async () => {
+        try {
+            let userToken = localStorage.getItem('medcarelog');
+            let get = await axios.get(API_URL + '/api/product/getcartdata', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
+
+            console.log('user cart', get.data);
+            setUserCartData(get.data);
+            dispatch(updateCart(get.data));
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    // kemal add to cart APKG2-26
+    const onAddToCart = async (id) => {
+        try {
+            console.log('idproduct', id);
+
+            let userToken = localStorage.getItem('medcarelog');
+
+            if (userToken === null) {
+                toast.info('You need to login first', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
+                navigate('/login');
+            } else {
+
+                let findIndex = userCartData.find(val => val.idproduct === id);
+
+                // console.log(findIndex)
+
+                if (findIndex === undefined) {
+                    console.log(true);
+
+                    let data = {
+                        idproduct: id,
+                        newQty: 1
+                    };
+
+                    let res = await axios.post(API_URL + '/api/product/addcart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                    }
+                } else {
+                    let data = {
+                        idcart: findIndex.idcart,
+                        newQty: findIndex.quantity + 1
+                    };
+
+                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
     return <div className="container mx-auto">
 
@@ -317,6 +430,7 @@ const ProductPage = (props) => {
                 </div>
             </div>
         </div>
+        <ToastContainer/>
     </div>
 }
 

@@ -40,8 +40,6 @@ const ProductCategory = (props) => {
         }
     }, []);
 
-    const childFunc = React.useRef(null);
-
     // kemal add to cart APKG2-26
     const getUserCartData = async () => {
         try {
