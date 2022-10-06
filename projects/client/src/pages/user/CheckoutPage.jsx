@@ -40,10 +40,13 @@ const Checkout = (props) => {
     // INPUT EDIT ADDRESS
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
+    const [totalPrice, setTotalPrice] = React.useState(0);
+
     const { state } = useLocation();
     const navigate = useNavigate();
 
     React.useEffect(() => {
+        console.log('selected', state.selected)
         setCheckoutData(state.selected);
         getAddress();
     }, []);
@@ -160,12 +163,19 @@ const Checkout = (props) => {
                     </div>
                     <div className='flex flex-col w-full'>
                         <div className='flex justify-between h-2/3'>
-                            <div className='w-3/4 px-3 pt-1'>
+                            <div className='w-3/5 px-3 pt-1'>
                                 <p className='font-medium'>{val.product_name}</p>
                                 <p className='text-transform: capitalize text-sm'>1 {val.default_unit}</p>
                             </div>
-                            <div className='w-1/4 text-center pt-1 font-semibold'>
-                                <Currency price={(val.price * val.quantity)} />
+                            <div className='w-2/5 text-center pt-1 font-semibold flex justify-between'>
+                                <div className='w-2/5 flex justify-around'>
+                                    <p>Qty:</p>
+                                    <p>{val.quantity}</p>
+                                    <p className='transform: capitalize'>{val.default_unit}</p>
+                                </div>
+                                <div className='w-3/5'>
+                                    <Currency price={(val.price * val.quantity)} />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -392,14 +402,14 @@ const Checkout = (props) => {
                                 <p>Delivery</p>
                                 {
                                     selectedDelivery ?
-                                        <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
+                                        <p><Currency price={parseInt(selectedDelivery.split(',')[0])} /></p>
                                         :
-                                        <p><Currency price={0}/></p>
+                                        <p><Currency price={0} /></p>
                                 }
                             </div>
                             <div className='flex justify-between my-4'>
                                 <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                                <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
+                                <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery} /></p>
                             </div>
                             <div>
                                 <button type='button'
