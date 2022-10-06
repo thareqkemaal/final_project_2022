@@ -5,7 +5,8 @@ module.exports = {
 
         let { query, sort, filterName } = req.body;
 
-        dbConf.query(`Select * from product 
+        // tambah join stock
+        dbConf.query(`Select * from product join stock on stock.product_id = product.idproduct
         ${filterName ? `where product_name like ('%${filterName}%')` : ''} 
         order by ${sort ? `${sort}` : `idproduct`} asc 
         limit ${dbConf.escape(query)}`,

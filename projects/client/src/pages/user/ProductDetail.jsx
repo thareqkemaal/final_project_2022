@@ -6,10 +6,18 @@ import axios from 'axios'
 import { API_URL } from '../../helper';
 import { Tabs } from 'flowbite-react';
 import ProductCategory from '../../components/ProductCategory';
+import { useNavigate } from 'react-router'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { updateCart } from '../../action/useraction';
+import { useDispatch } from 'react-redux';
 
 const ProductDetail = () => {
     const {search} = useLocation()
 
+    const navigate = useNavigate()
+    const dispatch = useDispatch();
+    const [userCartData, setUserCartData] = React.useState([]);
     
     const [productDetail,setProductDetail]=useState([])
     const [counter,setCounter]=useState(0)
@@ -23,6 +31,7 @@ const ProductDetail = () => {
             filterName:search.split(':')[1]
         })
         .then((res)=>{
+            console.log('get data', res.data);
             setProductDetail(res.data)
         })
         .catch((err)=>{
@@ -34,6 +43,10 @@ const ProductDetail = () => {
 
     useEffect(()=>{
         getDetailProduct();
+        let userToken = localStorage.getItem('medcarelog');
+        if (userToken !== null) {
+            getUserCartData();
+        }
     },[])
 
     const printProductDetail = ()=>{
@@ -67,12 +80,13 @@ const ProductDetail = () => {
                                 
                             </div>
                             <div className='hidden md:flex'>
-                                <button className='w-32 border bg-white border-main-600 hover:bg-gray-100 focus:ring-main-500 text-white rounded-lg flex justify-center py-2'>
+                                <button type='button' onClick={() => onAddToCart(val.idproduct)}
+                                    className='w-32 border bg-white border-main-600 hover:bg-gray-100 focus:ring-main-500 text-white rounded-lg flex justify-center py-2'>
                                     <AiOutlineShoppingCart size={20} className='fill-teal-500'/>
                                     <p className='text-sm text-main-500 font-Public'>Keranjang</p>
                                 </button>
-                                <button className='w-32 mx-3 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-Public'>Buy</button>
-                                <button className='w-10 pl-2 border  border-main-600 bg-white rounded-lg hover:bg-gray-100'><AiOutlineHeart size={20} className='fill-teal-500'/></button>
+                                <button type='button' className='w-32 mx-3 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-Public'>Buy</button>
+                                <button type='button' className='w-10 pl-2 border  border-main-600 bg-white rounded-lg hover:bg-gray-100'><AiOutlineHeart size={20} className='fill-teal-500'/></button>
                             </div>
                             <div className='px-7  pt-10 md:px-0'>
                             <Tabs.Group
@@ -111,7 +125,107 @@ const ProductDetail = () => {
         })
     }
 
+    // kemal add to cart APKG2-26
+    const getUserCartData = async () => {
+        try {
+            let userToken = localStorage.getItem('medcarelog');
+            let get = await axios.get(API_URL + '/api/product/getcartdata', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
 
+            console.log('user cart', get.data);
+            setUserCartData(get.data);
+            dispatch(updateCart(get.data));
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    // kemal add to cart APKG2-26
+    const onAddToCart = async (id) => {
+        try {
+            console.log('idproduct', id);
+
+            let userToken = localStorage.getItem('medcarelog');
+
+            if (userToken === null) {
+                toast.info('You need to login first', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
+                navigate('/login');
+            } else {
+
+                let findIndex = userCartData.find(val => val.idproduct === id);
+
+                // console.log(findIndex)
+
+                if (findIndex === undefined) {
+                    console.log(true);
+
+                    let data = {
+                        idproduct: id,
+                        newQty: counter
+                    };
+
+                    let res = await axios.post(API_URL + '/api/product/addcart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                    }
+                } else {
+                    let data = {
+                        idcart: findIndex.idcart,
+                        newQty: findIndex.quantity + counter
+                    };
+
+                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                    }
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
     
 return (
     <div>

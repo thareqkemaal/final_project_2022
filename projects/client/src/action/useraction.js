@@ -24,7 +24,7 @@ export const UpdateProfile = (data) =>{
 }
 
 export const updateCart = (data) => {
-    console.log('action to cart', data);
+    //console.log('action to cart', data);
     return {
         type: 'UPDATE_CART',
         payload: data
