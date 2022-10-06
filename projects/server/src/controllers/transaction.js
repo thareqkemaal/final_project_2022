@@ -85,20 +85,23 @@ module.exports = {
 
   updateTransaction: async (req, res) => {
     try {
-
+      console.log(req.body)
       if (req.files) {
-
         let data = JSON.parse(req.body.datatransaction);
-
         await dbQuery(`UPDATE transaction SET payment_proof_pic='/paymentproof/${req.files[0].filename}' WHERE idtransaction = ${dbConf.escape(data.transactionId)};`)
-
+      } else if (req.body) {
+        if (req.body.order == 'ok') {
+          await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        } else if (req.body.reason == 'Less Payment Amount') {
+          await dbQuery(`UPDATE transaction SET status_id=4 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        } else if (req.body.reason == 'Medicin Out of Stock') {
+          await dbQuery(`UPDATE transaction SET status_id=7 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        }
       }
-
       res.status(200).send({
         success: true,
         message: 'Transaction Updated'
       })
-
     } catch (error) {
       console.log(error)
       res.status(500).send(error)
