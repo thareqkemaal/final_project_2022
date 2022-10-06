@@ -9,15 +9,12 @@ import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
-import axios from 'axios';
-import { API_URL } from '../helper';
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const [dropdown, setDropdown] = useState(false)
-  const [userCartData, setUserCartData] = useState([]);
 
   let { username, role, profile_pic } = useSelector((state) => {
     return {
@@ -35,28 +32,11 @@ const NavbarComponent = (props) => {
 
   // kemal tambah fitur logo cart
 
-  React.useEffect(() => {
-    let userToken = localStorage.getItem('medcarelog');
-    if (userToken !== null) {
-      getUserCartData();
+  const { cart } = useSelector((state) => {
+    return {
+      cart: state.userReducer.cart
     }
-  }, []);
-
-  const getUserCartData = async () => {
-    try {
-      let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + '/api/product/getcartdata', {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            });
-
-            console.log('user cart', get.data);
-            setUserCartData(get.data);
-    } catch (error) {
-      console.log(error)
-    }
-  };
+  })
 
 
   return (
@@ -86,7 +66,7 @@ const NavbarComponent = (props) => {
                       {/* kemal tambah button cart */}
                       <button type='button' onClick={() => navigate('/cart')}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
-                        <div className='border-0 bg-red-600 font-bold text-white text-xs rounded-full w-fit p-1 px-2 z-10 absolute left-5 bottom-5'>{userCartData.length}</div>
+                        <div className='border-0 bg-red-600 font-bold text-white text-xs rounded-full w-fit p-1 px-2 z-10 absolute left-5 bottom-5'>{cart.length}</div>
                       </button>
                       <Avatar
                         onClick={() => setDropdown(!dropdown)}

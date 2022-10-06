@@ -4,10 +4,13 @@ import { API_URL } from '../helper'
 import { useNavigate } from 'react-router'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { updateCart } from '../action/useraction';
+import { useDispatch } from 'react-redux';
 
 
 const ProductCategory = (props) => {
     const navigate = useNavigate()
+    const dispatch = useDispatch();
 
     const [productByCategory, setProductByCategory] = useState([]);
     const [userCartData, setUserCartData] = React.useState([]);
@@ -37,6 +40,8 @@ const ProductCategory = (props) => {
         }
     }, []);
 
+    const childFunc = React.useRef(null);
+
     // kemal add to cart APKG2-26
     const getUserCartData = async () => {
         try {
@@ -49,6 +54,7 @@ const ProductCategory = (props) => {
 
             console.log('user cart', get.data);
             setUserCartData(get.data);
+            dispatch(updateCart(get.data));
         } catch (error) {
             console.log(error)
         }
@@ -77,7 +83,7 @@ const ProductCategory = (props) => {
 
                 let findIndex = userCartData.find(val => val.idproduct === id);
 
-                console.log(findIndex)
+                // console.log(findIndex)
 
                 if (findIndex === undefined) {
                     console.log(true);
@@ -107,10 +113,6 @@ const ProductCategory = (props) => {
                         getUserCartData();
                     }
                 } else {
-                    console.log(findIndex.product_name)
-                    console.log(findIndex.quantity)
-                    console.log(findIndex.price)
-
                     let data = {
                         idcart: findIndex.idcart,
                         newQty: findIndex.quantity + 1

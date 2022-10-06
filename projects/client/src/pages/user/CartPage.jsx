@@ -6,6 +6,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router';
 import Currency from '../../components/CurrencyComp';
+import { useDispatch } from 'react-redux';
+import { updateCart } from '../../action/useraction';
 
 const UserCart = (props) => {
 
@@ -16,6 +18,7 @@ const UserCart = (props) => {
     const [isCheckAll, setIsCheckAll] = React.useState('');
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     React.useEffect(() => {
         getCartData();
@@ -31,6 +34,7 @@ const UserCart = (props) => {
             });
             console.log('user cart', getCart.data);
             setCartData(getCart.data);
+            dispatch(updateCart(getCart.data));
 
             let total = 0;
             let count = 0;
