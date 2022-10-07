@@ -189,7 +189,7 @@ const Prescription = (props) => {
         })
     };
 
-    const onPay = async () => {
+    const onSubmit = async () => {
         try {
             // userid, user_name, invoice_number, status_id = 3, useraddress, 
             // orderweight, delivery price, shipping courier, prescription pic 
@@ -214,19 +214,19 @@ const Prescription = (props) => {
             // console.log('courier', courier);
             // console.log("prescriptionpic", prescriptionPic);
 
-            let formPay = new FormData();
-            formPay.append('datatransaction', JSON.stringify({
+            let formSubmit = new FormData();
+            formSubmit.append('datatransaction', JSON.stringify({
                 invoice: setInvoice,
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier,
             }));
-            formPay.append('prescription_pic', prescriptionPic);
+            formSubmit.append('prescription_pic', prescriptionPic);
 
             setLoading(true);
             setShowConfirmModal('');
-            let res = await axios.post(API_URL + '/api/transaction/addprescription', formPay, {
+            let res = await axios.post(API_URL + '/api/transaction/addprescription', formSubmit, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -235,8 +235,8 @@ const Prescription = (props) => {
             if (res.data.success) {
                 setTimeout(() => {
                     setLoading(false);
-                    navigate('/prescription/success', { replace: true })
-                }, 10000)
+                    navigate('/success', { replace: true })
+                }, 3000)
             }
         } catch (error) {
             console.log(error)
@@ -482,7 +482,7 @@ const Prescription = (props) => {
                                 }
                                 }
                             >Submit</button>
-                            {/* MODAL SELECT PAYMENT */}
+                            {/* MODALCONFIRMATION */}
                             {
                                 showConfirmModal === 'show' ?
                                     <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
@@ -498,7 +498,7 @@ const Prescription = (props) => {
                                                     <div className='w-full flex justify-center'>
                                                         <div className='w-2/3 flex justify-evenly items-center'>
                                                             <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
-                                                                onClick={() => onPay()}>Yes, Submit</button>
+                                                                onClick={() => onSubmit()}>Yes, Submit</button>
                                                             <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
                                                                 onClick={() => setShowConfirmModal('')}>No, Cancel</button>
                                                         </div>

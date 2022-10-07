@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
 import { useDispatch } from 'react-redux';
+import LoadingComponent from '../../components/Loading';
 
 const ProductDetail = () => {
     const { search } = useLocation()
@@ -18,6 +19,7 @@ const ProductDetail = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const [userCartData, setUserCartData] = React.useState([]);
+    const [loading, setLoading] = React.useState(false);
 
     const [productDetail, setProductDetail] = useState([])
     const [counter, setCounter] = useState(1);
@@ -91,11 +93,15 @@ const ProductDetail = () => {
                                     <p className='text-sm text-main-500 font-Public'>Cart</p>
                                 </button>
                                 <button type='button' onClick={() => {
-                                    let selected = [];
-                                    selected.push({ ...val, quantity: counter });
-                                    let totalPrice = val.price * counter;
-                                    let state = { selected, totalPrice };
-                                    navigate('/checkout', { state })
+                                    setLoading(true);
+                                    setTimeout(() => {
+                                        setLoading(false);
+                                        let selected = [];
+                                        selected.push({ ...val, quantity: counter });
+                                        let totalPrice = val.price * counter;
+                                        let state = { selected, totalPrice };
+                                        navigate('/checkout', { state })
+                                    }, 2000)
                                 }}
                                     className='w-32 mx-3 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-Public'
                                 >Buy</button>
@@ -251,6 +257,7 @@ const ProductDetail = () => {
                     />
                 </div>
             </div>
+            <LoadingComponent loading={loading} />
         </div>
     )
 }

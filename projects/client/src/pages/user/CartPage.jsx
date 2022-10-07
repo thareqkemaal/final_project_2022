@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import Currency from '../../components/CurrencyComp';
 import { useDispatch } from 'react-redux';
 import { updateCart } from '../../action/useraction';
+import LoadingComponent from '../../components/Loading';
 
 const UserCart = (props) => {
 
@@ -16,6 +17,7 @@ const UserCart = (props) => {
     const [countItem, setCountItem] = React.useState(0);
     const [totalPrice, setTotalPrice] = React.useState(0);
     const [isCheckAll, setIsCheckAll] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -252,7 +254,7 @@ const UserCart = (props) => {
         }
     };
 
-    const onPay = () => {
+    const onCheckout = () => {
         let selected = [];
         cartData.forEach((val, idx) => {
             if (val.selected === 'true') {
@@ -273,11 +275,15 @@ const UserCart = (props) => {
                 progress: undefined,
             });
         } else {
-            let state = {
-                selected,
-                totalPrice
-            }
-            navigate('/checkout', { state })
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                let state = {
+                    selected,
+                    totalPrice
+                }
+                navigate('/checkout', { state })
+            }, 1000)
         }
     };
 
@@ -316,13 +322,14 @@ const UserCart = (props) => {
                                 <button type='button'
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
-                                    onClick={onPay}>Pay ({countItem})</button>
+                                    onClick={onCheckout}>Checkout ({countItem})</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading}/>
         </div>
     )
 };

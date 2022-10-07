@@ -246,7 +246,7 @@ const Checkout = (props) => {
             // console.log('courier', courier);
             // console.log('total price', totalDelivery);
 
-            let formPay = {
+            let formSubmit = {
                 invoice: setInvoice,
                 address: setAddress,
                 weight,
@@ -261,13 +261,13 @@ const Checkout = (props) => {
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_image: val.picture })
+                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_unit: val.default_unit, product_image: val.picture })
             });
             // console.log(temp)
 
             setLoading(true);
             setShowPaymentModal('');
-            let res = await axios.post(API_URL + '/api/transaction/add', { formPay, detail: temp }, {
+            let res = await axios.post(API_URL + '/api/transaction/add', { formSubmit, detail: temp }, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -499,8 +499,8 @@ const Checkout = (props) => {
                                                         <img src={success} className='max-w-xl' alt='successorder' />
                                                         <p className='font-bold text-4xl text-main-500 my-2'>Checkout Success!</p>
                                                         <p className='font-bold text-2xl text-main-600 my-2'>Your order will be process until your payment complete.</p>
-                                                        <div className='w-1/2 my-2 flex justify-around'>
-                                                            <button className='border-2 rounded-lg py-3 px-14 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
+                                                        <div className='my-2 flex justify-around w-2/3'>
+                                                            <button className='border-2 rounded-lg py-3 px-10 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
                                                                 onClick={() => {
                                                                     setShowSuccessPayModal('');
                                                                     setLoading(true);
@@ -509,7 +509,7 @@ const Checkout = (props) => {
                                                                         navigate('/', { replace: true });
                                                                     }, 3500)
                                                                 }}>Back to Homepage</button>
-                                                            <button className='border-2 rounded-lg py-3 px-14 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
+                                                            <button className='border-2 rounded-lg py-3 px-10 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
                                                         </div>
                                                     </div>
                                                 </div>
