@@ -102,15 +102,15 @@ const TransactionPages = () => {
                 </div>
               </div>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Customer</p>
               <p className='font-thin text-lg'>{val.user_name}</p>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Address</p>
               <p className='font-thin text-lg'>{val.user_address}</p>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Courier</p>
               <p className='font-thin text-lg'>{val.shipping_courier}</p>
             </div>
@@ -521,9 +521,9 @@ const TransactionPages = () => {
                 <p className='text-xl font-bold'>Product Detail</p>
                 {modalDetail.detail ? modalDetail.detail.map((val, idx) => {
                   return <div key={val.idtransaction_detail} className='bg-white border border-teal-300 my-5 mr-10 rounded-2xl '>
-                    <div className='flex divide-x divide-dashed justify-between '>
-                      <div className='flex'>
-                        <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 mt-3'>
+                    <div className='grid grid-cols-10 divide-x divide-dashed justify-between '>
+                      <div className='flex p-1 ml-2 col-span-7'>
+                        <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 my-3'>
                           <img className="w-full h-auto rounded my-3" src={modalDetail.prescription_pic ? modalDetail.prescription_pic : val.product_image} alt="image description" />
                         </div>
                         <div className='my-3 mx-5'>
@@ -531,7 +531,7 @@ const TransactionPages = () => {
                           <p className='font-thin text-large flex'> {val.product_qty} x <Currency price={val.product_price} /></p>
                         </div>
                       </div>
-                      <div className='px-10 pt-3'>
+                      <div className='px-10 pt-3 col-span-3'>
                         <p className='text-large ml-2'>Total</p>
                         <p className='font-bold text-large'><Currency price={(val.product_qty * val.product_price)} /></p>
                       </div>
@@ -644,12 +644,10 @@ const TransactionPages = () => {
             {modalAccept.status_id == 5 ?
               <div>
                 <div className='border-b'>
-                  <div className='flex ml-5 my-3'>
-                    <p className='text-xl font-bold mr-5'>{modalAccept.user_name}</p>
-                    <p className='font-thin mr-5'>/</p>
-                    <p className='text-xl font-semibold mr-5'>{modalAccept.invoice_number}</p>
-                    <p className='font-thin mr-5'>/</p>
-                    <p className='text-xl font-thin flex items-center'><BsClock className='mr-2 opacity-50' /> {modalAccept.date_order} WIB</p>
+                  <div className='ml-5 my-3'>
+                    <p className='text-xl font-bold my-1'>{modalAccept.user_name}</p>
+                    <p className='text-xl font-semibold my-1'>{modalAccept.invoice_number}</p>
+                    <p className='text-xl font-thin flex items-center my-1'>{modalAccept.date_order} WIB</p>
                   </div>
                 </div>
                 <div className='overflow-hide-accept scroll' style={see ? { height: 400 } : {}}>
@@ -681,6 +679,11 @@ const TransactionPages = () => {
                   <p className='font-thin text-large col-span-2'>Customer</p>
                   <p>:</p>
                   <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_name}</p>
+                </div>
+                <div className='my-3 grid grid-cols-10'>
+                  <p className='font-thin text-large col-span-2'>Phone Number</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_phone_number}</p>
                 </div>
                 <div className='my-3 grid grid-cols-10'>
                   <p className='font-thin text-large col-span-2'>Address</p>
