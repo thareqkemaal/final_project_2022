@@ -176,8 +176,8 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                         <div>
                             <p className='text-2xl font-bold text-main-500'>Add New Address</p>
                         </div>
-                        <div className='border my-4'>
-                            <div className='border flex flex-col items-start px-3 mb-2'>
+                        <div className='my-4'>
+                            <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>Full Address :</p>
                                 <textarea maxLength={200} type='text'
                                     className={checkAddress === 'show' ? 'border border-red-600 w-full rounded-lg px-3 mt-2' : 'border border-main-600 w-full rounded-lg px-3 mt-2 focus:ring-2 focus:ring-main-500'}
@@ -186,7 +186,7 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                                     {countFullAddress} / 200
                                 </div>
                             </div>
-                            <div className='border flex flex-col items-start px-3 mb-2'>
+                            <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>Province (Provinsi) :</p>
                                 <select type='text' onChange={(e) => { handleFilterCity(e.target.value); setSelectedProvinceID(e.target.value); if (e.target.value > 0) { setCheckProvince('') } }}
                                     className={checkProvince === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -201,7 +201,7 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                                     }
                                 </select>
                             </div>
-                            <div className='border flex flex-col items-start px-3 mb-2'>
+                            <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>City (Kota) :</p>
                                 <select type='text' onChange={(e) => { setSelectedCityID(e.target.value); if (e.target.value > 0) { setCheckCity('') } }}
                                     className={checkCity === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -216,7 +216,7 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                                     }
                                 </select>
                             </div>
-                            <div className='border flex flex-col items-start px-3 mb-2'>
+                            <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>District (Kecamatan/Kabupaten) :</p>
                                 <input type='text'
                                     className={checkDistrict === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -224,7 +224,7 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                                     placeholder='District' onChange={(e) => { setInputDistrict(e.target.value); if (e.target.value.length > 0) { setCheckDistrict('') } }}
                                     value={inputDistrict} />
                             </div>
-                            <div className='border flex flex-col items-start px-3 mb-2'>
+                            <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>Postal Code (Kode Pos) :</p>
                                 <input type='number'
                                     className={checkPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :

@@ -5,7 +5,8 @@ module.exports = {
 
         let { query, sort, filterName } = req.body;
 
-        dbConf.query(`Select * from product 
+        // tambah join stock
+        dbConf.query(`Select * from product join stock on stock.product_id = product.idproduct
         ${filterName ? `where product_name like ('%${filterName}%')` : ''} 
         order by ${sort ? `${sort}` : `idproduct`} asc 
         limit ${dbConf.escape(query)}`,
@@ -79,7 +80,7 @@ module.exports = {
 
     updatecart: async (req, res) => {
         try {
-            //console.log(req.body)
+            // console.log(req.body)
             if (req.body.selected){
                 if(req.body.selectAll){
                     // checkbox all
@@ -101,4 +102,23 @@ module.exports = {
             res.status(500).send(error)
         }
     },
+
+    addCart: async (req, res) => {
+        try {
+            // console.log(req.body);
+            // console.log(req.dataToken);
+
+            // single income data
+            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+
+            res.status(200).send({
+                success: true,
+                message: 'Product Added'
+            })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
+        }
+    }
 };
