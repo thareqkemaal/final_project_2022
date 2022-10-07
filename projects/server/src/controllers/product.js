@@ -5,7 +5,8 @@ module.exports = {
 
         let { query, sort, filterName } = req.body;
 
-        dbConf.query(`Select * from product 
+        // tambah join stock
+        dbConf.query(`Select * from product join stock on stock.product_id = product.idproduct
         ${filterName ? `where product_name like ('%${filterName}%')` : ''} 
         order by ${sort ? `${sort}` : `idproduct`} asc 
         limit ${dbConf.escape(query)}`,
@@ -38,6 +39,74 @@ module.exports = {
 
                 res.status(200).send(results);
             })
+    },
+    getProductAdmin: (req, res) => {
+        let filterCategory = req.query.category_id;
+        let product_name = req.query.product_name;
+        let { limit, sort, offset } = req.body;
+
+        if (filterCategory) {
+            if (filterCategory[1]) {
+
+                let resultFilter = filterCategory.map((val, idx) => {
+                    if (idx == 0) {
+                        return `(category_id = ${val}`
+                    } else if (idx == (filterCategory.length - 1)) {
+                        if (JSON.stringify(product_name) == '{}') {
+                            return `or category_id = ${val})`
+                        } else {
+                            return `or category_id = ${val})`
+                        }
+                    } else {
+                        if (JSON.stringify(product_name) == '{}') {
+                            return `or category_id = ${val}`
+                        } else {
+                            return `or category_id = ${val}`
+                        }
+                    }
+                })
+
+                dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
+                ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter.join(' ') : ''}
+                order by ${sort ? `${sort} asc` : `idproduct desc`} 
+                limit 10 offset ${dbConf.escape(offset)}`,
+                    (err, results) => {
+                        if (err) {
+                            return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
+                        }
+
+                        res.status(200).send(results);
+                    })
+            } else {
+                let resultFilter = `category_id=${filterCategory}`;
+
+                dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
+                ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+                order by ${sort ? `${sort} asc` : `idproduct desc`} 
+                ${typeof offset == typeof 'string' ? `limit ${dbConf.escape(limit)}` : `limit 10 offset ${dbConf.escape(offset)}`}`,
+                    (err, results) => {
+                        if (err) {
+                            return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
+                        }
+
+                        res.status(200).send(results);
+                    })
+            }
+        } else {
+            let resultFilter = `category_id=${filterCategory}`;
+
+            dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
+                ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+                order by ${sort ? `${sort} asc` : `idproduct desc`} 
+                ${typeof offset == typeof 'string' ? `limit ${dbConf.escape(limit)}` : `limit 10 offset ${dbConf.escape(offset)}`}`,
+                (err, results) => {
+                    if (err) {
+                        return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
+                    }
+
+                    res.status(200).send(results);
+                })
+        }
     },
     getCategory: (req, res) => {
         dbConf.query(`Select * from category`,
@@ -76,12 +145,11 @@ module.exports = {
             res.status(500).send(error)
         }
     },
-
     updatecart: async (req, res) => {
         try {
             //console.log(req.body)
-            if (req.body.selected){
-                if(req.body.selectAll){
+            if (req.body.selected) {
+                if (req.body.selectAll) {
                     // checkbox all
                     await dbQuery(`UPDATE cart SET selected=${dbConf.escape(req.body.selected)} WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                 } else {
@@ -101,4 +169,23 @@ module.exports = {
             res.status(500).send(error)
         }
     },
+
+    addCart: async (req, res) => {
+        try {
+            // console.log(req.body);
+            // console.log(req.dataToken);
+
+            // single income data
+            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+
+            res.status(200).send({
+                success: true,
+                message: 'Product Added'
+            })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
+        }
+    }
 };

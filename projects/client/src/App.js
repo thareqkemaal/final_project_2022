@@ -99,7 +99,7 @@ function App() {
         <Route path='/checkout' element={<Checkout />} />
         <Route path='/product/detail' element={<ProductDetail />} />
         <Route path='/prescription' element={<Prescription />} />
-        <Route path='/prescription/success' element={<UploadSuccess />} />
+        <Route path='/success' element={<UploadSuccess />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
       </Routes>
       <Footer />

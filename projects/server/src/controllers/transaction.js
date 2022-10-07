@@ -50,7 +50,7 @@ module.exports = {
         // status_id = 4 menunggu pembayaran
         // from cart-checkout page
 
-        let data = req.body.formPay;
+        let data = req.body.formSubmit;
 
         await dbQuery(`INSERT INTO transaction (user_id, user_name, invoice_number, status_id, user_address, total_price, order_weight, delivery_price, shipping_courier)
         VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.total)}, ${dbConf.escape(data.weight)},
@@ -63,11 +63,11 @@ module.exports = {
         if (get[0].idtransaction > 0) {
           let temp = [];
           req.body.detail.forEach((val, idx) => {
-            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(get[0].idtransaction)})`);
+            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)})`);
           });
           console.log(temp.join(', '));
 
-          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, transaction_id) VALUES
+          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id) VALUES
           ${temp.join(', ')};`)
         }
       }
