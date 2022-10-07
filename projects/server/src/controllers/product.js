@@ -108,6 +108,97 @@ module.exports = {
                 })
         }
     },
+    addProduct: (req, res, next) => {
+        let image = `/imgProductPict/${req.files[0].filename}`;
+        let { product_name, price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit } = JSON.parse(req.body.data);
+
+        dbConf.query(`Insert into product (product_name, price, category_id, netto_stock, netto_unit, default_unit, picture, description, dosis, aturan_pakai) 
+        values (${dbConf.escape(product_name)},${dbConf.escape(price)},${dbConf.escape(category_id)},${dbConf.escape(netto_stock)},${dbConf.escape(netto_unit)},${dbConf.escape(default_unit)},${dbConf.escape(image)},${dbConf.escape(description)},${dbConf.escape(dosis)},${dbConf.escape(aturan_pakai)})`,
+            (err, results) => {
+                if (err) {
+                    return res.status(500).send(`Middlewear addProduct failed, error : ${err}`)
+                }
+
+                dbConf.query(`Select idproduct from product where product_name='${product_name}'`,
+                    (e, r) => {
+                        if (e) {
+                            return res.status(500).send(`Middlewear addProduct failed, error : ${e}`)
+                        }
+
+                        resultAddproduct = {
+                            product_id: r[0].idproduct,
+                            stock_unit,
+                            unit: default_unit
+                        };
+
+                        next()
+
+                    })
+            })
+    },
+    addStock: (req, res) => {
+        let { product_id, stock_unit, unit } = resultAddproduct;
+
+        dbConf.query(`Insert into stock (stock_unit, unit, isDefault, product_id)
+        values (${dbConf.escape(stock_unit)},${dbConf.escape(unit)},true,${dbConf.escape(product_id)})`),
+            (error, results) => {
+                if (err) {
+                    return res.status(500).send(`Middlewear addProduct failed, error : ${error}`)
+                }
+                res.status(200).send(results)
+            }
+    },
+    deleteProduct: (req, res) => {
+        let idproduct = req.params.id;
+
+        dbConf.query(`Delete from product where idproduct=${dbConf.escape(idproduct)}`,
+            (error, results) => {
+                if (error) {
+                    return res.status(500).send(`Middlewear query delete gagal : ${error}`);
+                }
+
+                if (results.affectedRows) {
+                    res.status(200).send(
+                        {
+                            message: true
+                        })
+                } else {
+                    res.status(200).send(
+                        {
+                            message: false
+                        })
+                }
+
+            })
+    },
+    editProduct: (req, res) => {
+        let idproduct = req.params.id;
+        let image = `/imgProductPict/${req.files[0].filename}`;
+        let { price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit, unit } = JSON.parse(req.body.data);
+        
+        dbConf.query(`UPDATE product p, stock s
+        SET p.price=${dbConf.escape(price)},
+            p.category_id=${dbConf.escape(category_id)},
+            p.netto_stock=${dbConf.escape(netto_stock)},
+            p.netto_unit=${dbConf.escape(netto_unit)},
+            p.default_unit=${dbConf.escape(default_unit)},
+            p.picture=${dbConf.escape(image)},
+            p.description=${dbConf.escape(description)},
+            p.dosis=${dbConf.escape(dosis)},
+            p.aturan_pakai=${dbConf.escape(aturan_pakai)},
+            s.stock_unit=${dbConf.escape(stock_unit)},
+            s.unit=${dbConf.escape(unit)}
+        WHERE
+            p.idproduct = ${dbConf.escape(idproduct)}
+            AND s.product_id = ${dbConf.escape(idproduct)}`,
+            (error, results) => {
+                if (error) {
+                    res.status(500).send(`Middleware query edit product gagal :`, error);
+                }
+
+                res.status(200).send(results);
+            })
+    },
     getCategory: (req, res) => {
         dbConf.query(`Select * from category`,
             (err, results) => {

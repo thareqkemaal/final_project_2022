@@ -7,10 +7,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { BsPlusCircle } from "react-icons/bs";
 // Prepare import for modal CRUD
-// import ModalAddProduct from "../../components/ModalAddProduct";
-// import { ToastContainer, toast } from 'react-toastify';
-// import ModalEdit from "../../components/ModalEdit";
-// import ModalDeleteProduct from "../../components/ModalDeleteProduct";
+import ModalAddProduct from "../../components/ModalAddProduct";
+import { ToastContainer, toast } from 'react-toastify';
+import ModalEdit from "../../components/ModalEdit";
+import ModalDeleteProduct from "../../components/ModalDeleteProduct";
 
 const ProductAdminPage = (props) => {
     // APKG2-23 : product list
@@ -390,7 +390,7 @@ const ProductAdminPage = (props) => {
                 </div>
             </div>
         </div>
-        {/* <ToastContainer
+        <ToastContainer
             position="bottom-center"
             autoClose={2000}
             hideProgressBar
@@ -404,7 +404,7 @@ const ProductAdminPage = (props) => {
 
         {modalAddOn && < ModalAddProduct setModalAddOn={setModalAddOn} category={category} setLoading={setLoading} />}
         {modalEditOn && <ModalEdit setModalEditOn={setModalEditOn} dataproduct={dataproduct} category={category} setLoading={setLoading} />}
-        {modalDeleteOn && <ModalDeleteProduct setModalDeleteOn={setModalDeleteOn} idproduct={idproduct} setLoading={setLoading} />} */}
+        {modalDeleteOn && <ModalDeleteProduct setModalDeleteOn={setModalDeleteOn} idproduct={idproduct} setLoading={setLoading} />}
 
     </div>
 }
