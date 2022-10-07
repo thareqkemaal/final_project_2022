@@ -15,11 +15,13 @@ import background from './../../assets/background.png'
 import Currency from '../../components/Currency';
 import accept from '../../assets/accept.png'
 import cancel from '../../assets/cancel.png'
+import pickup from '../../assets/pickup.png'
 
 const TransactionPages = () => {
   const [defaultSort, setDefaultSort] = React.useState('Date')
   const [loading, setLoading] = React.useState(true)
   const [drop, setDrop] = React.useState(true)
+  const [dropCancel, setDropCancel] = React.useState(true)
   const [filterKey, setFilterKey] = React.useState(0)
   const [transaction, setTransaction] = React.useState([])
   const [filterTransaction, setFilterTransaction] = React.useState([])
@@ -31,9 +33,8 @@ const TransactionPages = () => {
   const [modalDetail, setModalDetail] = React.useState('')
   const [modalPayment, setModalPayment] = React.useState('')
   const [modalAccept, setModalAccept] = React.useState('')
-  const [modalSuccess, setModalSuccess] = React.useState(false)
+  const [modalNote, setModalNote] = React.useState(false)
   const [modalCancel, setModalCancel] = React.useState('')
-  const [modalCancelNote, setModalCancelNote] = React.useState(false)
   const [cancelReason, setCancelReason] = React.useState('Select One')
   const [see, setSee] = React.useState(false)
 
@@ -93,7 +94,11 @@ const TransactionPages = () => {
                 <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`}>Make Recipe's Copy</button>
                 <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
                   <p className='font-thin text-lg flex'>{val.detail[0].product_qty} x <Currency price={val.detail[0].product_price} /></p>
-                  <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => setModalDetail(val)}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                  <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
+                    setLoading(true)
+                    setTimeout(() => setLoading(false), 1000)
+                    setTimeout(() => setModalDetail(val), 1000)
+                  }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
                 </div>
               </div>
             </div>
@@ -117,15 +122,35 @@ const TransactionPages = () => {
           <div className='flex m-5 justify-between'>
             <div className='flex'>
               <p className='mt-5 text-lg text-teal-500 font-semibold flex items-center'><BsFillChatDotsFill className='mr-2' /> Chat Customer</p>
-              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="detailModal" onClick={() => setModalDetail(val)}><BiDetail className='mr-2' />Order Detail</button>
-              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="paymentModal" onClick={() => setModalPayment(val)}><MdOutlinePayments className='mr-2' />Check Payment</button>
+              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="detailModal" onClick={() => {
+                setLoading(true)
+                setTimeout(() => setLoading(false), 1000)
+                setTimeout(() => setModalDetail(val), 1000)
+              }}><BiDetail className='mr-2' />Order Detail</button>
+              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="paymentModal" onClick={() => {
+                setLoading(true)
+                setTimeout(() => setLoading(false), 1000)
+                setTimeout(() => setModalPayment(val), 1000)
+              }}><MdOutlinePayments className='mr-2' />Check Payment</button>
             </div>
             <div className='flex'>
-              <button className='mt-5 text-lg mr-10 font-semibold text-teal-500 flex' onClick={() => setModalCancel(val)}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 || val.status_id == 6 ? 'Reject Order' : ''}</button>
+              <button className='mt-5 text-lg mr-10 font-semibold text-teal-500 flex' onClick={() => {
+                setLoading(true)
+                setTimeout(() => setLoading(false), 1000)
+                setTimeout(() => setModalCancel(val), 1000)
+              }}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 || val.status_id == 6 ? 'Reject Order' : ''}</button>
               <button type='button'
                 className={`${val.status_id == 7 || val.status_id == 9 ? 'hidden' : ''} ${val.status_id == 3 || val.status_id == 4 ? 'bg-gray-300' : ' bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} text-lg transition mt-4 p-1 mr-5 font-semibold text-white rounded w-44`}
                 disabled={val.status_id == 3 || val.status_id == 4 ? true : false}
-                onClick={val.status_id == 8 ? () => setModalDetail(val) : val.status_id == 5 ? () => setModalAccept(val) : {}}
+                onClick={val.status_id == 8 ? () => {
+                  setLoading(true)
+                  setTimeout(() => setLoading(false), 1000)
+                  setTimeout(() => setModalDetail(val), 1000)
+                } : () => {
+                  setLoading(true)
+                  setTimeout(() => setLoading(false), 1000)
+                  setTimeout(() => setModalAccept(val), 1000)
+                }}
               >
                 {val.status_id == 6 ? 'Ask For Pickup' : `${val.status_id == 8 ? 'See Detail' : 'Accept Order'}`}
               </button>
@@ -193,7 +218,11 @@ const TransactionPages = () => {
     setSee(false)
     setLoading(true)
     setTimeout(() => setLoading(false), 1000)
-    setTimeout(() => setModalSuccess(true), 1000)
+    if (val.status_id == 5) {
+      setTimeout(() => setModalNote('success'), 1000)
+    } else {
+      setTimeout(() => setModalNote('pickup'), 1000)
+    }
     setModalAccept('')
     axios.patch(API_URL + `/api/transaction/update`, {
       id: val.idtransaction,
@@ -214,7 +243,7 @@ const TransactionPages = () => {
     setModalCancel('')
     setLoading(true)
     setTimeout(() => setLoading(false), 1000)
-    setTimeout(() => setModalCancelNote(true), 1000)
+    setTimeout(() => setModalNote('cancel'), 1000)
     axios.patch(API_URL + `/api/transaction/update`, {
       id: val.idtransaction,
       reason
@@ -514,7 +543,7 @@ const TransactionPages = () => {
               <div class="items-center p-6 rounded-b border-t border-gray-200 dark:border-gray-600">
                 <p className='text-xl font-bold'>Delivery Detail</p>
                 <div className='my-3 grid grid-cols-10'>
-                  <p className='font-thin text-large'>Purchaser</p>
+                  <p className='font-thin text-large'>Customer</p>
                   <p>:</p>
                   <p className='font-bold text-large ml-[-50px] col-span-4'>{modalDetail.user_name}</p>
                 </div>
@@ -525,7 +554,7 @@ const TransactionPages = () => {
                 </div>
                 <div className='my-3 grid grid-cols-10'>
                   <p className='font-thin text-large'>Courier</p>
-                  <p className='ml-9'>:</p>
+                  <p>:</p>
                   <p className='font-bold text-large ml-[-50px] col-span-4'>{modalDetail.shipping_courier}</p>
                 </div>
               </div>
@@ -592,16 +621,16 @@ const TransactionPages = () => {
         : null}
     </div>
     {/* END MODAL CHECK PAYMENT */}
-    {/* MODAL ACCEPT ORDER */}
-    <div id="AcceptModal" tabindex="-1" aria-hidden='true' className={`${modalAccept ? "pl-[35%] pt-[5%] backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0" : "hidden"} `}>
+    {/* MODAL ACCEPT / SEND ORDER */}
+    <div id="AcceptModal" tabindex="-1" aria-hidden='true' className={`${modalAccept ? `pl-[37%] ${modalAccept.status_id == 5 ? 'pt-[5%]' : 'pt-[10%]'} backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0` : "hidden"} `}>
       {modalAccept ?
-        <div className="mt-20 w-full max-w-3xl border rounded-lg max-h-[70rem]" >
+        <div className="mt-20 w-full max-w-xl border rounded-lg max-h-[48rem]" >
           {/* <!-- Modal content --> */}
           <div className=" bg-white rounded-lg shadow dark:bg-gray-700">
             {/* <!-- Modal header --> */}
             <div className="flex items-center p-4 rounded-t border-b dark:border-gray-600">
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white ml-[37%]">
-                Accept Order
+                {modalAccept.status_id == 5 ? 'Accept Order' : 'Pickup Order'}
               </h3>
               <button type="button" onClick={() => {
                 setSee(false)
@@ -612,42 +641,73 @@ const TransactionPages = () => {
               </button>
             </div>
             {/* <!-- Modal body --> */}
-            <div className='flex ml-5 mt-3'>
-              <p className='text-xl font-bold mr-5'>{modalAccept.user_name}</p>
-              <p className='font-thin mr-5'>/</p>
-              <p className='text-xl font-semibold mr-5'>{modalAccept.invoice_number}</p>
-              <p className='font-thin mr-5'>/</p>
-              <p className='text-xl font-thin flex items-center'><BsClock className='mr-2 opacity-50' /> {modalAccept.date_order} WIB</p>
-            </div>
-            {see ?
-              <div className='my-3 ml-5'>
-                {modalAccept.detail.map((val, idx) => {
-                  return <div>
-                    <p className='font-bold text-lg'>{val.product_name}</p>
-                    <p className='font-thin text-lg flex'>{val.product_qty} x <Currency price={val.product_price} /></p>
+            {modalAccept.status_id == 5 ?
+              <div>
+                <div className='border-b'>
+                  <div className='flex ml-5 my-3'>
+                    <p className='text-xl font-bold mr-5'>{modalAccept.user_name}</p>
+                    <p className='font-thin mr-5'>/</p>
+                    <p className='text-xl font-semibold mr-5'>{modalAccept.invoice_number}</p>
+                    <p className='font-thin mr-5'>/</p>
+                    <p className='text-xl font-thin flex items-center'><BsClock className='mr-2 opacity-50' /> {modalAccept.date_order} WIB</p>
                   </div>
-                })}
-                <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(false)}>Hide <BsChevronDown className='ml-1 mt-1 rotate-[180deg]' /> </button>
+                </div>
+                <div className='overflow-hide-accept scroll' style={see ? { height: 400 } : {}}>
+                  {see ?
+                    <div className='my-3 ml-5'>
+                      {modalAccept.detail.map((val, idx) => {
+                        return <div>
+                          <p className='font-bold text-lg'>{val.product_name}</p>
+                          <p className='font-thin text-lg flex'>{val.product_qty} x <Currency price={val.product_price} /></p>
+                        </div>
+                      })}
+                      <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(false)}>Hide <BsChevronDown className='ml-1 mt-1 rotate-[180deg]' /> </button>
+                    </div>
+                    :
+                    <div className='my-3 ml-5'>
+                      <p className='font-bold text-lg'>{modalAccept.detail[0].product_name}</p>
+                      <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} x <Currency price={modalAccept.detail[0].product_price} /></p>
+                      <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                    </div>}
+                </div>
+                <div className='bg-teal-100 flex justify-between rounded ml-5 mr-5 my-5 h-10'>
+                  <p className='items-center pl-2 pt-1 font-semibold text-xl'>Total</p>
+                  <p className='items-center pr-2 pt-1 font-semibold text-xl'>Rp{(modalAccept.total_price + modalAccept.delivery_price).toLocaleString('id')}</p>
+                </div>
               </div>
               :
-              <div className='my-3 ml-5'>
-                <p className='font-bold text-lg'>{modalAccept.detail[0].product_name}</p>
-                <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} x <Currency price={modalAccept.detail[0].product_price} /></p>
-                <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
-              </div>}
-            <div className='bg-teal-100 flex justify-between rounded ml-5 mr-5 my-5 h-10'>
-              <p className='items-center pl-2 pt-1 font-semibold text-xl'>Total</p>
-              <p className='items-center pr-2 pt-1 font-semibold text-xl'>Rp{(modalAccept.total_price + modalAccept.delivery_price).toLocaleString('id')}</p>
-            </div>
+              <div className='ml-5 mt-3'>
+                <div className='my-3 grid grid-cols-10'>
+                  <p className='font-thin text-large col-span-2'>Customer</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_name}</p>
+                </div>
+                <div className='my-3 grid grid-cols-10'>
+                  <p className='font-thin text-large col-span-2'>Address</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_address}</p>
+                </div>
+                <div className='my-3 grid grid-cols-10 '>
+                  <p className='font-thin text-large col-span-2'>Courier</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.shipping_courier}</p>
+                </div>
+                <div className='my-3 grid grid-cols-10 '>
+                  <p className='font-thin text-large col-span-2'>Delivery Price</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-48px] col-span-4'><Currency price={modalAccept.delivery_price} /></p>
+                </div>
+              </div>
+            }
             <div className='flex justify-between'>
               <p />
-              <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => handleUpdate(modalAccept, 'ok')}>Accept Order</button>
+              <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => handleUpdate(modalAccept, 'ok')}>{modalAccept.status_id == 5 ? 'Accept Order' : 'Request Pickup'}</button>
             </div>
           </div>
         </div>
         : null}
     </div>
-    {/* END MODAL ACCEPT ORDER */}
+    {/* END MODAL ACCEPT / SEND ORDER */}
     {/* MODAL CANCEL ORDER */}
     <div id="CancelModal" tabindex="-1" aria-hidden='true' className={`${modalCancel ? "pl-[35%] pt-[5%] backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0" : "hidden"} `}>
       {modalCancel ?
@@ -669,24 +729,24 @@ const TransactionPages = () => {
             </div>
             {/* <!-- Modal body --> */}
             <p className='sm:text-2xl font-bold pb-3 text-center mt-10 mb-5'>Why do you want to cancel the order?</p>
-            <button onClick={() => setDrop(!drop)} id="dropdownCancel" data-dropdown-toggle="dropdownCancel"
-              className="border rounded-lg text-gray-400 bg-white hover:bg-gray-400 hover:text-white w-96 ml-36 font-medium mb-5 pl-2 h-5 sm:h-10 text-center inline-flex justify-between items-center" type="button">
+            <button onClick={() => setDropCancel(!dropCancel)} id="dropdownCancel" data-dropdown-toggle="dropdownCancel"
+              className="border rounded-lg text-gray-400 bg-white hover:bg-gray-400 hover:text-white w-96 ml-36 font-medium pl-2 h-5 sm:h-10 text-center inline-flex justify-between items-center" type="button">
               {cancelReason}
               <IoIosArrowDown />
             </button>
             {/* <!-- Dropdown menu --> */}
-            <div id="dropdownCancel" className={`${drop == true ? 'hidden' : 'w-96 ml-36 bg-white rounded divide-y divide-gray-100 shadow absolute'}`} >
+            <div id="dropdownCancel" className={`${dropCancel == true ? 'hidden' : 'w-96 ml-36 bg-white rounded divide-y divide-gray-100 shadow'}`} >
               <ul className="py-1 text-sm text-gray-700" aria-labelledby="dropdownCancel">
                 <li>
-                  <button className="block py-2 pl-4 pr-56 hover:bg-gray-100" onClick={() => {
+                  <button className={`${modalCancel.status_id == 3 ? 'hidden' : "block py-2 pl-4 pr-56 hover:bg-gray-100"}`} onClick={() => {
                     setCancelReason('Less Payment Amount')
-                    setDrop(true)
+                    setDropCancel(true)
                   }}>Less Payment Amount</button>
                 </li>
                 <li>
                   <button className="block py-2 pl-4 pr-56 hover:bg-gray-100" onClick={() => {
                     setCancelReason('Medicine Out of Stock')
-                    setDrop(true)
+                    setDropCancel(true)
                   }}>Medicine Out of Stock</button>
                 </li>
               </ul>
@@ -706,34 +766,9 @@ const TransactionPages = () => {
         : null}
     </div>
     {/* END MODAL CANCEL ORDER */}
-    {/* MODAL ORDER PROCESSING */}
-    {modalSuccess ?
-      <div id="SuccessModal" tabindex="-1" aria-hidden='true' className="pl-[35%] pt-[5%] backdrop-blur-sm fixed z-30 justify-center w-full md:inset-0">
-        <div className=" max-w-3xl mt-20 bg-white rounded-lg border-2" >
-          <div className="flex justify-between p-4 dark:border-gray-600">
-            <p />
-            <button type="button" onClick={() => {
-              setLoading(true)
-              setTimeout(() => setLoading(false), 1000)
-              setModalSuccess(false)
-            }} className="text-gray-400 bg-transparent border hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
-              <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-              <span className="sr-only">Close modal</span>
-            </button>
-          </div>
-          <div className="">
-            <div className='items-center justify-center'>
-              <img src={accept} className='max-w-md max-h-md mx-auto' />
-              <p className='sm:text-3xl font-bold pb-3 text-center'>Order Processing Success</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      : null}
-    {/* END MODAL ORDER PROCESSING */}
-    {/* MODAL CANCEL NOTE */}
-    {modalCancelNote ?
-      <div id="CancelNoteModal" tabindex="-1" aria-hidden='true' className="pl-[35%] pt-[5%] backdrop-blur-sm fixed z-30 justify-center w-full md:inset-0">
+    {/* MODAL NOTE */}
+    {modalNote ?
+      <div id="SuccessModal" tabindex="-1" aria-hidden='true' className="pl-[32%] pt-[5%] backdrop-blur-sm fixed z-30 justify-center w-full md:inset-0">
         <div className=" max-w-3xl mt-20 bg-white rounded-lg border-2" >
           <div className="flex justify-between p-4 dark:border-gray-600">
             <p />
@@ -741,7 +776,7 @@ const TransactionPages = () => {
               setLoading(true)
               setTimeout(() => setLoading(false), 1000)
               setCancelReason('Select One')
-              setModalCancelNote(false)
+              setModalNote(false)
             }} className="text-gray-400 bg-transparent border hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
               <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
               <span className="sr-only">Close modal</span>
@@ -749,14 +784,14 @@ const TransactionPages = () => {
           </div>
           <div className="">
             <div className='items-center justify-center'>
-              <img src={cancel} className='max-w-md max-h-md mx-auto' />
-              <p className='sm:text-3xl font-bold pb-3 text-center'>{cancelReason == 'Less Payment Amount' ? 'Status back to WAITING FOR PAYMENT' : 'Order Has Been Canceled'}</p>
+              <img src={`${modalNote == 'success' ? accept : modalNote == 'pickup' ? pickup : cancel}`} className={`${modalNote == 'pickup' ? 'w-md' : 'max-w-md'} h-md mx-auto`} />
+              <p className='sm:text-3xl font-bold pb-3 text-center'>{`${modalNote == 'success' ? 'Order Processing Success' : modalNote == 'pickup' ? 'Courier Will Pickup your Order' : cancelReason == 'Less Payment Amount' ? 'Status back to WAITING FOR PAYMENT' : 'Order Has Been Canceled'}`}</p>
             </div>
           </div>
         </div>
       </div>
       : null}
-    {/* END MODAL CANCEL NOTE */}
+    {/* END MODAL NOTE */}
     <Loading loading={loading} />
   </div>
   )
