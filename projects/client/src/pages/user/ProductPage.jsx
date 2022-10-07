@@ -67,7 +67,7 @@ const ProductPage = (props) => {
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
-                return <div key={val.idproduct}  className="row-span-3" onClick={()=>navigate(`/product/detail?name:${val.product_name}:${val.category_id}`)}>
+                return <div key={val.idproduct}  className="row-span-3" onClick={()=>navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)}>
                     <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-72" >
                         <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct}  />
                         <div className="" >

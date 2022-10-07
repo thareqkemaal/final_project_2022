@@ -1,21 +1,35 @@
 import React,{useState, useEffect} from 'react'
 import axios from 'axios'
 import { API_URL } from '../helper'
-import { useNavigate } from 'react-router'
+import { useNavigate} from 'react-router'
+import { Link} from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux';
+import { updateCart } from '../action/useraction';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 
 const ProductCategory = (props) => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+
 
     const [productByCategory, setProductByCategory]=useState([])
-    console.log(props)
+    const [userCartData, setUserCartData] = React.useState([]);
+    let {iduser , status}=useSelector((state)=>{
+        return{
+          iduser: state.userReducer.iduser,
+          status: state.userReducer.status_name,
+        }
+      })
 
 
     const getCategoryProduct=()=>{
-        axios.post(API_URL+`/api/product/filterproduct/category?category_id=${props.id}`,{
-            query:5,
+        axios.post(API_URL+`/api/product/getproductadmin?${props.id}`,{
+            limit:5,
             sort:'',
-            filterName:''
+            offset:''
         })
         .then((res)=>{
             setProductByCategory(res.data)
@@ -29,11 +43,150 @@ const ProductCategory = (props) => {
         getCategoryProduct()
     },[])
 
+
+
+
+
+
+
+
+   // kemal add to cart APKG2-26
+   const getUserCartData = async () => {
+    try {
+        let userToken = localStorage.getItem('medcarelog');
+        let get = await axios.get(API_URL + '/api/product/getcartdata', {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        });
+
+        console.log('user cart', get.data);
+        setUserCartData(get.data);
+        dispatch(updateCart(get.data));
+    } catch (error) {
+        console.log(error)
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// kemal add to cart APKG2-26
+    const onAddToCart = async (id) => {
+        
+        if(iduser){
+            if(status === 'Verified'){
+                try {
+
+                    let userToken = localStorage.getItem('medcarelog'); 
+                let findIndex = userCartData.find(val => val.idproduct === id);
+        
+        
+                if (findIndex === undefined) {
+                console.log(true);
+        
+                let data = {
+                    idproduct: id,
+                    newQty: 1
+                };
+        
+                let res = await axios.post(API_URL + '/api/product/addcart', data, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                            }
+                });
+        
+
+                if (res.data.success) {
+                    toast.success('Item Added to Cart', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                    });
+                    getUserCartData();
+                    }
+                    } else {
+                        let data = {
+                            idcart: findIndex.idcart,
+                            newQty: findIndex.quantity + 1
+                            };
+        
+                        let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`
+                                }
+                            });
+        
+                            if (res.data.success) {
+                                toast.success('Item Added to Cart', {
+                                    theme: "colored",
+                                    position: "top-center",
+                                    autoClose: 2000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: false,
+                                    progress: undefined,
+                                });
+                                getUserCartData();
+                            }
+                        }
+                } catch (error) {
+                    console.log(error)
+                }
+            }else{
+                toast.info('Verified your account first', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
+            }
+        }else{
+            toast.info('You need to login first', {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            });
+        }
+    };
+
     const printData = ()=>{
         return productByCategory.map((val,idx)=>{
             return(
-                <div className='w-48 h-80 shadow-lg mx-4 my-4 bg-white grid-cols-3' >
-                    <div onClick={()=>navigate(`/product/detail?name:${val.product_name}:${val.category_id}`)}>
+                <div className='w-48 h-80 shadow-lg mx-4 my-4 bg-white grid-cols-3' key={val.idproduct} >
+                    <Link to={`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`}>
+                    <div >
                         <div className='flex justify-center'>
                             <img src={val.picture} alt='medcare.com' className='w-64 h-36 px-10'/>
                         </div>
@@ -48,8 +201,9 @@ const ProductCategory = (props) => {
                             </div>
                         </div>
                     </div>
+                    </Link>
                         <div className='px-5 py-5'>
-                            <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'>Keranjang</button>
+                            <button className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public' onClick={onAddToCart}>Keranjang</button>
                         </div>
               </div>
                 
@@ -64,6 +218,7 @@ const ProductCategory = (props) => {
                 {printData()}
             </div>
         </div>
+        <ToastContainer/>
     </div>
   )
 }

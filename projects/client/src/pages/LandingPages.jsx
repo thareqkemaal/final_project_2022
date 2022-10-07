@@ -28,11 +28,10 @@ const LandingPages = () => {
     }
   })
 
-  console.log(status)
 
   const resendVerif = async () => {
     try {
-      await axios.get(`${API_URL}/api/user/resendverif?email=${email}`)
+      await axios.get(`${API_URL}/api/user/resend-verif?email=${email}`)
         .then((res) => {
           console.log(res)
         })

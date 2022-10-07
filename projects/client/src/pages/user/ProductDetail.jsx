@@ -14,13 +14,11 @@ const ProductDetail = () => {
     const [productDetail,setProductDetail]=useState([])
     const [counter,setCounter]=useState(0)
 
-
-
     const getDetailProduct =()=> {
-
-        axios.post(API_URL+`/api/product/getproduct`,{
-            query:1,
-            filterName:search.split(':')[1]
+        axios.post(API_URL+`/api/product/getproductadmin${search.split('&')[0]}`,{
+            limit:1,
+            sort:"",
+            offset:""
         })
         .then((res)=>{
             setProductDetail(res.data)
@@ -34,7 +32,7 @@ const ProductDetail = () => {
 
     useEffect(()=>{
         getDetailProduct();
-    },[])
+    },[search])
 
     const printProductDetail = ()=>{
         return productDetail.map((val,idx)=>{
@@ -120,7 +118,7 @@ return (
             <p className='mt-5 text-sm font-Public font-bold text-blue-900'>Product Terkait</p>
                 <div className='bg-gradient-to-t from-teal-50 to-white'>
                     <ProductCategory
-                    id={search.split(':')[2]}
+                    id={search.split('&')[1]}
                     />
                 </div>
         </div>

@@ -3,7 +3,7 @@ import{Link, useNavigate, useParams} from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../../helper';
 import { loginAction } from '../../action/useraction';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Verified = () => {
     const params = useParams()
@@ -12,8 +12,12 @@ const Verified = () => {
     console.log(params)
     const [isValidToken, setIsValidToken]=useState(false)
 
-    console.log(params.token)
-
+    let{status}=useSelector((state)=>{
+      return{
+          status:state.userReducer.status_name
+      }
+  })
+  console.log(status)
 
         
     useEffect(()=>{
@@ -22,7 +26,7 @@ const Verified = () => {
 
     const onVerified = async ()=>{
         try {
-            let res = await axios.patch(`${API_URL}/api/user/updateverif`,{},{
+            let res = await axios.patch(`${API_URL}/api/user/update-verif`,{},{
                 headers:{
                     'Authorization': `Bearer ${params.token}`
                 }

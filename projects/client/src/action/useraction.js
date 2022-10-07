@@ -22,3 +22,12 @@ export const UpdateProfile = (data) =>{
         payload :data
     }
 }
+
+
+export const updateCart = (data) => {
+    //console.log('action to cart', data);
+    return {
+        type: 'UPDATE_CART',
+        payload: data
+    }
+}
