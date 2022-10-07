@@ -5,7 +5,8 @@ module.exports = {
 
         let { query, sort, filterName } = req.body;
 
-        dbConf.query(`Select * from product 
+        // tambah join stock
+        dbConf.query(`Select * from product join stock on stock.product_id = product.idproduct
         ${filterName ? `where product_name like ('%${filterName}%')` : ''} 
         order by ${sort ? `${sort}` : `idproduct`} asc 
         limit ${dbConf.escape(query)}`,
@@ -20,7 +21,6 @@ module.exports = {
     filterProduct: (req, res) => {
         let filterCategory = req.query.category_id;
         let { query, sort, filterName } = req.body;
-
         if(JSON.stringify(filterName) != '{}'){
             `and category_id = ${filterCategory}`
         } else {
@@ -120,10 +120,6 @@ module.exports = {
     },
     getcartdata: async (req, res) => {
         try {
-            // butuh authorization token
-            // sementara pakai manual data iduser = 2;
-            // harus join sm tabel stock juga
-
             let getSql = await dbQuery(`SELECT * FROM cart c 
             JOIN product p ON c.product_id = p.idproduct 
             JOIN stock s ON s.product_id = p.idproduct
@@ -171,6 +167,25 @@ module.exports = {
         } catch (error) {
             console.log(error)
             res.status(500).send(error)
+        }
+    },
+
+    addCart: async (req, res) => {
+        try {
+            // console.log(req.body);
+            // console.log(req.dataToken);
+
+            // single income data
+            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+
+            res.status(200).send({
+                success: true,
+                message: 'Product Added'
+            })
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
         }
     }
 };

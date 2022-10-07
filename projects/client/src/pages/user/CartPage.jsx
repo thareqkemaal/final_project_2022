@@ -5,19 +5,22 @@ import { CgTrash } from "react-icons/cg";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router';
+import Currency from '../../components/CurrencyComp';
+import { useDispatch } from 'react-redux';
+import { updateCart } from '../../action/useraction';
+import LoadingComponent from '../../components/Loading';
 
 const UserCart = (props) => {
-
-    // NOTE PROBLEM
-    // 1. perlu get data produk untuk dapat stocknya? => fungsi onInc
 
     const [cartData, setCartData] = React.useState([]);
     const [modalDelete, setModalDelete] = React.useState(0);
     const [countItem, setCountItem] = React.useState(0);
     const [totalPrice, setTotalPrice] = React.useState(0);
     const [isCheckAll, setIsCheckAll] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     React.useEffect(() => {
         getCartData();
@@ -33,6 +36,7 @@ const UserCart = (props) => {
             });
             console.log('user cart', getCart.data);
             setCartData(getCart.data);
+            dispatch(updateCart(getCart.data));
 
             let total = 0;
             let count = 0;
@@ -80,9 +84,10 @@ const UserCart = (props) => {
                             <div className='w-2/3 pl-3'>
                                 <p className='font-medium'>{val.product_name}</p>
                                 <p className='text-sm'>1 {val.default_unit}</p>
+                                <p className='text-sm'>Available Stock : {val.stock_unit}</p>
                             </div>
                             <div className='w-1/3 text-end pr-3 font-medium'>
-                                Rp {val.price.toLocaleString('id')}
+                                <Currency price={val.price} />
                             </div>
                         </div>
                         <div className='flex justify-end h-1/3 items-center'>
@@ -119,7 +124,7 @@ const UserCart = (props) => {
                                     <div className='w-1/3 text-center mx-1'>
                                         <p>{val.quantity}</p>
                                     </div>
-                                    <button type='button' className='w-1/3 text-center text-lg' onClick={() => onInc(val.quantity, val.idcart)}>+</button>
+                                    <button type='button' className='w-1/3 text-center text-lg' onClick={() => onInc(val.quantity, val.idcart, val.stock_unit)}>+</button>
                                 </div>
                             </div>
                         </div>
@@ -176,18 +181,30 @@ const UserCart = (props) => {
         }
     };
 
-    const onInc = async (quantity, idcart) => {
+    const onInc = async (quantity, idcart, stock) => {
         try {
-            // belum ditambah kondisi ketika sudah mencapai stok maximum
-            let userToken = localStorage.getItem('medcarelog');
-            let newQty = quantity + 1;
-            let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
+            if (quantity < stock) {
+                let userToken = localStorage.getItem('medcarelog');
+                let newQty = quantity + 1;
+                let inc = await axios.patch(API_URL + `/api/product/updatecart`, { newQty, idcart }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                });
+                if (inc.data.success) {
+                    getCartData();
                 }
-            });
-            if (inc.data.success) {
-                getCartData();
+            } else if (quantity === stock) {
+                toast.error('Quantity has been reached maximum', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
             }
         } catch (error) {
             console.log(error)
@@ -237,7 +254,7 @@ const UserCart = (props) => {
         }
     };
 
-    const onPay = () => {
+    const onCheckout = () => {
         let selected = [];
         cartData.forEach((val, idx) => {
             if (val.selected === 'true') {
@@ -258,11 +275,15 @@ const UserCart = (props) => {
                 progress: undefined,
             });
         } else {
-            let state = {
-                selected,
-                totalPrice
-            }
-            navigate('/checkout', { state })
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                let state = {
+                    selected,
+                    totalPrice
+                }
+                navigate('/checkout', { state })
+            }, 1000)
         }
     };
 
@@ -291,23 +312,24 @@ const UserCart = (props) => {
                             <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Sub Total Price ({countItem} Item(s))</p>
-                                <p>Rp. {totalPrice.toLocaleString('id')}</p>
+                                <Currency price={totalPrice} />
                             </div>
                             <div className='flex justify-between my-4'>
                                 <p className='font-bold text-2xl text-main-500'>Total Price</p>
-                                <p className='font-bold text-2xl text-main-500'>Rp. {totalPrice.toLocaleString('id')}</p>
+                                <p className='font-bold text-2xl text-main-500'><Currency price={totalPrice} /></p>
                             </div>
                             <div>
                                 <button type='button'
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
-                                    onClick={onPay}>Pay ({countItem})</button>
+                                    onClick={onCheckout}>Checkout ({countItem})</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading}/>
         </div>
     )
 };

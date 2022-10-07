@@ -19,10 +19,8 @@ app.use(cors());
 // );
 
 app.use(express.json());
-
 // #destination file storage(image/pdf/document)
 app.use("/", express.static(__dirname + "/public"));
-
 app.use(bearerToken())
 
 // DB Check Connection

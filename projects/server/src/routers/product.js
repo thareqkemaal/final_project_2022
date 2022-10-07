@@ -7,8 +7,11 @@ route.post('/getproduct', productController.getProduct);
 route.post('/filterproduct/:id', productController.filterProduct);
 route.post('/getproductadmin', productController.getProductAdmin);
 route.get('/getcategory', productController.getCategory);
-route.get('/getcartdata', productController.getcartdata);
-route.delete('/deletecart', productController.deletecart)
-route.patch('/updatecart', productController.updatecart)
+
+// CART
+route.get('/getcartdata', readToken, productController.getcartdata);
+route.delete('/deletecart/:idcart', productController.deletecart);
+route.patch('/updatecart', readToken, productController.updatecart);
+route.post('/addcart', readToken, productController.addCart);
 
 module.exports = route;
