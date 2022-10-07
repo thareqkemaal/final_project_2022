@@ -74,7 +74,7 @@ function App() {
               {
                 role === 'Admin' ?
                   <>
-                    <Route path='/admin/dashboard' element={<DashboardPage />} />
+                    {/* <Route path='/admin/dashboard' element={<DashboardPage />} /> */}
                     <Route path='/admin/transaction' element={<TransactionPage />} />
                     <Route path='/profile' element={<EditProfile />} />
                   </>
@@ -100,6 +100,7 @@ function App() {
         <Route path='/product/detail' element={<ProductDetail />} />
         <Route path='/prescription' element={<Prescription />} />
         <Route path='/success' element={<UploadSuccess />} />
+        <Route path='/admin/dashboard' element={<DashboardPage />} />
         {/* <Route path='/dashboard' element={<Dashboard />} /> */}
       </Routes>
       <Footer />

@@ -13,10 +13,15 @@ route.post('/getproductadmin', productController.getProductAdmin);
 route.post('/add', uploadProductPict, productController.addProduct, productController.addStock);
 route.patch('/edit/:id', uploadProductPict, productController.editProduct);
 route.delete('/delete/:id', productController.deleteProduct);
-route.get('/getcategory', productController.getCategory);
 route.get('/getunit', productController.getUnit);
 route.post('/addunit', productController.addUnit);
 route.delete('/deleteunit/:id', productController.deleteUnit);
+
+// APKG2-20 : Add, edit, delete category
+route.get('/getcategory', productController.getCategory);
+route.post('/addcategory', productController.addCategory);
+route.patch('/editcategory/:id', productController.editCategory);
+route.delete('/deletecategory/:id', productController.deleteCategory);
 
 // CART
 route.get('/getcartdata', readToken, productController.getcartdata);
