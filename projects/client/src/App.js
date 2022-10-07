@@ -68,7 +68,6 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-        <Route path='/admin/transaction' element={<TransactionPage />} />
         {
           localStorage.getItem('medcarelog') ?
             <>
@@ -76,6 +75,7 @@ function App() {
                 role === 'Admin' ?
                   <>
                     <Route path='/admin/dashboard' element={<DashboardPage />} />
+                    <Route path='/admin/transaction' element={<TransactionPage />} />
                     <Route path='/profile' element={<EditProfile />} />
                   </>
                   :
