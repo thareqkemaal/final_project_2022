@@ -308,68 +308,59 @@ module.exports = {
 
   },
 
+
   verification: async (req, res) => {
     let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
     try {
-      if (isToken.length > 0) {
-        if (req.dataToken.iduser) {
-          await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-          //. proses login 
-          let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id from user u
-
-                    join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-                    if (resultUser.length > 0) {
-                      // login berhasil
-                      let token = createToken({ ...resultUser[0] })
-                      await dbQuery(`Update user set token = null`)
-            res.status(200).send({
-              success: true,
-              message: 'Verify Success',
-              dataLogin: {
-                ...resultUser[0],
-                token
-              },
-              error: ''
-            })
-          }
-        }
-      } else {
-        await dbQuery(`UPDATE user set status_id=2 WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-        //. proses login 
-        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.email, u.role, u.phone_number,u.token, u.gender, u.birthdate, u.profile_pic, u.status_id from user u
-              join status s on u.status_id = s.idstatus WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-        if (resultUser[0].token) {
+      if(isToken.length>0){
+        await dbQuery(`UPDATE user set status_id=2 where iduser = ${dbConf.escape(req.dataToken.iduser)}`)
+        await dbQuery(`UPDATE user set token = 'expired' where iduser = ${dbConf.escape(req.dataToken.iduser)}`)
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus WHERE iduser = ${dbConf.escape(req.dataToken.iduser)} `)
+        let token = createToken({ ...resultUser[0] })
+        res.status(200).send({
+          success:true,
+          message:'Verify Success',
+          dataLogin:{
+            ...resultUser[0],
+            token
+          },
+          error:''
+        })
+      }else{
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.token, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus WHERE iduser = ${dbConf.escape(req.dataToken.iduser)} `)
+        if(resultUser[0].token  || resultUser[0].token ==='expired'){
           res.status(500).send({
             success: false,
             message: "Email has been expired",
             code: 'EMAIL_EXPIRED'
           });
-        } else {
-          if (resultUser.length > 0) {
-            
-            // 3. login berhasil, maka buar token baru
+        }else{
+          await dbQuery(`UPDATE user set status_id=2 where iduser = ${dbConf.escape(req.dataToken.iduser)}`)
+          await dbQuery(`UPDATE user set token = 'expired' where iduser = ${dbConf.escape(req.dataToken.iduser)}`)
+          let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus WHERE iduser = ${dbConf.escape(req.dataToken.iduser)} `)
+          if(resultUser.length > 0){
             let token = createToken({ ...resultUser[0] })
             res.status(200).send({
-              success: true,
-              message: 'Verified Success',
-              dataLogin: {
+              success:true,
+              message:'Verify Success',
+              dataLogin:{
                 ...resultUser[0],
                 token
               },
-              error: ''
+              error:''
+            })
+          }else{
+            res.status(401).send({
+              success:false,
+              message:'Invalid Verification'
             })
           }
         }
       }
     } catch (error) {
-      console.log(error)
-      res.status(500).send({
-        success: false,
-        message: 'Failed',
-        error
-      })
-
+      res.status(500).send(error)
     }
+
   },
 
   resendVerif: async (req, res) => {

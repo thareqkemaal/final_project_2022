@@ -20,6 +20,7 @@ const NavbarComponent = (props) => {
 
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
+  const [disable, setDisable]=useState(false)  
 
   const {status,email}=useSelector((state)=>{
     return{
@@ -57,6 +58,7 @@ const NavbarComponent = (props) => {
     try {
       await axios.get(`${API_URL}/api/user/resend-verif?email=${email}`)
         .then((res) => {
+          setDisable(true)
           toast.success('Please check your email', {
             theme: "colored",
             position: "top-center",
@@ -87,7 +89,7 @@ const NavbarComponent = (props) => {
     <div>
       {
         status === 'Unverified'&&
-      <button className='w-full bg-red-700 hover:bg-red-800' onClick={resendVerif}>
+      <button className='w-full bg-red-700 hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-700' onClick={resendVerif} disabled={disable}>
         <p className='text-center font-Public'>Click here to verified your account</p>
       </button>
       }

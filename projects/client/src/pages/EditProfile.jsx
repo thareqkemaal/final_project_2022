@@ -127,7 +127,7 @@ const EditProfile = () => {
     }
 
     return (
-        <div>
+        <div className='container mx-auto px-16'>
             <Tabs.Group
                 aria-label="Tabs with icons"
                 style="underline"

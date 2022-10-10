@@ -108,10 +108,10 @@ const LandingPages = () => {
                 <p className='text-xs font-bold  text-main-500' onClick={()=>navigate('/product')}>Lihat Semua</p>
               </div>
               <div className='overflow-y-auto w-full'>
-                <div className='flex justify-between mx-auto py-5' onClick={()=>navigate('/product')}>
+                <div className='flex justify-between mx-auto py-5' >
                   {
                     dataCategory.map(data=>(
-                      <div key={data.id}>
+                      <div key={data.id} onClick={()=>navigate(`/product?id=${data.id}`)}>
                         <div className=' min-w-[195px] max-h-[119px] bg-white shadow-md rounded-2xl'> 
                         <div className='py-5 hover:-translate-y-2'>
                           <data.icon size={50} className={`mx-auto ${data.fill}`}/>
@@ -188,17 +188,17 @@ const LandingPages = () => {
                 </div>
               </div>
             </div>
-        <div className='hidden lg:block w-full bg-gray-100 my-8'>
+        <div className='hidden lg:block w-full bg-gray-100 my-8 h-40'>
           <div className='p-4'>
-            <p className='text-center text-blue-900 text-sm font-bold font-Public'>Metode Pembayaran</p>
+            <p className='text-center text-txt-500 text-base leading-[18.8px] font-bold font-Public'>Metode Pembayaran</p>
             <div className='container mx-auto px-20 mt-10'>
-              <div className='flex justify-center'>
-                <img src={bca} className='h-10' alt='medcare.com' />
-                <img src={bri} className='h-10 px-10' alt='medcare.com' />
-                <img src={bni} className='h-10 px-10' alt='medcare.com' />
-                <img src={ovo} className='h-14 px-10' alt='medcare.com' />
-                <img src={gopay} className='h-10 px-10' alt='medcare.com' />
-                <img src={shoppe} className='h-10 px-10' alt='medcare.com' />
+              <div className='flex justify-center '>
+                <img src={bca} className='h-7' alt='medcare.com' />
+                <img src={bri} className='h-7 px-10' alt='medcare.com' />
+                <img src={bni} className='h-7 px-10' alt='medcare.com' />
+                <img src={ovo} className='h-10 px-10' alt='medcare.com' />
+                <img src={gopay} className='h-7 px-10' alt='medcare.com' />
+                <img src={shoppe} className='h-7 px-10' alt='medcare.com' />
               </div>
             </div>
           </div>
