@@ -45,7 +45,7 @@ const FooterComponent = () => {
                         <div className='grid grid-rows-4 gap-2'>
                             <div className='flex'>
                                 <img src={logo} className='h-12' alt='medcare.com'/>
-                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-lg'>Medcare</p>
+                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-lg pt-2'>Medcare</p>
                             </div>
                             <div className=''>
                                 <div className='flex pl-2 '>
@@ -92,15 +92,15 @@ const FooterComponent = () => {
                             <p className='text-lg font-bold'>Ikuti Kami</p>
                             <div className='flex pl-2 '>
                                 <BsFacebook size={25}/>
-                                <p className='text-xs text-blue-900' style={{fontSize:'10px'}}>Facebook</p>
+                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Facebook</p>
                             </div>
                             <div className='flex pl-2 '>
                                 <BsTwitter size={25}/>
-                                <p className='text-xs text-blue-900' style={{fontSize:'10px'}}>Twitter</p>
+                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Twitter</p>
                             </div>
                             <div className='flex pl-2 '>
                                 <BsInstagram size={25}/>
-                                <p className='text-xs text-blue-900' style={{fontSize:'10px'}}>Instagram</p>
+                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Instagram</p>
                             </div>
                         </div>
                     </div>
