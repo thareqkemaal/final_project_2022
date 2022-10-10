@@ -10,10 +10,12 @@ const upload = uploader('/img_profile','/IMGPROFILE').array('images',1)
 route.get('/',userController.getData);
 route.post('/register',userController.register);
 route.post('/login',userController.login);
-route.get('/keeplogin',readToken,userController.keepLogin);
-route.patch('/updateverif',readToken,userController.verification);
-route.get('/resendverif',userController.resendVerif);
-route.patch('/editprofile',upload,readToken,userController.editProfile);
-route.patch('/changepassword',readToken,userController.changePass);
+route.get('/keep-login',readToken,userController.keeplogin);
+route.patch('/update-verif',readToken,userController.verification);
+route.get('/resend-verif',userController.resendVerif);
+route.patch('/edit-profile',upload,readToken,userController.editProfile);
+route.patch('/change-password',readToken,userController.changePass);
+route.post('/send-reset',userController.sendReset);
+route.post('/reset-password',readToken,userController.resetPass);
 
 module.exports=route
