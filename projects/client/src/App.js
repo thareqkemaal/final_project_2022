@@ -21,25 +21,25 @@ import Checkout from './pages/user/CheckoutPage';
 import ProductDetail from './pages/user/ProductDetail'
 import Prescription from './pages/user/PrescriptionPage';
 import UploadSuccess from './pages/user/UploadSuccessPage';
+import ResetPass from './pages/user/ResetPass';
+import ProtectRoute from './components/ProtectRoute/ProtectRoute';
+import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
+import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 
 function App() {
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
 
-  const { role } = useSelector(({ userReducer }) => {
-    return {
-      role: userReducer.role
-    }
-  })
-
   const keepLogin = () => {
     let medcarelog = localStorage.getItem('medcarelog')
     if (medcarelog) {
-      axios.get(API_URL + '/api/user/keeplogin', {
+      axios.get(API_URL + '/api/user/keep-login', {
         headers: {
           'Authorization': `Bearer ${medcarelog}`
         }
       }).then((res) => {
+        console.log(res.data)
+        console.log('====================================kepp')
         if (res.data.iduser) {
           localStorage.getItem('medcarelog', res.data.token)
           delete res.data.token
@@ -68,40 +68,31 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-        {
-          localStorage.getItem('medcarelog') ?
-            <>
-              {
-                role === 'Admin' ?
-                  <>
-                    {/* <Route path='/admin/dashboard' element={<DashboardPage />} /> */}
-                    <Route path='/admin/transaction' element={<TransactionPage />} />
-                    <Route path='/profile' element={<EditProfile />} />
-                  </>
-                  :
-                  <>
-                    <Route path='/profile' element={<EditProfile />} />
-                  </>
-              }
-            </>
-            :
-            <>
+
+          {/* Protect Route Ketika User Blm Login */}
+          <Route element={<ProtectRoute />}>
+            <Route path='/profile' element={<EditProfile />} />
+            <Route path='/prescription' element={<Prescription />} />
+            <Route path='/prescription/success' element={<UploadSuccess />} />
+            <Route path='/cart' element={<UserCart />} />
+            <Route path='/checkout' element={<Checkout />} />
+          </Route>
+          
+          {/* Protect Route Page Admin */}
+          <Route element={<ProtectRouteAdmin />}>
+              <Route path='/admin/dashboard' element={<DashboardPage />} />
+          </Route>
+
+          {/* Protect Route Ketika User Sudah Login */}
+          <Route element={<ProtectRouteLogin />}>
               <Route path='/register' element={<Register />} />
               <Route path='/login' element={<Login />} />
-            </>
-        }
+              <Route path='/resetpass/:token' element={<ResetPass />} />
+          </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/profile' element={<EditProfile />} />
         <Route path='/product' element={<ProductPage />} />
-        <Route path='/cart' element={<UserCart />} />
-        <Route path='/checkout' element={<Checkout />} />
-        <Route path='/product/detail' element={<ProductDetail />} />
-        <Route path='/prescription' element={<Prescription />} />
-        <Route path='/success' element={<UploadSuccess />} />
-        <Route path='/admin/dashboard' element={<DashboardPage />} />
-        {/* <Route path='/dashboard' element={<Dashboard />} /> */}
+        <Route path='/product/detail' element={<ProductDetail/>} />
       </Routes>
       <Footer />
     </div>

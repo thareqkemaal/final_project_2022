@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Spinner } from 'flowbite-react';
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
 import LoadingComponent from './Loading';
+
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
@@ -85,7 +85,7 @@ const NavbarComponent = (props) => {
                       </button>
                       <Avatar
                         onClick={() => setDropdown(!dropdown)}
-                        src={profile_pic}
+                        src={profile_pic ? API_URL + profile_pic : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
                         w={10}
                         h={10}
                         b={1}
