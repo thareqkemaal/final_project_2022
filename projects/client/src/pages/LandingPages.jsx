@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router';
 import ProductCategory from '../components/ProductCategory';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import image2 from '../assets/undraw_conference_re_2yld.svg'
+import image3 from '../assets/undraw_shopping_app_flsj.svg'
 
 const LandingPages = () => {
   const navigate = useNavigate()
@@ -28,26 +30,31 @@ const LandingPages = () => {
 
   let dataCategory = [
     {
+      id:1,
       icon:GiMedicines,
       name:'Fever',
       fill:'fill-purple-500'
     },
     {
+      id:2,
       icon:GiChestnutLeaf,
       name:'Flu',
       fill:'fill-red-500'
     },
     {
+      id:5,
       icon:GiBeerBottle,
       name:'Eyes',
       fill:'fill-green-500'
     },
     {
+      id:7,
       icon:GiMedicines,
       name:'Hypertension',
       fill:'fill-gray-500'
     },
     {
+      id:4,
       icon:GiGlassShot,
       name:'Vitamin',
       fill:'fill-yellow-500'
@@ -104,7 +111,7 @@ const LandingPages = () => {
                 <div className='flex justify-between mx-auto py-5' onClick={()=>navigate('/product')}>
                   {
                     dataCategory.map(data=>(
-                      <div key={data.name}>
+                      <div key={data.id}>
                         <div className=' min-w-[195px] max-h-[119px] bg-white shadow-md rounded-2xl'> 
                         <div className='py-5 hover:-translate-y-2'>
                           <data.icon size={50} className={`mx-auto ${data.fill}`}/>
@@ -116,6 +123,26 @@ const LandingPages = () => {
                   }
                 </div>
               </div>
+              <div className='grid md:grid-cols-2 gap-2 my-8 mx-auto'>
+              <div className='bg-[#FFB156]  h-28 rounded-lg lg:h-40'>
+                <div className='mt-2 flex px-5 lg:px-20'>
+                  <img src={image2} alt='medcare.com' className='h-24 lg:h-36'/>
+                  <div className='pt-3 lg:pt-5 lg:pl-10 '>
+                    <p className='text-medium font-bold  text-center text-txt-500 lg:text-2xl'>Program Hamil</p>
+                    <p className='text-sm text-center  text-[#213360]'>Rencanakan kelahiran buah hati anda</p>
+                  </div>
+                </div>
+              </div>
+              <div className='bg-[#92C3D1] h-28 rounded-lg lg:h-40'>
+                <div className='mt-2 flex px-5 lg:px-20'>
+                  <img src={image3} alt='medcare.com' className='h-24 lg:h-36'/>
+                  <div className='pt-3 lg:pt-5 lg:pl-10 '>
+                    <p className='text-medium font-bold  text-center text-txt-500 lg:text-2xl'>10-10 Flash Sale</p>
+                    <p className='text-sm text-center  text-[#213360]'>Dapatkan diskon besar untuk keperluan anda</p>
+                  </div>
+                </div>
+              </div>
+            </div>
               <div className='flex justify-between mt-8'>
                 <p className='text-sm font-bold text-txt-500 font-Public'>Produk Populer</p>
                 <p className='text-xs font-bold  text-main-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
