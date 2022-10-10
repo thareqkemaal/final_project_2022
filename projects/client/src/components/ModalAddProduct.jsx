@@ -3,6 +3,9 @@ import axios from "axios";
 import { API_URL } from "../helper";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AiFillEdit } from "react-icons/ai";
+import ModalAddMainUnit from "./ModalAddMainUnit";
+import ModalAddNettoUnit from "./ModalAddNettoUnit";
 
 const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
     const [product_name, setProduct_Name] = React.useState('');
@@ -17,6 +20,16 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
     const [aturan_pakai, setAturan_Pakai] = React.useState('');
     const [stock_unit, setStock_Unit] = React.useState('');
 
+    // Add new netto unit & main unit
+    const [all_netto, setAll_Netto] = React.useState([]);
+    const [all_main, setAll_Main] = React.useState([]);
+
+    const [modalAddMainUnitOn, setModalAddMainUnitOn] = React.useState(false);
+    const [unit_type, setUnit_Type] = React.useState('');
+
+    const [modalAddNettoUnitOn, setModalAddNettoUnitOn] = React.useState(false);
+
+
     const handleOKClick = () => {
         addProduct()
         setModalAddOn(false)
@@ -29,6 +42,43 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
     const printCategory = () => {
         return category.map((val, idx) => {
             return <option key={val.idcategory} value={`${val.idcategory}`}>{val.category_name}</option>
+        })
+    }
+
+    const getNetto = () => {
+        axios.get(API_URL + `/api/product/getunit?unit_type=netto`)
+            .then((res) => {
+                setAll_Netto(res.data)
+            })
+            .catch((error) => {
+                console.log('getNetto error :', error)
+            })
+    }
+
+    const getMain = () => {
+        axios.get(API_URL + `/api/product/getunit?unit_type=main`)
+            .then((res) => {
+                setAll_Main(res.data)
+            })
+            .catch((error) => {
+                console.log('getMain error :', error)
+            })
+    }
+
+    React.useEffect(() => {
+        getNetto()
+        getMain()
+    })
+
+    const prtintNetto = () => {
+        return all_netto.map((val, idx) => {
+            return <option key={val.idunit} value={val.unit}>{val.unit}</option>
+        })
+    }
+
+    const printMain = () => {
+        return all_main.map((val, idx) => {
+            return <option key={val.idunit} value={val.unit}>{val.unit}</option>
         })
     }
 
@@ -48,23 +98,23 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
         }));
         formData.append('images', picture);
         axios.post(API_URL + `/api/product/add`, formData)
-        .then((res) => {
-            if (res.data) {
-                console.log('berhasil', res)
+            .then((res) => {
+                if (res.data) {
+                    console.log('berhasil', res)
 
-                toast.success('Add product berhasil', {
-                    position: "bottom-center",
-                    autoClose: 2000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                })
-            };
-        }).catch((err) => {
-            console.log(`Axios post (newpost) failed : ${err}`)
-        })
+                    toast.success('Add product berhasil', {
+                        position: "bottom-center",
+                        autoClose: 2000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    })
+                };
+            }).catch((err) => {
+                console.log(`Axios post (newpost) failed : ${err}`)
+            })
     }
 
     return (
@@ -135,16 +185,14 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                                 <input type="number" onChange={(e) => setStock_Unit(e.target.value)} name="category" id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Jumlah stok obat" required />
                                             </div>
                                             <div>
-                                                <label className="block mt-4 mb-2 text-sm font-medium text-gray-900">
-                                                    Main Unit
+                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex">
+                                                    Main Unit  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
+                                                        {<AiFillEdit onClick={() => { setModalAddMainUnitOn(true); setUnit_Type('main') }} size={13} className="mx-2" />}
+                                                    </button>
                                                 </label>
                                                 <select onChange={(e) => setDefault_Unit(e.target.value)} className='bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-2'>
                                                     <option defaultValue='Pilih Unit Utama'>Pilih unit utama obat</option>
-                                                    <option value='Botol'>Botol</option>
-                                                    <option value='Strip'>Strip</option>
-                                                    <option value='Box'>Box</option>
-                                                    <option value='Tube'>Tube</option>
-                                                    <option value='Sachet'>Sachet</option>
+                                                    {printMain()}
                                                 </select>
                                             </div>
                                         </div>
@@ -157,16 +205,14 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                                 <input type="number" onChange={(e) => setNetto_Stock(e.target.value)} name="description" id="description" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Isi per obat" required />
                                             </div>
                                             <div>
-                                                <label className="block mt-4 mb-2 text-sm font-medium text-gray-900">
-                                                    Netto Unit
+                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex">
+                                                    Netto Unit  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
+                                                        {<AiFillEdit onClick={() => { setModalAddNettoUnitOn(true); setUnit_Type('netto') }} size={13} className="mx-2" />}
+                                                    </button>
                                                 </label>
                                                 <select onChange={(e) => setNetto_Unit(e.target.value)} className='bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-2'>
                                                     <option defaultValue='Pilih Unit Netto'>Pilih unit isi obat</option>
-                                                    <option value='tablet'>tablet</option>
-                                                    <option value='kapsul'>kapsul</option>
-                                                    <option value='ml'>ml</option>
-                                                    <option value='gr'>gr</option>
-                                                    <option value='mg'>mg</option>
+                                                    {prtintNetto()}
                                                 </select>
                                             </div>
                                         </div>
@@ -196,6 +242,20 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                     </div>
                 </div>
             </div>
+            <ToastContainer
+                position="bottom-center"
+                autoClose={2000}
+                hideProgressBar
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
+
+            {modalAddMainUnitOn && <ModalAddMainUnit setModalAddMainUnitOn={setModalAddMainUnitOn} unit_type={unit_type} />}
+            {modalAddNettoUnitOn && <ModalAddNettoUnit setModalAddNettoUnitOn={setModalAddNettoUnitOn} unit_type={unit_type} />}
         </div>
     );
 }

@@ -209,6 +209,74 @@ module.exports = {
                 res.status(200).send(results);
             })
     },
+    getUnit: (req, res) => {
+        let unit_type = req.query.unit_type;
+
+        dbConf.query(`Select * from unit where unit_type=${dbConf.escape(unit_type)}`,
+            (err, results) => {
+                if (err) {
+                    return res.status(500).send('Middlewear getUnit failed. Error :', err)
+                }
+                res.status(200).send(results);
+            })
+    },
+    addUnit: (req, res) => {
+        let unit_type = req.query.unit_type;
+        let unit = req.body.unit;
+
+        console.log(unit_type)
+        console.log(unit)
+
+        dbConf.query(`Select * from unit where unit=${dbConf.escape(unit)} `,
+            (err, results) => {
+                if (err) {
+                    return res.status(500).send('Middlewear getUnit failed. Error :', err)
+                }
+
+                console.log(results)
+
+                if (JSON.stringify(results) != '[]') {
+                    res.status(200).send({
+                        message: false
+                    })
+                } else {
+                    console.log(`Insert into unit (unit_type, unit) values (${dbConf.escape(unit_type)}, ${dbConf.escape(unit)})`)
+                    dbConf.query(`Insert into unit (unit_type, unit) values (${dbConf.escape(unit_type)}, ${dbConf.escape(unit)})`,
+                        (err, results) => {
+                            if (err) {
+                                res.status(500).send('Middlewear addUnit failed:', err)
+                            }
+                            res.status(200).send({
+                                ...results,
+                                message: true
+                            });
+                        })
+                }
+            })
+    },
+    deleteUnit:(req,res)=>{
+        let idunit = req.params.id;
+
+        dbConf.query(`Delete from unit where idunit=${dbConf.escape(idunit)}`,
+            (error, results) => {
+                if (error) {
+                    return res.status(500).send(`Middlewear query delete gagal : ${error}`);
+                }
+
+                if (results.affectedRows) {
+                    res.status(200).send(
+                        {
+                            message: true
+                        })
+                } else {
+                    res.status(200).send(
+                        {
+                            message: false
+                        })
+                }
+
+            })
+    },
     getcartdata: async (req, res) => {
         try {
             let getSql = await dbQuery(`SELECT * FROM cart c 

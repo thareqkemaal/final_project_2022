@@ -14,6 +14,9 @@ route.post('/add', uploadProductPict, productController.addProduct, productContr
 route.patch('/edit/:id', uploadProductPict, productController.editProduct);
 route.delete('/delete/:id', productController.deleteProduct);
 route.get('/getcategory', productController.getCategory);
+route.get('/getunit', productController.getUnit);
+route.post('/addunit', productController.addUnit);
+route.delete('/deleteunit/:id', productController.deleteUnit);
 
 // CART
 route.get('/getcartdata', readToken, productController.getcartdata);
