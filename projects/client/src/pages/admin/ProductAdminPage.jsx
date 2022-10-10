@@ -27,15 +27,12 @@ const ProductAdminPage = (props) => {
     const [filterName, setFilterName] = React.useState('');
     const [pagination, setPagination] = React.useState([1, 2, 3, 4, 5]);
 
-    // CRUD product
+    // Add, edit, delete product
     const [modalAddOn, setModalAddOn] = React.useState(false);
     const [modalEditOn, setModalEditOn] = React.useState(false);
     const [modalDeleteOn, setModalDeleteOn] = React.useState(false);
     const [idproduct, setIdproduct] = React.useState('');
     const [dataproduct, setDataproduct] = React.useState('');
-
-    // CRUD category
-    const [addCategory, setAddCategory] = React.useState(false);
 
     const getProduct = () => {
 
@@ -76,7 +73,6 @@ const ProductAdminPage = (props) => {
         })
             .then((res) => {
                 setData(res.data);
-                console.log(data)
             })
             .catch((error) => {
                 console.log('Print product error', error);
@@ -219,17 +215,15 @@ const ProductAdminPage = (props) => {
 
     React.useEffect(() => {
         getCategory()
-    }, [])
+    }, [category])
 
     const checkedCategory = (idcategory) => {
         if (document.getElementById(`select-${idcategory}`).checked) {
             setLoading(false)
             if (categoryChecked.length > 0) {
                 setCategoryChecked([...categoryChecked, idcategory])
-                console.log('dalam ini categoryChecked', categoryChecked)
             } else {
                 setCategoryChecked([idcategory])
-                console.log('dalam ini categoryChecked', categoryChecked)
             }
         } else {
             if (categoryChecked.length > 0) {
@@ -272,23 +266,8 @@ const ProductAdminPage = (props) => {
                                     {defaultFilterCategory}
                                     <IoIosArrowDown size={13} className="w-7 h-7 py-2 ml-3.5 rounded-r-lg bg-gray-200 text-sm hover:bg-gray-400 hover:text-white" />
                                 </button>
-                                <div className="dropdown-content w-44 pt-5 pb-3 mr-2">
+                                <div className="dropdown-content w-44 pt-5 pb-5 mr-2">
                                     {printCategory()}
-                                    {
-                                        addCategory ?
-                                            <div>
-                                                <label className="ml-2 text-btn-500 font-bold text-xs">Create new category</label>
-
-                                                <input placeholder="Input new category here" className="mt-3 text-btn-500 border border-btn-500 text-center bg-white w-40 rounded-lg place-content-center text-xs h-7 mx-auto flex items-center">
-                                                </input>
-                                            </div>
-                                            :
-                                            <button value='Add' onClick={() => setAddCategory(true)} className="mt-3 text-btn-500 border border-btn-500 text-center bg-white hover:bg-btn-600 hover:text-white w-40 font-bold rounded-lg place-content-center text-xs h-7 mx-auto flex items-center">
-                                                <BsPlusCircle size={13} className="mr-2" />
-                                                Add new category
-                                            </button>
-                                    }
-
                                 </div>
                             </div>
                         </div>

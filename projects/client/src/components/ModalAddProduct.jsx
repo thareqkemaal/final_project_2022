@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AiFillEdit } from "react-icons/ai";
 import ModalAddMainUnit from "./ModalAddMainUnit";
 import ModalAddNettoUnit from "./ModalAddNettoUnit";
+import ModalSettingCategory from "./ModalSettingCategory";
 
 const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
     const [product_name, setProduct_Name] = React.useState('');
@@ -29,6 +30,8 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
 
     const [modalAddNettoUnitOn, setModalAddNettoUnitOn] = React.useState(false);
 
+    // Add, edit, delete category 
+    const [modalSetCategoryOn, setModalSetCategoryOn] = React.useState(false);
 
     const handleOKClick = () => {
         addProduct()
@@ -100,8 +103,6 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
         axios.post(API_URL + `/api/product/add`, formData)
             .then((res) => {
                 if (res.data) {
-                    console.log('berhasil', res)
-
                     toast.success('Add product berhasil', {
                         position: "bottom-center",
                         autoClose: 2000,
@@ -130,8 +131,13 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             <div>
                                 <div className="block">
-                                    <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900">
+                                    {/* <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900">
                                         Category
+                                    </label> */}
+                                    <label className="mb-2 text-sm font-medium text-gray-900 flex">
+                                        Category  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
+                                            {<AiFillEdit onClick={() => setModalSetCategoryOn(true)} size={13} className="mx-2" />}
+                                        </button>
                                     </label>
                                     <select onChange={(e) => setCategory_Id(e.target.value)} className='bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-2'>
                                         <option defaultValue='Choose category'>Choose category</option>
@@ -256,6 +262,7 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
 
             {modalAddMainUnitOn && <ModalAddMainUnit setModalAddMainUnitOn={setModalAddMainUnitOn} unit_type={unit_type} />}
             {modalAddNettoUnitOn && <ModalAddNettoUnit setModalAddNettoUnitOn={setModalAddNettoUnitOn} unit_type={unit_type} />}
+            {modalSetCategoryOn && <ModalSettingCategory setModalSetCategoryOn={setModalSetCategoryOn} category={category} />}
         </div>
     );
 }

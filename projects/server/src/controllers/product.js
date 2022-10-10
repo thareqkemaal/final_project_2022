@@ -21,7 +21,7 @@ module.exports = {
     filterProduct: (req, res) => {
         let filterCategory = req.query.category_id;
         let { query, sort, filterName } = req.body;
-        if(JSON.stringify(filterName) != '{}'){
+        if (JSON.stringify(filterName) != '{}') {
             `and category_id = ${filterCategory}`
         } else {
             `where category_id = ${filterCategory}`
@@ -175,7 +175,7 @@ module.exports = {
         let idproduct = req.params.id;
         let image = `/imgProductPict/${req.files[0].filename}`;
         let { price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit, unit } = JSON.parse(req.body.data);
-        
+
         dbConf.query(`UPDATE product p, stock s
         SET p.price=${dbConf.escape(price)},
             p.category_id=${dbConf.escape(category_id)},
@@ -254,10 +254,77 @@ module.exports = {
                 }
             })
     },
-    deleteUnit:(req,res)=>{
+    deleteUnit: (req, res) => {
         let idunit = req.params.id;
 
         dbConf.query(`Delete from unit where idunit=${dbConf.escape(idunit)}`,
+            (error, results) => {
+                if (error) {
+                    return res.status(500).send(`Middlewear query delete gagal : ${error}`);
+                }
+
+                if (results.affectedRows) {
+                    res.status(200).send(
+                        {
+                            message: true
+                        })
+                } else {
+                    res.status(200).send(
+                        {
+                            message: false
+                        })
+                }
+
+            })
+    },
+    addCategory: (req, res) => {
+        let category_name = req.body.category_name;
+        
+        dbConf.query(`Select * from category where category_name=${dbConf.escape(category_name)}`,
+        (err,results)=>{
+            if(err){
+                res.send(500).status('Middlewear addCategory gagal :', error)
+            }
+
+            if(JSON.stringify(results) != '[]'){
+                res.status(200).send({
+                    message: false
+                })
+            } else {
+                dbConf.query(`Insert into category (category_name) values (${dbConf.escape(category_name)})`,
+                (err,results)=>{
+                    if(err){
+                        res.send(500).status('Middlewear addCategory gagal :', error)
+                    }
+
+                    res.status(200).send({
+                        ...results,
+                        message:true
+                    })
+                })
+            }
+        })
+    },
+    editCategory: (req, res) => {
+        let idcategory = req.params.id;
+        let category_name = req.body.category_name;
+
+        dbConf.query(`Update category set category_name=${dbConf.escape(category_name)} where idcategory=${dbConf.escape(idcategory)}`,
+        (err,results)=>{
+            if(err){
+                res.status(500).send('Middlewear editcategory gagal :', err)
+            }
+            console.log(results)
+            res.send(200).status({
+                ...results,
+                message:true
+            })
+        })
+    },
+    deleteCategory: (req, res) => {
+        let idcategory = req.params.id;
+
+        dbConf.query(`Delete from category where idcategory=${dbConf.escape(idcategory)}`,
             (error, results) => {
                 if (error) {
                     return res.status(500).send(`Middlewear query delete gagal : ${error}`);
@@ -328,7 +395,6 @@ module.exports = {
             res.status(500).send(error)
         }
     },
-
     addCart: async (req, res) => {
         try {
             // console.log(req.body);
