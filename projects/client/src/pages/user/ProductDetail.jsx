@@ -14,12 +14,17 @@ import { useDispatch } from 'react-redux';
 import LoadingComponent from '../../components/Loading';
 
 const ProductDetail = () => {
+
     const { search } = useLocation()
 
     const navigate = useNavigate()
     const dispatch = useDispatch();
-    const [userCartData, setUserCartData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+
+    const [productDetail,setProductDetail]=useState([])
+    const [counter, setCounter]=useState(0)
+    const [userCartData, setUserCartData] = React.useState([]);
+
 
     const getDetailProduct = () => {
         axios.post(API_URL + `/api/product/getproductadmin${search.split('&')[0]}`, {

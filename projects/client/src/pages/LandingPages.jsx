@@ -27,27 +27,14 @@ const LandingPages = () => {
   })
 
 
-  const resendVerif = async () => {
-    try {
-      await axios.get(`${API_URL}/api/user/resend-verif?email=${email}`)
-        .then((res) => {
-          console.log(res)
-        })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <div>
       <div>
+        
         <div className='px-3 lg:px-[9.5rem]'>
-          {
-            status === 'Unverified' &&
-            <button className='text-red-500 font-Public' onClick={resendVerif}>Click to verified your account</button>
-          }
+          {/* Verification dipindahkan ke navbar */}
           <Carousel />
-          <div className='grid grid-cols-2 my-3 w-full  py-10 shadow-lg bg-gradient-to-tr from-blue-500 to-white rounded-lg'>
+          <div className='grid grid-cols-2 my-3 w-full  py-10 shadow-lg bg-gradient-to-tr from-blue-500 to-white rounded-lg mt-8'>
             <div className=''>
               <img className='h-24 lg:h-52 lg:mx-auto' src={image} alt='medcare.com' />
             </div>

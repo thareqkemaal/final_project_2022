@@ -2,13 +2,16 @@ import React, { useState } from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Spinner } from 'flowbite-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
 import LoadingComponent from './Loading';
+import { API_URL } from '../helper';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+
 
 
 const NavbarComponent = (props) => {
@@ -17,6 +20,14 @@ const NavbarComponent = (props) => {
 
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
+
+  const {status,email}=useSelector((state)=>{
+    return{
+      status:state.userReducer.status_name,
+      email:state.userReducer.email
+    }
+  })
+
 
   let { username, role, profile_pic } = useSelector((state) => {
     return {
@@ -40,10 +51,47 @@ const NavbarComponent = (props) => {
     }
   })
 
+  // Update Verification
+
+  const resendVerif = async () => {
+    try {
+      await axios.get(`${API_URL}/api/user/resend-verif?email=${email}`)
+        .then((res) => {
+          toast.success('Please check your email', {
+            theme: "colored",
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+        })
+        })
+    } catch (error) {
+      toast.error(`${error.response.data.message}`, {
+        theme: "colored",
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+    })
+    }
+  }
+
 
   return (
     <div>
-      <div className='shadow-md'>
+      {
+        status === 'Unverified'&&
+      <button className='w-full bg-red-700 hover:bg-red-800' onClick={resendVerif}>
+        <p className='text-center font-Public'>Click here to verified your account</p>
+      </button>
+      }
+      <div className='shadow-md shadow-teal-50 mb-8'>
         <div className='container md:px-14 md:mx-auto'>
           <div className='flex py-3 justify-between'>
             <div className='flex-none'>
@@ -138,9 +186,10 @@ const NavbarComponent = (props) => {
                       }
                     </div>
                   ) : (
+                    // Update Button
                     <div className='flex '>
-                      <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100' onClick={() => navigate('/login')}>Sign In</button>
-                      <button className='transition mr-4 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 ' onClick={() => navigate('/register')} >Sign Up</button>
+                      <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 font-bold text-sm rounded-lg w-20 md:w-28 h-11 hover:-translate-y-1 ' onClick={() => navigate('/login')}>Sign In</button>
+                      <button className='transition mr-4 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-bold text-sm w-20 md:w-28 h-11 hover:-translate-y-1 ' onClick={() => navigate('/register')} >Sign Up</button>
                     </div>
                   )
               }
@@ -148,6 +197,7 @@ const NavbarComponent = (props) => {
           </div>
         </div>
       </div>
+      <ToastContainer/>
       <LoadingComponent loading={loading} className='z-50' />
     </div>
   )
