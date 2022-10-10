@@ -22,7 +22,7 @@ const UploadSuccess = (props) => {
                         setTimeout(() => {
                             setLoading(false);
                             navigate('/', {replace: true})
-                        }, 3500)
+                        }, 2000)
                     }}>Back to Homepage</button>
                     <button className='border-2 rounded-lg py-3 px-14 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
                 </div>

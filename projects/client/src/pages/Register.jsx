@@ -8,6 +8,8 @@ import PhoneInput from 'react-phone-number-input'
 import axios from 'axios'
 import { API_URL } from '../helper' ;
 import Loading from '../components/Loading';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
     const navigate = useNavigate()
@@ -16,7 +18,6 @@ const Register = () => {
     const [strongPass, setStrongPass] = useState(false)
     const [visible,setVisible]=useState('password')
     // const [phone_number, setPhone_Number] = useState('')
-    const [toast, setToast]=useState(false)
     const [agree, setAgree]=useState(false)
     const [avalaibleUsername, setAvalaibleUsername]=useState(false)
     const [avalaibleEmail, setAvalaibleEmail]=useState(false)
@@ -84,7 +85,17 @@ const Register = () => {
             console.log('data token', res.data)
             if(res.data.success){
                 // navigate('/',{replace:true})
-                setToast(true)
+                toast.success('Register Success', {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                })
+                
                 setInput({
                     fullname:'',
                     username:'',
@@ -92,7 +103,6 @@ const Register = () => {
                     password:'',
                     phone_number:''
                 })
-                // setPhone_Number('+62')
                 setAgree(false)
                 setWeakPass(false)
                 setMediumPass(false)
@@ -103,6 +113,16 @@ const Register = () => {
             }
         }).catch((err)=>{
             setLoading(false)
+            toast.error(`${err}`, {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            })
             console.log(err)
             if(err.response.data.error === 'username'){
                 setAvalaibleUsername(true)
@@ -243,6 +263,7 @@ const Register = () => {
         </div>
 
         }
+        <ToastContainer/>
     </div>
   )
 }

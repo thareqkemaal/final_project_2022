@@ -17,12 +17,14 @@ const INITIAL_STATE={
 
 
 export const userReducer=(state= INITIAL_STATE, action)=>{
-    console.log("data dari Action",action)
+    console.log("data dari Action", action)
         switch (action.type) {
         case "LOGIN_SUCCESS":
             return {...state, ...action.payload}
         case "UPDATE_PROFILE":
             return {...state, ...action.payload}
+        case "UPDATE_CART":
+            return {...state, cart: action.payload}
         case "LOGOUT_SUCCESS":
                 return INITIAL_STATE;
         default:

@@ -10,6 +10,7 @@ import bri from '../../assets/bri.png';
 import LoadingComponent from "../../components/Loading";
 import NewAddressComponent from "../../components/NewAddressModalComp";
 import EditAddressComponent from "../../components/EditAddressModalComp";
+import Currency from "../../components/CurrencyComp";
 
 const Prescription = (props) => {
 
@@ -24,8 +25,7 @@ const Prescription = (props) => {
     const [showAddressModal, setShowAddressModal] = React.useState('');
     const [showNewAddressModal, setShowNewAddressModal] = React.useState('');
     const [showEditAddressModal, setShowEditAddressModal] = React.useState('');
-    const [showPaymentModal, setShowPaymentModal] = React.useState('');
-    const [paymentMethod, setPaymentMethod] = React.useState('');
+    const [showConfirmModal, setShowConfirmModal] = React.useState('');
 
     // RAJAONGKIR
     const [courier, setCourier] = React.useState('');
@@ -178,18 +178,18 @@ const Prescription = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - Rp {val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value}/></option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - Rp {val.cost[0].value.toLocaleString('id')}</option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value}/></option>
                     )
                 }
             }
         })
     };
 
-    const onPay = async () => {
+    const onSubmit = async () => {
         try {
             // userid, user_name, invoice_number, status_id = 3, useraddress, 
             // orderweight, delivery price, shipping courier, prescription pic 
@@ -214,19 +214,19 @@ const Prescription = (props) => {
             // console.log('courier', courier);
             // console.log("prescriptionpic", prescriptionPic);
 
-            let formPay = new FormData();
-            formPay.append('datatransaction', JSON.stringify({
+            let formSubmit = new FormData();
+            formSubmit.append('datatransaction', JSON.stringify({
                 invoice: setInvoice,
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier,
             }));
-            formPay.append('prescription_pic', prescriptionPic);
+            formSubmit.append('prescription_pic', prescriptionPic);
 
             setLoading(true);
-            setShowPaymentModal('');
-            let res = await axios.post(API_URL + '/api/transaction/addprescription', formPay, {
+            setShowConfirmModal('');
+            let res = await axios.post(API_URL + '/api/transaction/addprescription', formSubmit, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -235,8 +235,8 @@ const Prescription = (props) => {
             if (res.data.success) {
                 setTimeout(() => {
                     setLoading(false);
-                    navigate('/prescription/success', { replace: true })
-                }, 10000)
+                    navigate('/success', { replace: true })
+                }, 3000)
             }
         } catch (error) {
             console.log(error)
@@ -418,14 +418,14 @@ const Prescription = (props) => {
                             <p>Delivery</p>
                             {
                                 selectedDelivery ?
-                                    <p>Rp {parseInt(selectedDelivery.split(',')[0]).toLocaleString('id')}</p>
+                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
                                     :
-                                    <p>Rp 0</p>
+                                    <p><Currency price={0}/></p>
                             }
                         </div>
                         <div className='flex justify-between my-4'>
                             <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                            <p className='font-bold text-2xl text-main-500'>Rp {totalDelivery.toLocaleString('id')}</p>
+                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
                         </div>
                         <div>
                             <button type='button'
@@ -477,38 +477,30 @@ const Prescription = (props) => {
                                             progress: undefined,
                                         });
                                     } else {
-                                        setShowPaymentModal('show')
+                                        setShowConfirmModal('show');
                                     }
                                 }
                                 }
-                            >Select Payment</button>
-                            {/* MODAL SELECT PAYMENT */}
+                            >Submit</button>
+                            {/* MODALCONFIRMATION */}
                             {
-                                showPaymentModal === 'show' ?
+                                showConfirmModal === 'show' ?
                                     <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
                                         <div className="relative p-4 w-1/3 h-full md:h-auto">
                                             <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                 <div className="p-6 text-center">
                                                     <div>
-                                                        <p className='text-2xl font-bold text-main-500'>Select Payment Method</p>
+                                                        <p className='text-2xl font-bold text-main-500'>Order Confirmation</p>
                                                     </div>
-                                                    <div className='flex w-full my-4 items-center justify-center'>
-                                                        <img src={bni} className='w-20' alt="bnilogo"/>
-                                                        <img src={bca} className='w-20 mx-4' alt="bcalogo"/>
-                                                        <img src={bri} className='w-28' alt="brilogo"/>
-                                                    </div>
-                                                    <div className='border-2 rounded-lg border-main-600 p-3 my-3'>
-                                                        <div className='flex w-full items-center justify-start my-1'>
-                                                            <input type='radio' value='manual' onChange={(e) => { setPaymentMethod(e.target.value); console.log(paymentMethod) }} />
-                                                            <span className='ml-2'>Bank Transfer (Manual Verification)</span>
-                                                        </div>
+                                                    <div className='my-5'>
+                                                        <p className="font-semibold">Please make sure the prescription and selected address are correct!</p>
                                                     </div>
                                                     <div className='w-full flex justify-center'>
-                                                        <div className='w-1/2 flex justify-evenly items-center'>
+                                                        <div className='w-2/3 flex justify-evenly items-center'>
                                                             <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
-                                                                onClick={() => onPay()} disabled={paymentMethod === '' ? true : false}>Pay</button>
+                                                                onClick={() => onSubmit()}>Yes, Submit</button>
                                                             <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
-                                                                onClick={() => { setShowPaymentModal(''); setPaymentMethod('') }}>Cancel</button>
+                                                                onClick={() => setShowConfirmModal('')}>No, Cancel</button>
                                                         </div>
                                                     </div>
                                                 </div>

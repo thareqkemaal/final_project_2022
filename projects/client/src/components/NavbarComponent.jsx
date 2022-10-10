@@ -1,20 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Spinner } from 'flowbite-react';
-import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
+import LoadingComponent from './Loading';
+import { API_URL } from '../helper';
+
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const [dropdown, setDropdown] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   let { username, role, profile_pic } = useSelector((state) => {
     return {
@@ -29,13 +32,30 @@ const NavbarComponent = (props) => {
     dispatch(logoutAction())
     navigate('/', { replace: true })
   }
+
+  // kemal tambah fitur logo cart
+
+  const { cart } = useSelector((state) => {
+    return {
+      cart: state.userReducer.cart
+    }
+  })
+
+
   return (
     <div>
       <div className='shadow-md'>
         <div className='container md:px-14 md:mx-auto'>
           <div className='flex py-3 justify-between'>
             <div className='flex-none'>
-              <div className='hidden sm:flex' onClick={() => navigate('/')}>
+              <div className='hidden sm:flex' onClick={() => {
+                setLoading(true);
+                setTimeout(() => {
+                  setDropdown(false);
+                  setLoading(false);
+                  navigate('/');
+                }, 1000)
+              }}>
                 <img src={logo} className='h-9' alt='medcare.com' />
                 <span className='text-sm bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-extrabold bg-clip-text mt-2'>MedCare</span>
               </div>
@@ -54,12 +74,19 @@ const NavbarComponent = (props) => {
                   : username && !props.loading ? (
                     <div className='relative flex items-center w-24 justify-between'>
                       {/* kemal tambah button cart */}
-                      <button type='button' onClick={() => navigate('/cart')}>
+                      <button type='button' onClick={() => {
+                        setLoading(true);
+                        setTimeout(() => {
+                          setLoading(false);
+                          navigate('/cart');
+                        }, 1500)
+                      }}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
+                        <div className='border-0 bg-red-600 font-bold text-white text-xs rounded-full w-fit p-1 px-2 z-10 absolute left-5 bottom-5'>{cart.length}</div>
                       </button>
                       <Avatar
                         onClick={() => setDropdown(!dropdown)}
-                        src={profile_pic}
+                        src={profile_pic ? API_URL + profile_pic : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
                         w={10}
                         h={10}
                         b={1}
@@ -73,8 +100,22 @@ const NavbarComponent = (props) => {
                             role === 'User' ?
                               <div className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
                                 <div className="py-1" role="none">
-                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => navigate('/profile')}>Account settings</button>
-                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => navigate('/product')}>Product</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => {
+                                    setLoading(true);
+                                    setTimeout(() => {
+                                      setDropdown(false);
+                                      setLoading(false);
+                                      navigate('/profile');
+                                    }, 1500)
+                                  }}>Account settings</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => {
+                                    setLoading(true);
+                                    setTimeout(() => {
+                                      setDropdown(false);
+                                      setLoading(false);
+                                      navigate('/product');
+                                    }, 1500)
+                                  }}>Product</button>
                                   <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Transaction</button>
                                   <form method="POST" action="#" role="none">
                                     <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
@@ -108,6 +149,7 @@ const NavbarComponent = (props) => {
           </div>
         </div>
       </div>
+      <LoadingComponent loading={loading} className='z-50' />
     </div>
   )
 }
