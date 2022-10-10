@@ -20,6 +20,8 @@ const ProductDetail = () => {
     const dispatch = useDispatch();
     const [userCartData, setUserCartData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
+    const [counter, setCounter] = React.useState(1);
+    const [productDetail, setProductDetail] = React.useState([]);
 
     const getDetailProduct = () => {
         axios.post(API_URL + `/api/product/getproductadmin${search.split('&')[0]}`, {

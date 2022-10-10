@@ -9,6 +9,7 @@ import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
 import LoadingComponent from './Loading';
+import { API_URL } from '../helper';
 
 
 const NavbarComponent = (props) => {
