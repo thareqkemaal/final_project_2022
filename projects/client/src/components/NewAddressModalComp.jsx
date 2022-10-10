@@ -134,8 +134,6 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                 })
 
                 if (add.data.success) {
-                    showModal('');
-                    setAddress();
                     toast.success('Address Added Success!', {
                         theme: 'colored',
                         position: "top-center",
@@ -146,6 +144,8 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                         draggable: true,
                         progress: undefined,
                     });
+                    showModal('');
+                    setAddress();
                     setInputFullAddress('');
                     setInputDistrict('');
                     setInputPostalCode('');
@@ -226,11 +226,11 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                             </div>
                             <div className='flex flex-col items-start px-3 mb-2'>
                                 <p>Postal Code (Kode Pos) :</p>
-                                <input type='number'
+                                <input type='text'
                                     className={checkPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
                                         'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}
                                     placeholder='Postal Code' onChange={(e) => { setInputPostalCode(e.target.value); if (e.target.value > 0) { setCheckPostal('') } }}
-                                    value={inputPostalCode} />
+                                    value={inputPostalCode} maxLength={5} />
                             </div>
                         </div>
                         <button type="button" className="mr-1 text-white bg-main-500 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
