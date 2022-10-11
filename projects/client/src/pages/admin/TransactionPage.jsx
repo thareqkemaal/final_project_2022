@@ -12,7 +12,7 @@ import format from 'date-fns/format'
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 import background from './../../assets/background.png'
-import Currency from '../../components/Currency';
+import Currency from '../../components/CurrencyComp';
 import accept from '../../assets/accept.png'
 import cancel from '../../assets/cancel.png'
 import pickup from '../../assets/pickup.png'
@@ -93,7 +93,7 @@ const TransactionPages = () => {
                 <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
                 <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`}>Make Recipe's Copy</button>
                 <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
-                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} x <Currency price={val.detail[0].product_price} /></p>
+                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
                   <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
                     setLoading(true)
                     setTimeout(() => setLoading(false), 1000)
@@ -102,15 +102,15 @@ const TransactionPages = () => {
                 </div>
               </div>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Customer</p>
               <p className='font-thin text-lg'>{val.user_name}</p>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Address</p>
               <p className='font-thin text-lg'>{val.user_address}</p>
             </div>
-            <div className='my-3'>
+            <div className='my-3 ml-3'>
               <p className='font-bold text-lg'>Courier</p>
               <p className='font-thin text-lg'>{val.shipping_courier}</p>
             </div>
@@ -521,19 +521,19 @@ const TransactionPages = () => {
                 <p className='text-xl font-bold'>Product Detail</p>
                 {modalDetail.detail ? modalDetail.detail.map((val, idx) => {
                   return <div key={val.idtransaction_detail} className='bg-white border border-teal-300 my-5 mr-10 rounded-2xl '>
-                    <div className='flex divide-x divide-dashed justify-between '>
-                      <div className='flex'>
-                        <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 mt-3'>
+                    <div className='grid grid-cols-10 divide-x divide-dashed justify-between '>
+                      <div className='flex p-1 ml-2 col-span-7'>
+                        <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 my-3'>
                           <img className="w-full h-auto rounded my-3" src={modalDetail.prescription_pic ? modalDetail.prescription_pic : val.product_image} alt="image description" />
                         </div>
                         <div className='my-3 mx-5'>
                           <p className='font-bold text-large'>{val.product_name}</p>
-                          <p className='font-thin text-large flex'> {val.product_qty} x <Currency price={val.product_price} /></p>
+                          <p className='font-thin text-large flex'> {val.product_qty} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
                         </div>
                       </div>
-                      <div className='px-10 pt-3'>
+                      <div className='px-10 pt-3 col-span-3'>
                         <p className='text-large ml-2'>Total</p>
-                        <p className='font-bold text-large'><Currency price={(val.product_qty * val.product_price)} /></p>
+                        <p className='font-bold text-large ml-2'><Currency price={(val.product_qty * val.product_price)} /></p>
                       </div>
                     </div>
                   </div>
@@ -644,12 +644,10 @@ const TransactionPages = () => {
             {modalAccept.status_id == 5 ?
               <div>
                 <div className='border-b'>
-                  <div className='flex ml-5 my-3'>
-                    <p className='text-xl font-bold mr-5'>{modalAccept.user_name}</p>
-                    <p className='font-thin mr-5'>/</p>
-                    <p className='text-xl font-semibold mr-5'>{modalAccept.invoice_number}</p>
-                    <p className='font-thin mr-5'>/</p>
-                    <p className='text-xl font-thin flex items-center'><BsClock className='mr-2 opacity-50' /> {modalAccept.date_order} WIB</p>
+                  <div className='ml-5 my-3'>
+                    <p className='text-xl font-bold my-1'>{modalAccept.user_name}</p>
+                    <p className='text-xl font-semibold my-1'>{modalAccept.invoice_number}</p>
+                    <p className='text-xl font-thin flex items-center my-1'>{modalAccept.date_order} WIB</p>
                   </div>
                 </div>
                 <div className='overflow-hide-accept scroll' style={see ? { height: 400 } : {}}>
@@ -658,7 +656,7 @@ const TransactionPages = () => {
                       {modalAccept.detail.map((val, idx) => {
                         return <div>
                           <p className='font-bold text-lg'>{val.product_name}</p>
-                          <p className='font-thin text-lg flex'>{val.product_qty} x <Currency price={val.product_price} /></p>
+                          <p className='font-thin text-lg flex'>{val.product_qty} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
                         </div>
                       })}
                       <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(false)}>Hide <BsChevronDown className='ml-1 mt-1 rotate-[180deg]' /> </button>
@@ -666,7 +664,7 @@ const TransactionPages = () => {
                     :
                     <div className='my-3 ml-5'>
                       <p className='font-bold text-lg'>{modalAccept.detail[0].product_name}</p>
-                      <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} x <Currency price={modalAccept.detail[0].product_price} /></p>
+                      <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} x <p className='ml-2'><Currency price={modalAccept.detail[0].product_price} /></p></p>
                       <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
                     </div>}
                 </div>
@@ -683,6 +681,11 @@ const TransactionPages = () => {
                   <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_name}</p>
                 </div>
                 <div className='my-3 grid grid-cols-10'>
+                  <p className='font-thin text-large col-span-2'>Phone Number</p>
+                  <p>:</p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_phone_number}</p>
+                </div>
+                <div className='my-3 grid grid-cols-10'>
                   <p className='font-thin text-large col-span-2'>Address</p>
                   <p>:</p>
                   <p className='font-bold text-large ml-[-40px] col-span-4'>{modalAccept.user_address}</p>
@@ -695,7 +698,7 @@ const TransactionPages = () => {
                 <div className='my-3 grid grid-cols-10 '>
                   <p className='font-thin text-large col-span-2'>Delivery Price</p>
                   <p>:</p>
-                  <p className='font-bold text-large ml-[-48px] col-span-4'><Currency price={modalAccept.delivery_price} /></p>
+                  <p className='font-bold text-large ml-[-40px] col-span-4'><Currency price={modalAccept.delivery_price} /></p>
                 </div>
               </div>
             }
