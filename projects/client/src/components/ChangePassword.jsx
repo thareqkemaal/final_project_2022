@@ -50,7 +50,7 @@ const ChangePassword = () => {
     const onSubmitPass = ()=>{
         let medcarelog = localStorage.getItem('medcarelog')
         if(formInputPass.newPassword === formInputPass.repeatPassword){
-            axios.patch(API_URL+`/api/user/changepassword`,{
+            axios.patch(API_URL+`/api/user/change-password`,{
                 password:formInputPass.password,
                 newPassword:formInputPass.newPassword
             },

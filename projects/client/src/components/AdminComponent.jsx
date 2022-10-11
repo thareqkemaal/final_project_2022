@@ -9,7 +9,7 @@ const AdminComponent = (page) => {
   const [open, setOpen] = React.useState(true)
   return (<div>
     <div className='hidden sm:block'>
-      <div className={`${open ? "w-60" : "w-20"} p-5 pt-8 h-screen bg-white relative duration-500`}>
+      <div className={`${open ? "w-80" : "w-20"} p-5 pt-8 h-screen bg-white relative duration-500`}>
         <IoIosArrowBack size={30}
           className={`absolute -right-3 rounded-full cursor-pointer top-9 border-2 duration-300 bg-white  ${!open && "rotate-180"} ring-2 ring-teal-200`}
           onClick={() => setOpen(!open)} />
@@ -18,31 +18,31 @@ const AdminComponent = (page) => {
           <span className={`cursor-pointer origin-center bg-gradient-to-r from-green-500 to-blue-600 text-2xl text-transparent font-extrabold bg-clip-text ${!open && "hidden"}`}>MedCare</span>
         </div>
         <ul className='pt-16 mx-1'>
-          <li className={`${page.page == '/admin/dashboard' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`}
+          <li className={`${page.page == '/admin/dashboard' ? 'underline decoration-wavy' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`}
             onClick={() => navigate('/admin/dasboard')}
           >
             <FcTemplate size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Dashboard</span>
           </li>
-          <li className={`${page.page == '/admin/product' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
+          <li className={`${page.page == '/admin/product' ? 'underline decoration-wavy' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
             onClick={() => navigate('/admin/product')}
           >
             <FcBriefcase size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Product</span>
           </li>
-          <li className={`${page.page == '/admin/transaction' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
+          <li className={`${page.page == '/admin/transaction' ? 'underline decoration-wavy' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
             onClick={() => navigate('/admin/transaction')}
           >
             <FcInTransit size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Transaction</span>
           </li>
-          <li className={`${page.page == '/admin/report' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
+          <li className={`${page.page == '/admin/report' ? 'underline decoration-wavy' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
             onClick={() => navigate('/admin/report')}
           >
             <FcSalesPerformance size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Sales Report</span>
           </li>
-          <li className={`${page.page == '/admin/stock_log' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
+          <li className={`${page.page == '/admin/stock_log' ? 'underline decoration-wavy' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}
             onClick={() => navigate('/admin/stock_log')}
           >
             <FcClock size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />

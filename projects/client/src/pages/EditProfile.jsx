@@ -13,11 +13,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import AddressComponent from '../components/AdressComponent';
 import ChangePassword from '../components/ChangePassword';
+import { compareAsc, format } from 'date-fns'
 
 
 const EditProfile = () => {
 
     // DanielHS APKG2-13 dan APKG2-14
+    
     const dispatch = useDispatch()
     const hiddenFileInput = useRef(null)
     
@@ -43,26 +45,24 @@ const EditProfile = () => {
     })
     const[newProfilPict, setNewProfilPict]=useState('')
 
-
-    
     useEffect(()=>{
         setInput({
             fullname: fullname,
             username:username,
             email:email,
-            gender:gender,
-            birthdate:birthdate.split('').splice(0,10).join(''),
-            phone_number: phone_number
+            gender:gender?gender:'select gender',
+            birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
+            phone_number: phone_number,
         })
     },[fullname,username,email,phone_number, gender, birthdate])
-
+    
     
     const updateProfile = ()=>{
         let medcarelog = localStorage.getItem('medcarelog')
         let formData = new FormData()
         formData.append('data',JSON.stringify(input))
         formData.append('images',newProfilPict)
-        axios.patch(API_URL+`/api/user/editprofile`,formData,{
+        axios.patch(API_URL+`/api/user/edit-profile`,formData,{
             headers:{
                 'Authorization': `Bearer ${medcarelog}`
             }
@@ -95,6 +95,7 @@ const EditProfile = () => {
     }
 
     const onChange = (e)=>{
+        console.log(e.target.value)
         const {value,name}=e.target
         setInput({...input, [name]:value})
     }
@@ -113,7 +114,16 @@ const EditProfile = () => {
                     case'gif':
                 return setNewProfilPict(files)
             }
-            return alert('format gagal')
+            return toast.error(`Wrong file format`, {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            })
     }
 
     return (
@@ -128,15 +138,32 @@ const EditProfile = () => {
                 >
                     <div className='container mx-auto lg:px-96'>
                         <div className='flex justify-center mt-5'>
-                            <Avatar
-                                onClick={handleClick}
-                                src={newProfilPict ? URL.createObjectURL(newProfilPict) : profile_pic}
-                                w={20}
-                                h={20}
-                                b={1}
-                                width={6}
-                                height={6}
-                            />
+                            {
+                                profile_pic || newProfilPict ?
+                                <>
+                                <Avatar
+                                    onClick={handleClick}
+                                    src={newProfilPict ? URL.createObjectURL(newProfilPict) :API_URL + profile_pic}
+                                    w={20}
+                                    h={20}
+                                    b={1}
+                                    width={6}
+                                    height={6}
+                                />
+                                </>
+                                :
+                                <>
+                                <Avatar
+                                    onClick={handleClick}
+                                    src={'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                    w={20}
+                                    h={20}
+                                    b={1}
+                                    width={6}
+                                    height={6}
+                                />
+                                </>
+                            }
                             <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} />
                         </div>
                         <form>
@@ -165,13 +192,13 @@ const EditProfile = () => {
                             {/* Birth date */}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Birth Date</span>
-                                <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public' defaultValue={input.birthdate.split('').splice(0, 10).join('')} name='birthdate' onChange={onChange} type='date' />
+                                <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public' defaultValue={input.birthdate} name='birthdate' onChange={onChange} type='date' />
                             </label>
                             {/* gender*/}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Gender</span>
                                 <select onChange={onChange} value={input.gender} name='gender' className='h-10 rounded-md font-Public'>
-                                    <option disabled className='font-Public'>Select Gender</option>
+                                    <option disabled value='select gender' className='font-Public'>Select Gender</option>
                                     <option value='male' className='font-Public'>Male</option>
                                     <option value='female' className='font-Public'>Female</option>
                                 </select>
