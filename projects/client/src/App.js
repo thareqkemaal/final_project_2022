@@ -1,25 +1,100 @@
-import axios from "axios";
-import logo from "./logo.svg";
-import "./App.css";
-import { useEffect, useState } from "react";
+import './App.css'
+import React, { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from '../src/components/NavbarComponent';
+import Footer from '../src/components/FooterComponent';
+import LandingPages from '../src/pages/LandingPages.jsx';
+import Register from './pages/Register';
+import 'react-phone-number-input/style.css'
+import Verified from './pages/user/Verified';
+import Login from './pages/Login';
+import axios from 'axios';
+import { API_URL } from './helper';
+import { useDispatch, useSelector } from 'react-redux'
+import { loginAction } from './action/useraction';
+import EditProfile from './pages/EditProfile.jsx'
+import DashboardPage from './pages/admin/DashboardPage.jsx';
+import TransactionPage from './pages/admin/TransactionPage';
+import ProductPage from "./pages/user/ProductPage";
+import UserCart from './pages/user/CartPage';
+import Checkout from './pages/user/CheckoutPage';
+import ProductDetail from './pages/user/ProductDetail'
+import Prescription from './pages/user/PrescriptionPage';
+import UploadSuccess from './pages/user/UploadSuccessPage';
+import ResetPass from './pages/user/ResetPass';
+import ProtectRoute from './components/ProtectRoute/ProtectRoute';
+import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
+import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 
 function App() {
-  const [message, setMessage] = useState("");
+  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true)
+
+  const keepLogin = () => {
+    let medcarelog = localStorage.getItem('medcarelog')
+    if (medcarelog) {
+      axios.get(API_URL + '/api/user/keep-login', {
+        headers: {
+          'Authorization': `Bearer ${medcarelog}`
+        }
+      }).then((res) => {
+        console.log(res.data)
+        console.log('====================================kepp')
+        if (res.data.iduser) {
+          localStorage.getItem('medcarelog', res.data.token)
+          delete res.data.token
+          setLoading(false)
+          dispatch(loginAction(res.data))
+
+        }
+      })
+        .catch((err) => {
+          console.log(err)
+          setLoading(false)
+        })
+    } else {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    (async () => {
-      const { data } = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/greetings`
-      );
-      setMessage(data?.message || "");
-    })();
-  }, []);
+    keepLogin()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        {message}
-      </header>
+    <div>
+      <div>
+        <Navbar loading={loading} />
+      </div>
+      <Routes>
+        <Route path='/' element={<LandingPages />} />
+
+          {/* Protect Route Ketika User Blm Login */}
+          <Route element={<ProtectRoute />}>
+            <Route path='/profile' element={<EditProfile />} />
+            <Route path='/prescription' element={<Prescription />} />
+            <Route path='/prescription/success' element={<UploadSuccess />} />
+            <Route path='/cart' element={<UserCart />} />
+            <Route path='/checkout' element={<Checkout />} />
+          </Route>
+          
+          {/* Protect Route Page Admin */}
+          <Route element={<ProtectRouteAdmin />}>
+              <Route path='/admin/dashboard' element={<DashboardPage />} />
+          </Route>
+
+          {/* Protect Route Ketika User Sudah Login */}
+          <Route element={<ProtectRouteLogin />}>
+              <Route path='/register' element={<Register />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/resetpass/:token' element={<ResetPass />} />
+          </Route>
+
+        <Route path='/verification/:token' element={<Verified />} />
+        <Route path='/product' element={<ProductPage />} />
+        <Route path='/product/detail' element={<ProductDetail/>} />
+      </Routes>
+      <Footer />
     </div>
   );
 }
