@@ -20,7 +20,7 @@ const CarouselComponent = () => {
     },
   ]
   return (
-        <div className="h-40 lg:h-80 lg:px-0 lg:w-full mx-auto my-10">
+        <div className="h-40 lg:h-80 lg:px-0 lg:w-full mx-auto my-3">
           <Carousel>
             {
               dataImage.map(data=>(
