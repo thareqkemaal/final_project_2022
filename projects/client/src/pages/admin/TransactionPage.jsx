@@ -4,7 +4,7 @@ import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
 import { BiSearchAlt2, BiDetail } from 'react-icons/bi';
 import { BsFillChatDotsFill, BsClock, BsChevronDown } from 'react-icons/bs'
-import { MdOutlinePayments, MdOutlineHideImage } from 'react-icons/md'
+import { MdOutlinePayments, MdOutlineHideImage, MdAdd, MdOutlineDeleteOutline, MdOutlineArrowForward } from 'react-icons/md'
 import { IoIosArrowDown } from "react-icons/io";
 import { API_URL } from '../../helper';
 import { DateRangePicker } from 'react-date-range'
@@ -16,16 +16,20 @@ import Currency from '../../components/CurrencyComp';
 import accept from '../../assets/accept.png'
 import cancel from '../../assets/cancel.png'
 import pickup from '../../assets/pickup.png'
+import { set } from 'date-fns';
 
 const TransactionPages = () => {
   const [defaultSort, setDefaultSort] = React.useState('Date')
   const [loading, setLoading] = React.useState(true)
   const [drop, setDrop] = React.useState(true)
   const [dropCancel, setDropCancel] = React.useState(true)
+  const [dropMed, setDropMed] = React.useState(true)
+  const [dropRecipe, setDropRecipe] = React.useState(true)
   const [filterKey, setFilterKey] = React.useState(0)
   const [transaction, setTransaction] = React.useState([])
   const [filterTransaction, setFilterTransaction] = React.useState([])
   const [allTransaction, setAllTransaction] = React.useState([])
+  const [product, setProduct] = React.useState([])
   const [selectedStatus, setSelectedStatus] = React.useState(3456789)
   const [isFilter, setIsFilter] = React.useState(false)
   const [invoice, setInvoice] = React.useState('')
@@ -35,10 +39,17 @@ const TransactionPages = () => {
   const [modalAccept, setModalAccept] = React.useState('')
   const [modalNote, setModalNote] = React.useState(false)
   const [modalCancel, setModalCancel] = React.useState('')
+  const [modalRecipe, setModalRecipe] = React.useState('')
+  const [modalConv, setModalConv] = React.useState('')
+  const [qtyConv, setQtyConv] = React.useState(0)
   const [cancelReason, setCancelReason] = React.useState('Select One')
+  const [pickMed, setPickMed] = React.useState('Search Medicine')
   const [see, setSee] = React.useState(false)
-
-
+  const [showBtn, setShowBtn] = React.useState(true)
+  const [showInput, setShowInput] = React.useState(false)
+  const [qty, setQty] = React.useState(0)
+  const [buyUnit, setBuyUnit] = React.useState('Select Unit')
+  const [recipe, setRecipe] = React.useState([])
   const [range, setRange] = React.useState([
     {
       startDate: '',
@@ -56,6 +67,7 @@ const TransactionPages = () => {
   const [status5, setStatus5] = React.useState(false)
   const [status6, setStatus6] = React.useState(false)
 
+
   const getTrans = () => {
     axios.get(API_URL + `/api/transaction/all`)
       .then((res) => {
@@ -69,7 +81,20 @@ const TransactionPages = () => {
 
   React.useEffect(() => {
     getTrans()
+    getProduct()
   }, [])
+
+  const getProduct = () => {
+    axios.post(API_URL + `/api/product/getproduct`, {})
+      .then((res) => {
+        console.log(res.data)
+        setProduct(res.data)
+        setTimeout(() => setLoading(false), 1000)
+      })
+      .catch((error) => {
+        console.log('Print product error', error);
+      })
+  }
 
   const printTrans = () => {
     return transaction.map((val, idx) => {
@@ -91,9 +116,9 @@ const TransactionPages = () => {
               </div>
               <div className='my-3 mx-5'>
                 <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
-                <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`}>Make Recipe's Copy</button>
+                <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`} onClick={val.status_id == 3 ? () => setModalRecipe(val) : () => setModalDetail(val)}>{val.status_id == 3 ? `Make Recipe's Copy` : 'See Detail Order'}</button>
                 <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
-                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
+                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
                   <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
                     setLoading(true)
                     setTimeout(() => setLoading(false), 1000)
@@ -122,12 +147,12 @@ const TransactionPages = () => {
           <div className='flex m-5 justify-between'>
             <div className='flex'>
               <p className='mt-5 text-lg text-teal-500 font-semibold flex items-center'><BsFillChatDotsFill className='mr-2' /> Chat Customer</p>
-              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="detailModal" onClick={() => {
+              <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="detailModal" onClick={() => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
                 setTimeout(() => setModalDetail(val), 1000)
               }}><BiDetail className='mr-2' />Order Detail</button>
-              <button className='mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center' data-modal-toggle="paymentModal" onClick={() => {
+              <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="paymentModal" onClick={() => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
                 setTimeout(() => setModalPayment(val), 1000)
@@ -220,23 +245,45 @@ const TransactionPages = () => {
     setTimeout(() => setLoading(false), 1000)
     if (val.status_id == 5) {
       setTimeout(() => setModalNote('success'), 1000)
+    } else if (val.status_id == 3) {
+      setTimeout(() => setModalNote('gopayment'), 1000)
     } else {
       setTimeout(() => setModalNote('pickup'), 1000)
     }
     setModalAccept('')
-    axios.patch(API_URL + `/api/transaction/update`, {
-      id: val.idtransaction,
-      status: val.status_id,
-      order: status
-    }).then((res) => {
-      if (isFilter) {
-        handleFilter()
-      } else {
-        getTrans()
-      }
-    }).catch((err) => {
-      console.log(err)
-    })
+    if (val.status_id == 3) {
+      axios.patch(API_URL + `/api/transaction/update`, {
+        id: val.idtransaction,
+        status: val.status_id,
+        order: status,
+        price: val.total_price,
+        image: val.prescription_pic,
+        recipe: recipe
+      }).then((res) => {
+        setRecipe('')
+        if (isFilter) {
+          handleFilter()
+        } else {
+          getTrans()
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else {
+      axios.patch(API_URL + `/api/transaction/update`, {
+        id: val.idtransaction,
+        status: val.status_id,
+        order: status
+      }).then((res) => {
+        if (isFilter) {
+          handleFilter()
+        } else {
+          getTrans()
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
   }
 
   const handleCancel = (val, reason) => {
@@ -256,6 +303,159 @@ const TransactionPages = () => {
     }).catch((err) => {
       console.log(err)
     })
+  }
+
+  const handleFilterMed = () => {
+    let input = document.getElementById("inputMed");
+    let filter = input.value.toUpperCase();
+    let div = document.getElementById("dropdownMed");
+    let a = div.getElementsByTagName("button");
+    console.log(input)
+    console.log(filter)
+    console.log(a)
+    for (let i = 0; i < a.length; i++) {
+      let txtValue = a[i].textContent || a[i].innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        a[i].style.display = "";
+      } else {
+        a[i].style.display = "none";
+      }
+    }
+  }
+
+  const printAddRecipe = () => {
+    let data = product.filter((val) => val.product_name == pickMed)
+    if (data.length > 0) {
+      return <div className='ml-5 mt-3'>
+        <p className='font-semibold'>{pickMed}</p>
+        <p className='font-semibold'>Main Stock : {data[0].stock_unit} {data[0].unit}</p>
+        <p className='font-semibold'>{data[1] ? `Netto Stock : ${data[1].stock_unit} ${data[1].unit}` : 'No Netto Stock Yet'}</p>
+        <div className='flex mt-3'>
+          <input placeholder='Quantity' key={filterKey} className='w-20 sm:w-48 h-5 sm:h-10 border border-teal-500 rounded-lg px-3 sm:px-5' type='number' onChange={(e) => setQty(e.target.value)} />
+          <div className='inline'>
+            <button onClick={() => setDropRecipe(!dropRecipe)} id="dropdownRecipe" data-dropdown-toggle="dropdownRecipe"
+              className="border rounded-lg text-gray-400 bg-white hover:bg-gray-400 hover:text-white w-32 ml-5 font-medium pl-2 h-5 sm:h-10 text-center inline-flex justify-between items-center" type="button">
+              {buyUnit == 'Select Unit' ? 'Select Unit' : buyUnit.unit}
+              <IoIosArrowDown />
+            </button>
+            <div id="dropdownRecipe" className={`${dropRecipe == true ? 'hidden' : 'w-32 ml-5 bg-white z-10 overflow-hide-accept scroll rounded divide-y divide-gray-100 shadow absolute'}`} >
+              <ul className="py-1 text-sm text-gray-700" aria-labelledby="dropdownRecipe">
+                <li className='hover:bg-gray-100'>
+                  <button className="block py-2 pl-4 " onClick={() => {
+                    setBuyUnit(data[0])
+                    setDropRecipe(true)
+                  }}>{data[0].unit}</button>
+                </li>
+                {data[1] ?
+                  <li className='hover:bg-gray-100'>
+                    <button className="block py-2 pl-4 " onClick={() => {
+                      setBuyUnit(data[1])
+                      setDropRecipe(true)
+                    }}>{data[1].unit}</button>
+                  </li>
+                  : null
+                }
+              </ul>
+            </div>
+          </div>
+          <button className='text-teal-500 font-semibold ml-3' type='button' onClick={() => setModalConv(data)}>Need Conversion ?</button>
+        </div>
+        <div className='flex justify-between'>
+          <p />
+          <div className='flex'>
+            <button className='transition h-8 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg my-4 p-1 mr-5 hover:-translate-y-1 hover:bg-gray-100 w-20' onClick={() => {
+              setQty(0)
+              setBuyUnit('Select Unit')
+              setPickMed('')
+              setShowBtn(true)
+            }}>Cancel</button>
+            <button type='button' className={`${(!qty || buyUnit == 'Select Unit') || (qty > buyUnit.stock_unit || qty <= 0) ? 'bg-gray-300' : 'bg-main-500  hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} h-8 transition my-4 p-1 mr-5 font-semibold text-white rounded-lg w-20 `} disabled={(!qty || buyUnit == 'Select Unit') || (qty > buyUnit.stock_unit || qty <= 0) ? true : false} onClick={handleAddRecipe} >Save</button>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  const handleAddRecipe = () => {
+    let data = []
+    if (buyUnit.isDefault == 'true') {
+      modalRecipe.total_price = modalRecipe.total_price + (qty * buyUnit.price)
+      data = [{
+        name: pickMed,
+        qty: qty,
+        unit: buyUnit.unit,
+        price: buyUnit.price,
+        idproduct: buyUnit.idproduct
+      }]
+    } else {
+      modalRecipe.total_price = modalRecipe.total_price + (qty * buyUnit.price / buyUnit.netto_stock)
+      data = [{
+        name: pickMed,
+        qty: qty,
+        unit: buyUnit.unit,
+        price: buyUnit.price / buyUnit.netto_stock,
+        idproduct: buyUnit.idproduct
+      }]
+    }
+    if (recipe.length == 0) {
+      setRecipe(data)
+    } else {
+      setRecipe(recipe.concat(data))
+    }
+
+    setQty(0)
+    setBuyUnit('Select Unit')
+    setPickMed('')
+    setShowBtn(true)
+  }
+
+  const printFixRecipe = () => {
+    if (recipe.length > 0) {
+      return recipe.map((val, idx) => {
+        return <div className='grid grid-cols-6 ml-5 my-3'>
+          <p className='font-semibold col-span-3'>{val.name}</p>
+          <p className='font-semibold col-span-2 flex'>{val.qty} {val.unit} x<p className='ml-2'><Currency price={val.price} /></p></p>
+          <button className='items-center'><MdOutlineDeleteOutline className='border' onClick={() => handleDeleteRecipe(val.idproduct)} /></button>
+        </div>
+      })
+    }
+  }
+
+  const handleDeleteRecipe = (id) => {
+    let index = recipe.findIndex((val) => val.idproduct == id)
+    recipe.splice(index, 1)
+    getTrans()
+  }
+
+  const handleConv = (val) => {
+    setLoading(true)
+    setModalConv('')
+    if (val[1]) {
+      axios.patch(API_URL + `/api/product/unitconv`, {
+        idproduct: val[0].idproduct,
+        main: val[0].stock_unit - qtyConv,
+        conv: val[1].stock_unit + (qtyConv * val[0].netto_stock),
+        status: 'already'
+      }).then((res) => {
+        getProduct()
+        setQtyConv(0)
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else {
+      axios.patch(API_URL + `/api/product/unitconv`, {
+        idproduct: val[0].idproduct,
+        main: val[0].stock_unit - qtyConv,
+        conv: qtyConv * val[0].netto_stock,
+        convUnit: val[0].netto_unit,
+        status: 'new'
+      }).then((res) => {
+        getProduct()
+        setQtyConv(0)
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
   }
 
   return (<div className={`${loading || modalDetail || modalPayment ? 'overflow-hide scroll ' : ""}`}  >
@@ -278,15 +478,15 @@ const TransactionPages = () => {
                 {/* <!-- Dropdown menu --> */}
                 <div id="dropdown" className={`${drop == true ? 'hidden' : 'z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow absolute'}`} >
                   <ul className="py-1 text-sm text-gray-700" aria-labelledby="dropdownDefault">
-                    <li>
-                      <button className="block py-2 pl-4 pr-32 hover:bg-gray-100" onClick={() => {
+                    <li className='hover:bg-gray-100'>
+                      <button className="block py-2 pl-4" onClick={() => {
                         setDefaultSort('Date')
                         setTransaction(transaction.reverse())
                         setDrop(true)
                       }}>Date</button>
                     </li>
-                    <li>
-                      <button className="block py-2 pl-4 pr-24 hover:bg-gray-100" onClick={() => {
+                    <li className='hover:bg-gray-100'>
+                      <button className="block py-2 pl-4" onClick={() => {
                         setDefaultSort('Invoice ID')
                         setTransaction(transaction.reverse())
                         setDrop(true)
@@ -528,7 +728,7 @@ const TransactionPages = () => {
                         </div>
                         <div className='my-3 mx-5'>
                           <p className='font-bold text-large'>{val.product_name}</p>
-                          <p className='font-thin text-large flex'> {val.product_qty} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
+                          <p className='font-thin text-large flex'> {val.product_qty} {val.product_unit} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
                         </div>
                       </div>
                       <div className='px-10 pt-3 col-span-3'>
@@ -622,7 +822,7 @@ const TransactionPages = () => {
     </div>
     {/* END MODAL CHECK PAYMENT */}
     {/* MODAL ACCEPT / SEND ORDER */}
-    <div id="AcceptModal" tabindex="-1" aria-hidden='true' className={`${modalAccept ? `pl-[37%] ${modalAccept.status_id == 5 ? 'pt-[5%]' : 'pt-[10%]'} backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0` : "hidden"} `}>
+    <div id="AcceptModal" tabindex="-1" aria-hidden='true' className={`${modalAccept ? `pl-[37%] ${modalAccept.status_id == 5 || modalAccept.status_id == 3 ? 'pt-[5%]' : 'pt-[10%]'} backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0` : "hidden"} `}>
       {modalAccept ?
         <div className="mt-20 w-full max-w-xl border rounded-lg max-h-[48rem]" >
           {/* <!-- Modal content --> */}
@@ -630,18 +830,25 @@ const TransactionPages = () => {
             {/* <!-- Modal header --> */}
             <div className="flex items-center p-4 rounded-t border-b dark:border-gray-600">
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white ml-[37%]">
-                {modalAccept.status_id == 5 ? 'Accept Order' : 'Pickup Order'}
+                {modalAccept.status_id == 5 ? 'Accept Order' : modalAccept.status_id == 3 ? 'Recipe Summary' : 'Pickup Order'}
               </h3>
-              <button type="button" onClick={() => {
-                setSee(false)
-                setModalAccept('')
-              }} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="detailModal">
+              <button type="button" onClick={modalAccept.status_id == 3 ?
+                () => {
+                  setSee(false)
+                  setModalAccept('')
+                  setModalRecipe(modalAccept)
+                }
+                :
+                () => {
+                  setSee(false)
+                  setModalAccept('')
+                }} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="detailModal">
                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
             {/* <!-- Modal body --> */}
-            {modalAccept.status_id == 5 ?
+            {modalAccept.status_id == 5 || modalAccept.status_id == 3 ?
               <div>
                 <div className='border-b'>
                   <div className='ml-5 my-3'>
@@ -653,18 +860,40 @@ const TransactionPages = () => {
                 <div className='overflow-hide-accept scroll' style={see ? { height: 400 } : {}}>
                   {see ?
                     <div className='my-3 ml-5'>
-                      {modalAccept.detail.map((val, idx) => {
-                        return <div>
-                          <p className='font-bold text-lg'>{val.product_name}</p>
-                          <p className='font-thin text-lg flex'>{val.product_qty} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
+                      {modalAccept.status_id == 3 ?
+                        <div>
+                          {recipe.map((val, idx) => {
+                            return <div>
+                              <p className='font-bold text-lg'>{val.name}</p>
+                              <p className='font-thin text-lg flex'>{val.qty} {val.unit} x <p className='ml-2'><Currency price={val.price} /></p></p>
+                            </div>
+                          })}
                         </div>
-                      })}
+                        :
+                        <div>
+                          {modalAccept.detail.map((val, idx) => {
+                            return <div>
+                              <p className='font-bold text-lg'>{val.product_name}</p>
+                              <p className='font-thin text-lg flex'>{val.product_qty} {val.product_unit} x <p className='ml-2'><Currency price={val.product_price} /></p></p>
+                            </div>
+                          })}
+                        </div>
+                      }
                       <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(false)}>Hide <BsChevronDown className='ml-1 mt-1 rotate-[180deg]' /> </button>
                     </div>
                     :
                     <div className='my-3 ml-5'>
-                      <p className='font-bold text-lg'>{modalAccept.detail[0].product_name}</p>
-                      <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} x <p className='ml-2'><Currency price={modalAccept.detail[0].product_price} /></p></p>
+                      {modalAccept.status_id == 3 ?
+                        <div>
+                          <p className='font-bold text-lg'>{recipe[0].name}</p>
+                          <p className='font-thin text-lg flex'>{recipe[0].qty} {recipe[0].unit} x <p className='ml-2'><Currency price={recipe[0].price} /></p></p>
+                        </div>
+                        :
+                        <div>
+                          <p className='font-bold text-lg'>{modalAccept.detail[0].product_name}</p>
+                          <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} {modalAccept.detail[0].product_unit} x <p className='ml-2'><Currency price={modalAccept.detail[0].product_price} /></p></p>
+                        </div>
+                      }
                       <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
                     </div>}
                 </div>
@@ -704,7 +933,13 @@ const TransactionPages = () => {
             }
             <div className='flex justify-between'>
               <p />
-              <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => handleUpdate(modalAccept, 'ok')}>{modalAccept.status_id == 5 ? 'Accept Order' : 'Request Pickup'}</button>
+              <div>
+                <button className={`${modalAccept.status_id == 3 ? '' : 'hidden'}transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20`} onClick={() => {
+                  setModalRecipe(modalAccept)
+                  setModalAccept('')
+                }}>Back</button>
+                <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => handleUpdate(modalAccept, 'ok')}>{modalAccept.status_id == 5 ? 'Accept Order' : modalAccept.status_id == 3 ? 'Set Order' : 'Request Pickup'}</button>
+              </div>
             </div>
           </div>
         </div>
@@ -740,14 +975,14 @@ const TransactionPages = () => {
             {/* <!-- Dropdown menu --> */}
             <div id="dropdownCancel" className={`${dropCancel == true ? 'hidden' : 'w-96 ml-36 bg-white rounded divide-y divide-gray-100 shadow'}`} >
               <ul className="py-1 text-sm text-gray-700" aria-labelledby="dropdownCancel">
-                <li>
-                  <button className={`${modalCancel.status_id == 3 ? 'hidden' : "block py-2 pl-4 pr-56 hover:bg-gray-100"}`} onClick={() => {
+                <li className='hover:bg-gray-100'>
+                  <button className={`${modalCancel.status_id == 3 ? 'hidden' : "block py-2 pl-4 "}`} onClick={() => {
                     setCancelReason('Less Payment Amount')
                     setDropCancel(true)
                   }}>Less Payment Amount</button>
                 </li>
-                <li>
-                  <button className="block py-2 pl-4 pr-56 hover:bg-gray-100" onClick={() => {
+                <li className='hover:bg-gray-100'>
+                  <button className="block py-2 pl-4 " onClick={() => {
                     setCancelReason('Medicine Out of Stock')
                     setDropCancel(true)
                   }}>Medicine Out of Stock</button>
@@ -787,14 +1022,156 @@ const TransactionPages = () => {
           </div>
           <div className="">
             <div className='items-center justify-center'>
-              <img src={`${modalNote == 'success' ? accept : modalNote == 'pickup' ? pickup : cancel}`} className={`${modalNote == 'pickup' ? 'w-md' : 'max-w-md'} h-md mx-auto`} />
-              <p className='sm:text-3xl font-bold pb-3 text-center'>{`${modalNote == 'success' ? 'Order Processing Success' : modalNote == 'pickup' ? 'Courier Will Pickup your Order' : cancelReason == 'Less Payment Amount' ? 'Status back to WAITING FOR PAYMENT' : 'Order Has Been Canceled'}`}</p>
+              <img src={`${modalNote == 'success' || modalNote == 'gopayment' ? accept : modalNote == 'pickup' ? pickup : cancel}`} className={`${modalNote == 'pickup' ? 'w-md' : 'max-w-md'} h-md mx-auto`} />
+              <p className='sm:text-3xl font-bold pb-3 text-center'>{`${modalNote == 'success' ? 'Order Processing Success' : modalNote == 'gopayment' ? 'Success Making Order, Waiting for User Payment' : modalNote == 'pickup' ? 'Courier Will Pickup your Order' : cancelReason == 'Less Payment Amount' ? 'Status back to WAITING FOR PAYMENT' : 'Order Has Been Canceled'}`}</p>
             </div>
           </div>
         </div>
       </div>
       : null}
     {/* END MODAL NOTE */}
+    {/* MODAL MAKE RECIPE */}
+    <div id="RecipeModal" tabindex="-1" aria-hidden='true' className={`${modalRecipe ? `pl-[23%] pt-[5%] backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0` : "hidden"} `}>
+      {modalRecipe ?
+        <div className="w-full max-w-[1200px] border rounded-lg max-h-[48rem]" >
+          {/* <!-- Modal content --> */}
+          <div className=" bg-gray-100 rounded-lg shadow dark:bg-gray-700">
+            {/* <!-- Modal header --> */}
+            <div className="flex items-center p-4 rounded-t border-b dark:border-gray-600">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white ml-[37%]">
+                Make Order from Recipe
+              </h3>
+              <button type="button" onClick={() => {
+                setRecipe('')
+                setModalRecipe('')
+              }} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="RecipeModal">
+                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+            </div>
+            {/* <!-- Modal body --> */}
+            <div className='mt-5 grid grid-cols-2 '>
+              <div className='p-3 ml-3 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden mt-3 '>
+                <img src={modalRecipe.prescription_pic.includes('https') ? modalRecipe.prescription_pic : API_URL + modalRecipe.prescription_pic} className='max-w-md max-h-md m-auto' />
+              </div>
+              <div className=''>
+                <div className='border-b'>
+                  <div className='ml-5 my-3'>
+                    <div className='flex justify-between my-3 mr-3'>
+                      <p className='text-large font-bold'>Customer</p>
+                      <p className='text-large text-main-500 font-bold'>{modalRecipe.user_name}</p>
+                    </div>
+                    <div className='flex justify-between my-3 mr-3'>
+                      <p className='text-large font-bold'>No. Invoice</p>
+                      <p className='text-large text-main-500 font-bold'>{modalRecipe.invoice_number}</p>
+                    </div>
+                    <div className='flex justify-between my-3 mr-3'>
+                      <p className='text-large font-bold'>Request Date</p>
+                      <p className='text-large font-thin flex items-center'> {modalRecipe.date_order} WIB</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div className={`${recipe.length > 0 ? '' : 'hidden'} border-b`}>
+                    <p className='ml-5 my-3 font-bold text-lg border-b'>Medicine</p>
+                    {printFixRecipe()}
+                  </div>
+                  {printAddRecipe()}
+                  <button className={`${showBtn ? '' : 'hidden'} flex items-center m-5`} onClick={() => setShowInput(true)} disabled={showInput ? true : false} ><MdAdd className='mr-3 border rounded-full bg-main-500 text-white' size={30} /> Add Medicine</button>
+                  <input onClick={() => setDropMed(!dropMed)} id="inputMed" data-dropdown-toggle="dropdownMed" placeholder='Search Medicine' onKeyUp={handleFilterMed}
+                    className={`${showInput ? '' : 'hidden'} w-48 sm:w-72 h-5sm:h-10 border border-teal-500 rounded-lg ml-5 px-2`} type="text" />
+                  {/* <!-- Dropdown menu --> */}
+                  <div id="dropdownMed" className={`${dropMed == true ? 'hidden' : 'w-72 h-32 ml-5 bg-white overflow-hide-accept scroll rounded divide-y divide-gray-100 shadow'}`} >
+                    <ul className="py-1 text-sm text-gray-700 " aria-labelledby="dropdownCancel">
+                      {product.map((val, idx) => {
+                        if (val.isDefault == "true") {
+                          return <li className='hover:bg-gray-100'>
+                            <button className="py-2 pl-4" onClick={() => {
+                              setDropMed(true)
+                              setPickMed(val.product_name)
+                              setShowInput(false)
+                              setShowBtn(false)
+                            }} value={val.product_name}>{val.product_name}</button>
+                          </li>
+                        }
+                      })
+                      }
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className='flex justify-between'>
+              <p />
+              <div className='flex items-center'>
+                <p className='font-semibold mr-3'>Recipe will reset if you cancel</p>
+                <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20' onClick={() => {
+                  setRecipe('')
+                  setModalRecipe('')
+                }}>Cancel</button>
+                <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => {
+                  setModalAccept(modalRecipe)
+                  setModalRecipe('')
+                }}>Make Order</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        : null}
+    </div>
+    {/* END MODAL RECIPE */}
+    {/* MODAL CONVERSION */}
+    <div id="ConvModal" tabindex="-1" aria-hidden='true' className={`${modalConv ? "pl-[35%] pt-[5%] backdrop-blur-sm overflow-x-hidden fixed z-30 justify-center w-full md:inset-0" : "hidden"} `}>
+      {modalConv ?
+        <div className="mt-20 w-full max-w-xl border rounded-lg max-h-[70rem]" >
+          {/* <!-- Modal content --> */}
+          <div className="bg-blue-100 rounded-lg shadow dark:bg-gray-700">
+            {/* <!-- Modal header --> */}
+            <div className="flex items-center p-4 rounded-t border-b dark:border-gray-600">
+              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white ml-[37%]">
+                Unit Conversion
+              </h3>
+              <button type="button" onClick={() => {
+                setModalConv('')
+              }} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="ConvModal">
+                <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                <span className="sr-only">Close modal</span>
+              </button>
+            </div>
+            {/* <!-- Modal body --> */}
+            <p className='sm:text-2xl font-bold text-center mt-3 mb-1'>{pickMed}</p>
+            <div className='text-center'>
+              <p className='font-semibold'>Main Stock : {modalConv[0].stock_unit} {modalConv[0].unit}</p>
+              <p className='font-semibold'>{modalConv[1] ? `Netto Stock : ${modalConv[1].stock_unit} ${modalConv[1].unit}` : 'No Netto Stock Yet'}</p>
+            </div>
+            <div className='flex justify-center items-center my-3'>
+              <button className='border text-lg bg-white rounded-lg mx-2 w-4 text-center' onClick={() => setQtyConv(qtyConv - 1)} disabled={qtyConv == 0 ? true : false}>-</button>
+              <p>{qtyConv}</p>
+              <button className='border text-lg bg-white rounded-lg mx-2 w-4 text-center' onClick={() => setQtyConv(qtyConv + 1)} disabled={qtyConv >= modalConv[0].stock_unit ? true : false} >+</button>
+              <p className='font-semibold ml-2'>{modalConv[0].unit}</p>
+              <MdOutlineArrowForward className='items-center ml-2' />
+              <p className='font-semibold ml-2'>{qtyConv * modalConv[0].netto_stock} {modalConv[0].netto_unit}</p>
+            </div>
+            <div className='text-center my-3'>
+              <p className='sm:text-xl font-bold text-center mt-3 mb-1'>After Conversion</p>
+              <p className='font-semibold'>Main Stock : {modalConv[0].stock_unit - qtyConv} {modalConv[0].unit}</p>
+              <p className='font-semibold'>{modalConv[1] ? `Netto Stock : ${modalConv[1].stock_unit + (qtyConv * modalConv[0].netto_stock)} ${modalConv[1].unit}` : `Netto Stock : ${qtyConv * modalConv[0].netto_stock} ${modalConv[0].netto_unit}`}</p>
+            </div>
+            <div className='flex justify-between'>
+              <p />
+              <div>
+                <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20' onClick={() => {
+                  setQtyConv(0)
+                  setModalConv('')
+                }}>Cancel</button>
+                <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-20' onClick={() => handleConv(modalConv)}>Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        : null}
+    </div>
+    {/* END MODAL CONVERSION */}
     <Loading loading={loading} />
   </div>
   )

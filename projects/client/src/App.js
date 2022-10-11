@@ -68,6 +68,7 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
+        <Route path='/admin/transaction' element={<TransactionPage />} />
         {/* Protect Route Ketika User Blm Login */}
         <Route element={<ProtectRoute />}>
           <Route path='/profile' element={<EditProfile />} />
@@ -80,7 +81,6 @@ function App() {
         {/* Protect Route Page Admin */}
         <Route element={<ProtectRouteAdmin />}>
           <Route path='/admin/dashboard' element={<DashboardPage />} />
-          <Route path='/admin/transaction' element={<TransactionPage />} />
         </Route>
 
         {/* Protect Route Ketika User Sudah Login */}

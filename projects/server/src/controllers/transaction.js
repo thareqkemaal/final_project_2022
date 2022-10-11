@@ -63,11 +63,11 @@ module.exports = {
         if (get[0].idtransaction > 0) {
           let temp = [];
           req.body.detail.forEach((val, idx) => {
-            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(get[0].idtransaction)})`);
+            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(get[0].idtransaction)})`);
           });
           console.log(temp.join(', '));
 
-          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, transaction_id) VALUES
+          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty,product_unit, product_price, product_image, transaction_id) VALUES
           ${temp.join(', ')};`)
         }
       }
@@ -92,6 +92,14 @@ module.exports = {
         if (req.body.order == 'ok') {
           if (req.body.status == 6) {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 2} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+          } else if (req.body.status == 3) {
+            await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1},total_price=${req.body.price} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+            let detail = []
+            req.body.recipe.map((val, idx) => {
+              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)})`)
+            })
+            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id)
+            values ${detail.join(', ')}; `)
           } else {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
           }
