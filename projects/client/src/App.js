@@ -68,34 +68,34 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
+        {/* Protect Route Ketika User Blm Login */}
+        <Route element={<ProtectRoute />}>
+          <Route path='/profile' element={<EditProfile />} />
+          <Route path='/prescription' element={<Prescription />} />
+          <Route path='/prescription/success' element={<UploadSuccess />} />
+          <Route path='/cart' element={<UserCart />} />
+          <Route path='/checkout' element={<Checkout />} />
+        </Route>
 
-          {/* Protect Route Ketika User Blm Login */}
-          <Route element={<ProtectRoute />}>
-            <Route path='/profile' element={<EditProfile />} />
-            <Route path='/prescription' element={<Prescription />} />
-            <Route path='/prescription/success' element={<UploadSuccess />} />
-            <Route path='/cart' element={<UserCart />} />
-            <Route path='/checkout' element={<Checkout />} />
-          </Route>
-          
-          {/* Protect Route Page Admin */}
-          <Route element={<ProtectRouteAdmin />}>
-              <Route path='/admin/dashboard' element={<DashboardPage />} />
-          </Route>
+        {/* Protect Route Page Admin */}
+        <Route element={<ProtectRouteAdmin />}>
+          <Route path='/admin/dashboard' element={<DashboardPage />} />
+          <Route path='/admin/transaction' element={<TransactionPage />} />
+        </Route>
 
-          {/* Protect Route Ketika User Sudah Login */}
-          <Route element={<ProtectRouteLogin />}>
-              <Route path='/register' element={<Register />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/resetpass/:token' element={<ResetPass />} />
-          </Route>
+        {/* Protect Route Ketika User Sudah Login */}
+        <Route element={<ProtectRouteLogin />}>
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/resetpass/:token' element={<ResetPass />} />
+        </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/product' element={<ProductPage />} />
-        <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/product/detail' element={<ProductDetail />} />
       </Routes>
       <Footer />
-    </div>
+    </div >
   );
 }
 

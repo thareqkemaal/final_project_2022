@@ -29,4 +29,7 @@ route.delete('/deletecart/:idcart', productController.deletecart);
 route.patch('/updatecart', readToken, productController.updatecart);
 route.post('/addcart', readToken, productController.addCart);
 
+
+// Conversion Unit
+route.patch('/unitconv', productController.unitConv);
 module.exports = route;
