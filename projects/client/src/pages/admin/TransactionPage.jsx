@@ -23,12 +23,15 @@ const TransactionPages = () => {
   const [loading, setLoading] = React.useState(true)
   const [drop, setDrop] = React.useState(true)
   const [dropCancel, setDropCancel] = React.useState(true)
+
   const [dropMed, setDropMed] = React.useState(true)
   const [dropRecipe, setDropRecipe] = React.useState(true)
+
   const [filterKey, setFilterKey] = React.useState(0)
   const [transaction, setTransaction] = React.useState([])
   const [filterTransaction, setFilterTransaction] = React.useState([])
   const [allTransaction, setAllTransaction] = React.useState([])
+
   const [product, setProduct] = React.useState([])
   const [selectedStatus, setSelectedStatus] = React.useState(3456789)
   const [isFilter, setIsFilter] = React.useState(false)
@@ -39,6 +42,7 @@ const TransactionPages = () => {
   const [modalAccept, setModalAccept] = React.useState('')
   const [modalNote, setModalNote] = React.useState(false)
   const [modalCancel, setModalCancel] = React.useState('')
+
   const [modalRecipe, setModalRecipe] = React.useState('')
   const [modalConv, setModalConv] = React.useState('')
   const [qtyConv, setQtyConv] = React.useState(0)
@@ -50,6 +54,7 @@ const TransactionPages = () => {
   const [qty, setQty] = React.useState(0)
   const [buyUnit, setBuyUnit] = React.useState('Select Unit')
   const [recipe, setRecipe] = React.useState([])
+
   const [range, setRange] = React.useState([
     {
       startDate: '',
