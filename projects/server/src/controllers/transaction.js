@@ -82,7 +82,6 @@ module.exports = {
       res.status(500).send(error)
     }
   },
-
   updateTransaction: async (req, res) => {
     try {
       if (req.files) {
@@ -112,6 +111,22 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: 'Transaction Updated'
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
+  getReport: async (req, res) => {
+    try {
+      let product = await dbQuery(`SELECT date_format(date_order,'%b') as month,sum(product_qty*product_price) as product FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id group by date_format(date_order,'%b') order by date_order;`)
+      let transaction = await dbQuery(`SELECT date_format(date_order,'%b') as month,count(*) as transaction FROM transaction group by date_format(date_order,'%b') order by date_order;`)
+      let user = await dbQuery(`SELECT date_format(date_order,'%b') as month,count(distinct user_id) as user FROM transaction group by date_format(date_order,'%b') order by date_order;`)
+
+      res.status(200).send({
+        product,
+        transaction,
+        user
       })
     } catch (error) {
       console.log(error)

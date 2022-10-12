@@ -15,6 +15,7 @@ import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
 import TransactionPage from './pages/admin/TransactionPage';
+import ReportPage from './pages/admin/ReportPage';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
@@ -68,6 +69,8 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
+        <Route path='/admin/transaction' element={<TransactionPage />} />\
+        <Route path='/admin/report' element={<ReportPage />} />
         {/* Protect Route Ketika User Blm Login */}
         <Route element={<ProtectRoute />}>
           <Route path='/profile' element={<EditProfile />} />
@@ -80,7 +83,6 @@ function App() {
         {/* Protect Route Page Admin */}
         <Route element={<ProtectRouteAdmin />}>
           <Route path='/admin/dashboard' element={<DashboardPage />} />
-          <Route path='/admin/transaction' element={<TransactionPage />} />
         </Route>
 
         {/* Protect Route Ketika User Sudah Login */}

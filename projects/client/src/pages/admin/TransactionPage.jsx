@@ -16,7 +16,6 @@ import Currency from '../../components/CurrencyComp';
 import accept from '../../assets/accept.png'
 import cancel from '../../assets/cancel.png'
 import pickup from '../../assets/pickup.png'
-import { set } from 'date-fns';
 
 const TransactionPages = () => {
   const [defaultSort, setDefaultSort] = React.useState('Date')
