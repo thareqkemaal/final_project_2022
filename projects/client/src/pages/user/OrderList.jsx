@@ -9,8 +9,8 @@ import { useNavigate } from "react-router";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { DateRangePicker } from 'react-date-range';
-import format from 'date-fns/format'
-import { Pagination } from 'flowbite-react';
+import format from 'date-fns/format';
+import nodata from '../../assets/nodata.png';
 
 const UserOrderList = (props) => {
 
@@ -87,7 +87,7 @@ const UserOrderList = (props) => {
             console.log('jumlah page', Math.ceil(get.data.count / 5));
 
             let arr = [];
-            if(get.data.count > 10){
+            if (get.data.count > 10) {
                 if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
                     arr[0] = activePage - 1;
                     arr[1] = activePage;
@@ -101,7 +101,7 @@ const UserOrderList = (props) => {
                     arr[1] = activePage - 1;
                     arr[2] = activePage;
                 }
-            } else {
+            } else if (get.data.count > 5) {
                 if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
                     arr[0] = activePage - 1;
                     arr[1] = activePage;
@@ -112,6 +112,8 @@ const UserOrderList = (props) => {
                     arr[1] = activePage - 1;
                     arr[2] = activePage;
                 }
+            } else {
+                arr[0] = activePage;
             }
             console.log(arr);
             setShowPageList(arr);
@@ -176,39 +178,40 @@ const UserOrderList = (props) => {
                     'Authorization': `Bearer ${userToken}`
                 }
             })
-            if (get.data.length > 0) {
+            console.log('data filter', get.data.results);
+            console.log('jumlah data', get.data.count);
+            console.log('jumlah page', Math.ceil(get.data.count / 5));
 
-                console.log('data filter', get.data.results);
-                console.log('jumlah data', get.data.count);
-                console.log('jumlah page', Math.ceil(get.data.count / 5));
-
+            if (get.data.results.length > 0) {
                 let arr = [];
-            if(get.data.count > 10){
-                if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 1;
-                    arr[1] = activePage;
-                    arr[2] = activePage + 1;
-                } else if (activePage === 1) {
+                if (get.data.count > 10) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                        arr[2] = activePage + 1;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                        arr[2] = activePage + 2;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 2;
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else if (get.data.count > 5) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else {
                     arr[0] = activePage;
-                    arr[1] = activePage + 1;
-                    arr[2] = activePage + 2;
-                } else if (activePage === Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 2;
-                    arr[1] = activePage - 1;
-                    arr[2] = activePage;
                 }
-            } else {
-                if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 1;
-                    arr[1] = activePage;
-                } else if (activePage === 1) {
-                    arr[0] = activePage;
-                    arr[1] = activePage + 1;
-                } else if (activePage === Math.ceil(get.data.count / 5)) {
-                    arr[1] = activePage - 1;
-                    arr[2] = activePage;
-                }
-            }
                 console.log(arr);
                 setShowPageList(arr);
 
@@ -442,109 +445,119 @@ const UserOrderList = (props) => {
                             className={selected.tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Canceled</button>
                     </div>
-                    <div className="my-3 p-2 flex justify-between">
-                        <div className="flex w-1/2 justify-between items-center">
-                            <p className="font-semibold text-main-500">Type of Order</p>
-                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                            >All Type</button>
-                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                className={selected.type === "prescription" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                            >Doctor Prescription</button>
-                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                            >Free Drugs</button>
-                        </div>
-                        <div className="flex items-center w-1/5 justify-between">
-                            <p className="font-semibold text-main-500">Sort by:</p>
-                            <select className="border rounded-lg border-main-500 text-gray-500"
-                                onChange={(e) => { setSelected({ ...selected, sort: e.target.value }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }} defaultValue={'new'}>
-                                <option value="new">Newest</option>
-                                <option value="old">Oldest</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="p-2 flex items-center">
-                            <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
-                            <div className="p-1 border border-main-500 rounded flex mx-1">
-                                <input
-                                    value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
-                                    className="text-center"
-                                    placeholder='Select Date Range'
-                                    onClick={() => setShowFilterDate(true)}
-                                />
-                            </div>
-                            <div className="p-1 border border-main-500 rounded flex mx-1">
-                                <input
-                                    value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
-                                    className="text-center"
-                                    placeholder='Select Date Range'
-                                    onClick={() => setShowFilterDate(true)}
-                                />
-                            </div>
-                            <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                onClick={() => handleFilter()}>Filter</button>
-                            <button type="button" className="ml-2 hover:underline"
-                                onClick={() => {
-                                    setRange([{
-                                        startDate: '',
-                                        endDate: '',
-                                        key: 'selection',
-                                        color: 'teal'
-                                    }]);
-                                    setSelected({ ...selected });
-                                }}
-                            >Clear</button>
-                        </div>
-                        {
-                            showFilterDate ?
-                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                    <div className="relative p-4 w-1/2 h-full md:h-auto">
-                                        <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                            <div className="p-6 text-center flex flex-col items-center justify-center">
-                                                <DateRangePicker
-                                                    onChange={item => setRange([item.selection])}
-                                                    editableDateInputs={true}
-                                                    moveRangeOnFirstSelection={false}
-                                                    ranges={range}
-                                                    months={2}
-                                                    direction="horizontal"
-                                                />
-                                                <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
-                                                    onClick={() => setShowFilterDate(false)}>Set Date</button>
-                                            </div>
-                                        </div>
+                    {
+                        userTransactionData.length > 0 ?
+                            <>
+                                <div className="my-3 p-2 flex justify-between">
+                                    <div className="flex w-1/2 justify-between items-center">
+                                        <p className="font-semibold text-main-500">Type of Order</p>
+                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                                            className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                        >All Type</button>
+                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                                            className={selected.type === "prescription" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                        >Doctor Prescription</button>
+                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                                            className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                        >Free Drugs</button>
+                                    </div>
+                                    <div className="flex items-center w-1/5 justify-between">
+                                        <p className="font-semibold text-main-500">Sort by:</p>
+                                        <select className="border rounded-lg border-main-500 text-gray-500"
+                                            onChange={(e) => { setSelected({ ...selected, sort: e.target.value }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }} defaultValue={'new'}>
+                                            <option value="new">Newest</option>
+                                            <option value="old">Oldest</option>
+                                        </select>
                                     </div>
                                 </div>
-                                :
-                                ""
-                        }
-                    </div>
-                    <div>
-                        {printTransaction()}
-                    </div>
-                    <div className="w-full flex justify-center items-center">
-                        <ul className="list-none flex">
-                            {
-                                activePage === 1 ?
-                                    <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
-                                    :
-                                    <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                        type='button' onClick={() => setActivePage(activePage - 1)}
-                                    >Previous</li>
-                            }
-                            {printPagination()}
-                            {
-                                activePage === totalPage ?
-                                    <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
-                                    :
-                                    <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                        type='button' onClick={() => setActivePage(activePage + 1)}
-                                    >Next</li>
-                            }
-                        </ul>
-                    </div>
+                                <div>
+                                    <div className="p-2 flex items-center">
+                                        <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
+                                                className="text-center"
+                                                placeholder='Select Date Range'
+                                                onClick={() => setShowFilterDate(true)}
+                                            />
+                                        </div>
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
+                                                className="text-center"
+                                                placeholder='Select Date Range'
+                                                onClick={() => setShowFilterDate(true)}
+                                            />
+                                        </div>
+                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => { setActivePage(1); handleFilter() }}>Filter</button>
+                                        <button type="button" className="ml-2 hover:underline"
+                                            onClick={() => {
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setSelected({ ...selected });
+                                            }}
+                                        >Clear</button>
+                                    </div>
+                                    {
+                                        showFilterDate ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                                <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center flex flex-col items-center justify-center">
+                                                            <DateRangePicker
+                                                                onChange={item => setRange([item.selection])}
+                                                                editableDateInputs={true}
+                                                                moveRangeOnFirstSelection={false}
+                                                                ranges={range}
+                                                                months={2}
+                                                                direction="horizontal"
+                                                            />
+                                                            <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                                                onClick={() => setShowFilterDate(false)}>Set Date</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            :
+                                            ""
+                                    }
+                                </div>
+                                <div>
+                                    {printTransaction()}
+                                </div>
+                                <div className="w-full flex justify-center items-center">
+                                    <ul className="list-none flex">
+                                        {
+                                            activePage === 1 ?
+                                                <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
+                                                :
+                                                <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                    type='button' onClick={() => setActivePage(activePage - 1)}
+                                                >Previous</li>
+                                        }
+                                        {printPagination()}
+                                        {
+                                            activePage === totalPage ?
+                                                <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
+                                                :
+                                                <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                    type='button' onClick={() => setActivePage(activePage + 1)}
+                                                >Next</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </>
+                            :
+                            <div className="flex flex-col justify-center items-center text-center my-5">
+                                <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
+                                <img src={nodata} className="w-2/3" />
+                            </div>
+                    }
                 </div>
             </div>
             <ToastContainer />
