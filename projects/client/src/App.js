@@ -25,6 +25,8 @@ import ResetPass from './pages/user/ResetPass';
 import ProtectRoute from './components/ProtectRoute/ProtectRoute';
 import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
+import UserOrderList from './pages/user/OrderList';
+import OrderDetail from './pages/user/OrderDetail';
 
 function App() {
   const dispatch = useDispatch()
@@ -73,7 +75,7 @@ function App() {
           <Route element={<ProtectRoute />}>
             <Route path='/profile' element={<EditProfile />} />
             <Route path='/prescription' element={<Prescription />} />
-            <Route path='/prescription/success' element={<UploadSuccess />} />
+            <Route path='/success' element={<UploadSuccess />} />
             <Route path='/cart' element={<UserCart />} />
             <Route path='/checkout' element={<Checkout />} />
           </Route>
@@ -93,6 +95,8 @@ function App() {
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/transaction/:user' element={<UserOrderList/>} />
+        <Route path='/transaction/detail/:id' element={<OrderDetail/>} />
       </Routes>
       <Footer />
     </div>

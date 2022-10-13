@@ -53,7 +53,7 @@ const Prescription = (props) => {
                     'Authorization': `Bearer ${userToken}`
                 }
             });
-            //console.log('user address', getAddress.data);
+            console.log('user address', getAddress.data);
             setAllAddress(getAddress.data);
 
             let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");

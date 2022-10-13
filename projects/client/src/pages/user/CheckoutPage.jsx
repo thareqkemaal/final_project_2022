@@ -12,6 +12,7 @@ import EditAddressComponent from '../../components/EditAddressModalComp';
 import LoadingComponent from '../../components/Loading';
 import success from '../../assets/success.png';
 import Currency from '../../components/CurrencyComp';
+import { useSelector } from 'react-redux';
 
 const Checkout = (props) => {
 
@@ -40,10 +41,14 @@ const Checkout = (props) => {
     // INPUT EDIT ADDRESS
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
-    const [totalPrice, setTotalPrice] = React.useState(0);
-
     const { state } = useLocation();
     const navigate = useNavigate();
+
+    const { username } = useSelector((state) => {
+        return {
+            username : state.userReducer.username
+        }
+    })
 
     React.useEffect(() => {
         console.log('selected', state.selected)
@@ -274,10 +279,16 @@ const Checkout = (props) => {
             })
 
             if (res.data.success) {
+                state.selected.forEach(async (val, idx) => {
+                    if (val.idcart){
+                        await axios.delete(API_URL + `/api/product/deletecart/${val.idcart}`)
+                    }
+                });
+
                 setTimeout(() => {
                     setLoading(false);
                     setShowSuccessPayModal('show');
-                }, 5000)
+                }, 2500)
             }
         } catch (error) {
             console.log(error)
@@ -509,7 +520,14 @@ const Checkout = (props) => {
                                                                         navigate('/', { replace: true });
                                                                     }, 3500)
                                                                 }}>Back to Homepage</button>
-                                                            <button className='border-2 rounded-lg py-3 px-10 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
+                                                            <button className='border-2 rounded-lg py-3 px-10 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'
+                                                                onClick={() => {
+                                                                    setLoading(true);
+                                                                    setTimeout(() => {
+                                                                        setLoading(false);
+                                                                        navigate(`/transaction/${username}`, { replace: true })
+                                                                    }, 2000)
+                                                                }}>Go To Order Progress</button>
                                                         </div>
                                                     </div>
                                                 </div>
