@@ -15,7 +15,7 @@ module.exports = {
           filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
         }
       }
-      let sqlGet = `Select *,date_format(date_order,'%e %b %Y, %H:%i') as date_order from transaction 
+      let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as date_order from transaction 
         ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
 
       let transaction = await dbQuery(sqlGet);
@@ -119,14 +119,23 @@ module.exports = {
   },
   getReport: async (req, res) => {
     try {
-      let product = await dbQuery(`SELECT date_format(date_order,'%b') as month,sum(product_qty*product_price) as product FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id group by date_format(date_order,'%b') order by date_order;`)
-      let transaction = await dbQuery(`SELECT date_format(date_order,'%b') as month,count(*) as transaction FROM transaction group by date_format(date_order,'%b') order by date_order;`)
-      let user = await dbQuery(`SELECT date_format(date_order,'%b') as month,count(distinct user_id) as user FROM transaction group by date_format(date_order,'%b') order by date_order;`)
-
+      console.log(req.query)
+      let revenue = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id group by date_format(date_order,'%b %Y') order by date_order;`)
+      let revenueSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id group by date_format(date_order,'%b %Y') order by revenue desc;`)
+      let transaction = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction group by date_format(date_order,'%b %Y ') order by date_order;`)
+      let transactionSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction group by date_format(date_order,'%b %Y ') order by transaction desc;`)
+      let user = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction group by date_format(date_order,'%b %Y') order by date_order;`)
+      let userSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction group by date_format(date_order,'%b %Y') order by user desc;`)
+      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id where date_format(date_order,'%b %Y') = '${req.query.month}' group by product_name order by best_seller desc limit 10 ;`)
+      console.log(product)
       res.status(200).send({
-        product,
+        revenue,
+        revenueSales,
         transaction,
-        user
+        transactionSales,
+        user,
+        userSales,
+        product
       })
     } catch (error) {
       console.log(error)

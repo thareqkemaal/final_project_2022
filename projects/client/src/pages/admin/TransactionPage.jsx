@@ -122,12 +122,17 @@ const TransactionPages = () => {
                 <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
                 <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`} onClick={val.status_id == 3 ? () => setModalRecipe(val) : () => setModalDetail(val)}>{val.status_id == 3 ? `Make Recipe's Copy` : 'See Detail Order'}</button>
                 <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
-                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
-                  <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
-                    setLoading(true)
-                    setTimeout(() => setLoading(false), 1000)
-                    setTimeout(() => setModalDetail(val), 1000)
-                  }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                  {val.status_id == 3 ? null
+                    :
+                    <div>
+                      <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
+                      <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
+                        setLoading(true)
+                        setTimeout(() => setLoading(false), 1000)
+                        setTimeout(() => setModalDetail(val), 1000)
+                      }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                    </div>
+                  }
                 </div>
               </div>
             </div>

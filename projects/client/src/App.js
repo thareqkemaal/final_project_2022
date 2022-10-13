@@ -16,6 +16,7 @@ import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
 import TransactionPage from './pages/admin/TransactionPage';
 import ReportPage from './pages/admin/ReportPage';
+import HistoryPage from './pages/admin/HistoryPage';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
@@ -71,6 +72,7 @@ function App() {
         <Route path='/' element={<LandingPages />} />
         <Route path='/admin/transaction' element={<TransactionPage />} />\
         <Route path='/admin/report' element={<ReportPage />} />
+        <Route path='/admin/stock_log' element={<HistoryPage />} />
         {/* Protect Route Ketika User Blm Login */}
         <Route element={<ProtectRoute />}>
           <Route path='/profile' element={<EditProfile />} />
