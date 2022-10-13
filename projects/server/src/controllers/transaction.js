@@ -6,7 +6,7 @@ module.exports = {
   getTransaction: async (req, res) => {
     try {
       if (req.dataToken.role.toLowerCase() === 'user') {
-        console.log(req.query)
+        // console.log(req.query)
 
         let data = req.query;
         let filter = [];
@@ -38,9 +38,9 @@ module.exports = {
         // console.log(filter)
         // console.log(sort)
 
-        console.log(`SELECT * FROM transaction t 
-          JOIN status s ON t.status_id = s.idstatus 
-          WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+        // console.log(`SELECT * FROM transaction t 
+        //   JOIN status s ON t.status_id = s.idstatus 
+        //   WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
 
         let getSql = await dbQuery(`SELECT * FROM transaction t 
         JOIN status s ON t.status_id = s.idstatus 
@@ -51,10 +51,13 @@ module.exports = {
         WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
 
         if (getSql.length > 0) {
+          // console.log(getSql)
           let comb = getSql.map(async (val, idx) => {
-            let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)}`)
+            // console.log(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
+            let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
             return { ...val, transaction_detail: detailSql };
           });
+          
           const resultComb = await Promise.all(comb);
 
           // console.log(resultComb);
@@ -116,6 +119,8 @@ module.exports = {
         // status_id = 4 menunggu pembayaran
         // from cart-checkout page
 
+        console.log(req.body.detail);
+
         let data = req.body.formSubmit;
 
         await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, user_address, total_price, order_weight, delivery_price, shipping_courier)
@@ -129,11 +134,11 @@ module.exports = {
         if (get[0].idtransaction > 0) {
           let temp = [];
           req.body.detail.forEach((val, idx) => {
-            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)})`);
+            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)}, ${dbConf.escape(val.product_id)})`);
           });
           // console.log(temp.join(', '));
 
-          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id) VALUES
+          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id, product_id) VALUES
           ${temp.join(', ')};`)
         }
       }

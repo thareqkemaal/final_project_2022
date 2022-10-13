@@ -11,6 +11,7 @@ import 'react-date-range/dist/theme/default.css';
 import { DateRangePicker } from 'react-date-range';
 import format from 'date-fns/format';
 import nodata from '../../assets/nodata.png';
+import OrderDetail from "../../components/OrderDetailComp";
 
 const UserOrderList = (props) => {
 
@@ -34,7 +35,8 @@ const UserOrderList = (props) => {
         }
     ]);
 
-    const navigate = useNavigate();
+    const [showDetail, setShowDetail] = React.useState(false);
+    const [selectedDetail, setSelectedDetail] = React.useState({});
 
     React.useEffect(() => {
         getUserTransactionData();
@@ -276,8 +278,14 @@ const UserOrderList = (props) => {
                                 <div className="h-1/4 flex">
                                     <div className="border-b-2 w-full p-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
-                                            onClick={() => navigate(`/transaction/detail/${val.idtransaction}`, { state: val })}
+                                            onClick={() => {setShowDetail(true); setSelectedDetail(val)}}
                                         >See Order Detail</button>
+                                        {
+                                            showDetail ?
+                                            <OrderDetail selected={selectedDetail} showModal={setShowDetail}/>
+                                            :
+                                            ""
+                                        }
                                     </div>
                                 </div>
                                 <div className="h-1/4 flex">
@@ -286,11 +294,24 @@ const UserOrderList = (props) => {
                                     </div>
                                     <div className="w-1/2 flex justify-end items-center">
                                         {
-                                            val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
+                                            val.status_id === 3 ?
                                                 <p className="font-bold">Waiting for Admin Confirmation</p>
                                                 :
-                                                <p className="font-bold"><Currency price={val.total_price + val.delivery_price} /></p>
+                                                ""
                                         }
+                                        {
+                                            val.status_id === 4 || val.status_id === 5 || val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
+                                                <p className="font-bold"><Currency price={val.total_price + val.delivery_price} /></p>
+                                            :
+                                            ""
+                                        }
+                                        {
+                                            val.status_id === 7 ?
+                                                <p className="font-bold">Order Canceled</p>
+                                                :
+                                                ""
+                                        }
+                                        
                                     </div>
                                 </div>
 
@@ -362,8 +383,14 @@ const UserOrderList = (props) => {
                                 <div className="h-1/4 flex">
                                     <div className="border-b-2 w-full p-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
-                                            onClick={() => navigate(`/transaction/detail/${val.idtransaction}`, { state: val })}
+                                            onClick={() => {setShowDetail(true); setSelectedDetail(val)}}
                                         >See Order Detail</button>
+                                        {
+                                            showDetail ?
+                                            <OrderDetail selected={selectedDetail} showModal={setShowDetail}/>
+                                            :
+                                            ""
+                                        }
                                     </div>
                                 </div>
                                 <div className="h-1/4 flex">
@@ -406,13 +433,13 @@ const UserOrderList = (props) => {
         return showPageList.map((val, idx) => {
             if (activePage === val) {
                 return (
-                    <li className="border border-main-500 px-3 py-1 bg-main-500 text-white hover:cursor-default"
+                    <li key={idx} className="border border-main-500 px-3 py-1 bg-main-500 text-white hover:cursor-default"
                         type='button' onClick={() => setActivePage(parseInt(val))}
                     >{val}</li>
                 )
             } else {
                 return (
-                    <li className="border border-main-500 px-3 py-1 text-main-500 hover:cursor-pointer"
+                    <li key={idx} className="border border-main-500 px-3 py-1 text-main-500 hover:cursor-pointer"
                         type='button' onClick={() => setActivePage(parseInt(val))}
                     >{val}</li>
                 )
@@ -421,7 +448,7 @@ const UserOrderList = (props) => {
     };
 
     return (
-        <div className="container mx-auto py-5">
+        <div className={showDetail ? "overflow-y-hidden container mx-auto py-5 h-96" : "container mx-auto py-5"}>
             <div className="p-5 flex flex-col justify-center items-center">
                 <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
                 <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">

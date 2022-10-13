@@ -256,7 +256,7 @@ const Checkout = (props) => {
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
-                courier,
+                courier: courier + '/' + selectedDelivery.split(',')[1],
                 total: state.totalPrice
             }
 
@@ -266,7 +266,7 @@ const Checkout = (props) => {
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_unit: val.default_unit, product_image: val.picture })
+                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_unit: val.default_unit, product_image: val.picture, product_id: val.idproduct })
             });
             // console.log(temp)
 
