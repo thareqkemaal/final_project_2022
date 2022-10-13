@@ -148,13 +148,13 @@ const LandingPages = () => {
                 <p className='text-xs font-bold  text-main-500 font-Public' onClick={()=>navigate('/product')}>Lihat Semua</p>
               </div>
               {/* Gunakan Produk Component */}
-              <div className='bg-gradient-to-t from-teal-50 to-white mt-8'>
+              <div className='bg-gradient-to-t from-white to-teal-50 mt-8'>
                 <ProductCategory
-                id={1}
+                id={2}
                 />
               </div>
             </div>
-            <div className='my-8 '>
+            <div className='mb-8 mt-4 '>
               <p className='text-sm font-bold text-blue-800 font-Public'>Jaminan Untuk Anda</p>
             </div>
             <div className='my-2'>

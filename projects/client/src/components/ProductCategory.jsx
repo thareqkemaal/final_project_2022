@@ -27,18 +27,11 @@ const ProductCategory = (props) => {
 
     const getCategoryProduct = () => {
         axios.post(API_URL + `/api/product/getproductadmin?${props.id}`, {
-            limit: 5,
+            limit: 10,
             sort: '',
             offset: ''
         })
             .then((res) => {
-                setProductByCategory(res.data)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-            .then((res) => {
-                console.log(res.data)
                 setProductByCategory(res.data)
             })
             .catch((err) => {
@@ -170,7 +163,7 @@ const ProductCategory = (props) => {
     const printData = () => {
         return productByCategory.map((val, idx) => {
             return (
-                <div className='w-48 h-[350px] rounded-lg shadow-[16px] mx-4 my-4 bg-white grid-cols-8 hover:-translate-y-1 hover:scale-110 duration-500'  key={val.idproduct} >
+                <div className='w-48 h-[350px] rounded-lg shadow-[16px] mx-4 my-4 bg-white grid-cols-8 hover:-translate-y-1 hover:scale-110 duration-500 delay-300 hover:shadow-2xl hover:shadow-main-500'  key={val.idproduct} >
                     <Link to={`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`}>
                         <div className=''>
                             <div className='flex justify-center min-w-full h-[147px] object-none mt-2'>
@@ -194,7 +187,7 @@ const ProductCategory = (props) => {
                         </div>
                     </Link >
                     <div className='px-5 py-5'>
-                        <button type='button' className='border-2 border-main-500 text-main-500 px-10 text-base leading-[14px] rounded-lg py-2 hover:bg-main-500 hover:text-white font-Public'
+                        <button type='button' className='border-2 border-main-500 text-main-500 px-10 text-base leading-[14px] rounded-lg py-2 font-bold hover:bg-main-500 hover:text-white font-Public'
                             onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
                     </div>
                 </div >

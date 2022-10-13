@@ -28,7 +28,6 @@ const FooterComponent = () => {
             text:'+62 2323-0990'
         },
     ]
-console.log(contact)
 
 return (
     <div>
@@ -65,7 +64,7 @@ return (
                         <div className=''>
                             <div className='flex'>
                                 <img src={logo} className='h-12' alt='medcare.com'/>
-                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-3xl pt-2'>Medcare</p>
+                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-3xl pt-1'>Medcare</p>
                             </div>
                             <div className='mt-5'>
                                 {

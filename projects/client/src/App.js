@@ -25,6 +25,7 @@ import ResetPass from './pages/user/ResetPass';
 import ProtectRoute from './components/ProtectRoute/ProtectRoute';
 import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
+import EmailVerification from './pages/user/EmailVerification';
 
 function App() {
   const dispatch = useDispatch()
@@ -38,8 +39,6 @@ function App() {
           'Authorization': `Bearer ${medcarelog}`
         }
       }).then((res) => {
-        console.log(res.data)
-        console.log('====================================kepp')
         if (res.data.iduser) {
           localStorage.getItem('medcarelog', res.data.token)
           delete res.data.token
@@ -91,6 +90,7 @@ function App() {
           </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
+        <Route path='/email-verification/:token' element={<EmailVerification />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/product/detail' element={<ProductDetail/>} />
       </Routes>

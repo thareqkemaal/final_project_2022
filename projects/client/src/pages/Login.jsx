@@ -64,7 +64,7 @@ const Login = () => {
                 <div className='lg:px-10'>
                 <div className='font-bold text-2xl font-Public'>Login</div>
                 <div className='text-sm font-extralight text-gray-400 font-Public'>Don't have account ?
-                <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign In</span>
+                <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign Up</span>
                 </div>
                   <form>
                     <label className='block mb-3 my-14'>
