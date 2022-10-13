@@ -109,7 +109,7 @@ module.exports = {
         }else{
             res.status(500).send({
                 status:false,
-                message:`The username you entered doesn't belong to an account. Please check your username and try again.`
+                message:`The username you entered doesn't belong to an account. Please check your username and password try again.`
             })
         }
     } catch (error) {
@@ -370,7 +370,7 @@ module.exports = {
   sendReset:async(req,res)=>{
     try {
       let userEmail = await dbQuery(`Select iduser, email,username from user where email = ${dbConf.escape(req.body.email)} `)
-      if(userEmail.length >0){
+      if(userEmail[0].email){
         let token = createToken({ ...userEmail[0]})
         var source = fs.readFileSync(path.join(__dirname,'../../template-email/resetPasswordConfirmation.hbs'),'utf-8')
         var template =Handlebars.compile(source)
@@ -396,7 +396,7 @@ module.exports = {
       console.log(error)
       res.status(500).send({
         success:false,
-        message:'error'
+        message:'Wrong Email'
       })
     }
     },
