@@ -113,18 +113,16 @@ module.exports = {
         let data = JSON.parse(req.body.datatransaction);
 
         await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, user_address, order_weight, delivery_price, shipping_courier, prescription_pic)
-        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)},${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.weight)},
+        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)}, ${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.weight)},
         ${dbConf.escape(data.delivery)}, ${dbConf.escape(data.courier)}, '/prescription/${req.files[0].filename}');`)
       } else {
         // status_id = 4 menunggu pembayaran
         // from cart-checkout page
 
-        console.log(req.body.detail);
-
         let data = req.body.formSubmit;
 
         await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, user_address, total_price, order_weight, delivery_price, shipping_courier)
-        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)}, ${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.total)}, ${dbConf.escape(data.weight)},
+        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)},${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.total)}, ${dbConf.escape(data.weight)},
         ${dbConf.escape(data.delivery)}, ${dbConf.escape(data.courier)});`)
 
         let get = await dbQuery(`SELECT idtransaction FROM transaction WHERE invoice_number = ${dbConf.escape(data.invoice)};`)
@@ -156,20 +154,34 @@ module.exports = {
 
   updateTransaction: async (req, res) => {
     try {
-
       if (req.files) {
-
         let data = JSON.parse(req.body.datatransaction);
-
         await dbQuery(`UPDATE transaction SET payment_proof_pic='/paymentproof/${req.files[0].filename}' WHERE idtransaction = ${dbConf.escape(data.transactionId)};`)
-
+      } else if (req.body) {
+        if (req.body.order == 'ok') {
+          if (req.body.status == 6) {
+            await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 2} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+          } else if (req.body.status == 3) {
+            await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1},total_price=${req.body.price} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+            let detail = []
+            req.body.recipe.map((val, idx) => {
+              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)})`)
+            })
+            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id)
+            values ${detail.join(', ')}; `)
+          } else {
+            await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+          }
+        } else if (req.body.reason == 'Less Payment Amount') {
+          await dbQuery(`UPDATE transaction SET status_id=4 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        } else if (req.body.reason == 'Medicine Out of Stock') {
+          await dbQuery(`UPDATE transaction SET status_id=7 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        }
       }
-
       res.status(200).send({
         success: true,
         message: 'Transaction Updated'
       })
-
     } catch (error) {
       console.log(error)
       res.status(500).send(error)

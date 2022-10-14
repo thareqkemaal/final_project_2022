@@ -69,7 +69,6 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-
           {/* Protect Route Ketika User Blm Login */}
           <Route element={<ProtectRoute />}>
             <Route path='/profile' element={<EditProfile />} />
@@ -82,14 +81,16 @@ function App() {
           {/* Protect Route Page Admin */}
           <Route element={<ProtectRouteAdmin />}>
               <Route path='/admin/dashboard' element={<DashboardPage />} />
+              <Route path='/admin/transaction' element={<TransactionPage />} />
           </Route>
 
-          {/* Protect Route Ketika User Sudah Login */}
-          <Route element={<ProtectRouteLogin />}>
-              <Route path='/register' element={<Register />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/resetpass/:token' element={<ResetPass />} />
-          </Route>
+
+        {/* Protect Route Ketika User Sudah Login */}
+        <Route element={<ProtectRouteLogin />}>
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/resetpass/:token' element={<ResetPass />} />
+        </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/product' element={<ProductPage />} />
@@ -97,7 +98,7 @@ function App() {
         <Route path='/transaction/:user' element={<UserOrderList/>} />
       </Routes>
       <Footer />
-    </div>
+    </div >
   );
 }
 
