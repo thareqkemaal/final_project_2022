@@ -260,13 +260,21 @@ const Checkout = (props) => {
                 total: state.totalPrice
             }
 
-            // console.log(checkoutData);
+            console.log(checkoutData);
 
             // Data untuk ke transaction_detail
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_unit: val.default_unit, product_image: val.picture, product_id: val.idproduct })
+                temp.push({ 
+                    product_name: val.product_name, 
+                    product_qty: val.quantity, 
+                    product_price: val.price, 
+                    product_unit: val.default_unit, 
+                    product_image: val.picture, 
+                    product_id: val.idproduct,
+                    initial_stock: val.stock_unit
+                })
             });
             // console.log(temp)
 
@@ -495,7 +503,7 @@ const Checkout = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                          S  </div>
                                         </div>
                                         :
                                         ""

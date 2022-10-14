@@ -12,8 +12,11 @@ import { DateRangePicker } from 'react-date-range';
 import format from 'date-fns/format';
 import nodata from '../../assets/nodata.png';
 import OrderDetail from "../../components/OrderDetailComp";
+import LoadingComponent from "../../components/Loading";
 
 const UserOrderList = (props) => {
+
+    const [loading, setLoading] = React.useState(false);
 
     const [userTransactionData, setUserTransactionData] = React.useState([]);
     const [selected, setSelected] = React.useState({
@@ -44,7 +47,7 @@ const UserOrderList = (props) => {
 
     const getUserTransactionData = async () => {
         try {
-
+            setLoading(true);
             let temp = [];
             if (selected.tab === 'waiting') {
                 temp.push('status_id=3', 'status_id=4', 'status_id=5')
@@ -88,40 +91,43 @@ const UserOrderList = (props) => {
             console.log('jumlah data', get.data.count);
             console.log('jumlah page', Math.ceil(get.data.count / 5));
 
-            let arr = [];
-            if (get.data.count > 10) {
-                if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 1;
-                    arr[1] = activePage;
-                    arr[2] = activePage + 1;
-                } else if (activePage === 1) {
+            if (get.data.results) {
+                let arr = [];
+                if (get.data.count > 10) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                        arr[2] = activePage + 1;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                        arr[2] = activePage + 2;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 2;
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else if (get.data.count > 5) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else {
                     arr[0] = activePage;
-                    arr[1] = activePage + 1;
-                    arr[2] = activePage + 2;
-                } else if (activePage === Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 2;
-                    arr[1] = activePage - 1;
-                    arr[2] = activePage;
                 }
-            } else if (get.data.count > 5) {
-                if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                    arr[0] = activePage - 1;
-                    arr[1] = activePage;
-                } else if (activePage === 1) {
-                    arr[0] = activePage;
-                    arr[1] = activePage + 1;
-                } else if (activePage === Math.ceil(get.data.count / 5)) {
-                    arr[1] = activePage - 1;
-                    arr[2] = activePage;
-                }
-            } else {
-                arr[0] = activePage;
-            }
-            console.log(arr);
-            setShowPageList(arr);
+                console.log(arr);
+                setShowPageList(arr);
 
-            setTotalPage(Math.ceil(get.data.count / 5));
-            setUserTransactionData(get.data.results);
+                setTotalPage(Math.ceil(get.data.count / 5));
+                setUserTransactionData(get.data.results);
+                setLoading(false);
+            }
         } catch (error) {
             console.log(error)
         }
@@ -129,7 +135,8 @@ const UserOrderList = (props) => {
 
     const handleFilter = async () => {
         try {
-            console.log('range', range)
+            setLoading(true);
+            // console.log('range', range)
             let temp = [];
             if (selected.tab === 'waiting') {
                 temp.push('status_id=3', 'status_id=4', 'status_id=5')
@@ -219,7 +226,9 @@ const UserOrderList = (props) => {
 
                 setTotalPage(Math.ceil(get.data.count / 5));
                 setUserTransactionData(get.data.results);
+                setLoading(false);
             } else if (get.data.failed) {
+                setLoading(false);
                 toast.error("Data not found!", {
                     theme: "colored",
                     position: "top-center",
@@ -264,7 +273,7 @@ const UserOrderList = (props) => {
                         </div>
                         <div className="flex my-2">
                             <div className="w-1/5">
-                                <img src={API_URL + val.prescription_pic} className="w-full p-1" />
+                                <img src={API_URL + val.prescription_pic} className="w-full p-1" alt='prescription'/>
                             </div>
                             <div className="w-4/5">
                                 <div className="h-2/4 flex">
@@ -278,13 +287,13 @@ const UserOrderList = (props) => {
                                 <div className="h-1/4 flex">
                                     <div className="border-b-2 w-full p-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
-                                            onClick={() => {setShowDetail(true); setSelectedDetail(val)}}
+                                            onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
                                         {
                                             showDetail ?
-                                            <OrderDetail selected={selectedDetail} showModal={setShowDetail}/>
-                                            :
-                                            ""
+                                                <OrderDetail selected={selectedDetail} showModal={setShowDetail} />
+                                                :
+                                                ""
                                         }
                                     </div>
                                 </div>
@@ -302,8 +311,8 @@ const UserOrderList = (props) => {
                                         {
                                             val.status_id === 4 || val.status_id === 5 || val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
                                                 <p className="font-bold"><Currency price={val.total_price + val.delivery_price} /></p>
-                                            :
-                                            ""
+                                                :
+                                                ""
                                         }
                                         {
                                             val.status_id === 7 ?
@@ -311,7 +320,7 @@ const UserOrderList = (props) => {
                                                 :
                                                 ""
                                         }
-                                        
+
                                     </div>
                                 </div>
 
@@ -362,7 +371,7 @@ const UserOrderList = (props) => {
                         </div>
                         <div className="flex my-2">
                             <div className="w-1/5">
-                                <img src={val.transaction_detail[0].product_image} className="w-full p-1" />
+                                <img src={val.transaction_detail[0].product_image} className="w-full p-1" alt='product_image'/>
                             </div>
                             <div className="w-4/5">
                                 <div className="h-2/4 flex">
@@ -383,13 +392,13 @@ const UserOrderList = (props) => {
                                 <div className="h-1/4 flex">
                                     <div className="border-b-2 w-full p-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
-                                            onClick={() => {setShowDetail(true); setSelectedDetail(val)}}
+                                            onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
                                         {
                                             showDetail ?
-                                            <OrderDetail selected={selectedDetail} showModal={setShowDetail}/>
-                                            :
-                                            ""
+                                                <OrderDetail selected={selectedDetail} showModal={setShowDetail} />
+                                                :
+                                                ""
                                         }
                                     </div>
                                 </div>
@@ -448,7 +457,7 @@ const UserOrderList = (props) => {
     };
 
     return (
-        <div className={showDetail ? "overflow-y-hidden container mx-auto py-5 h-96" : "container mx-auto py-5"}>
+        <div className={showDetail ? "overflow-y-hidden container mx-auto py-5 h-[55vh]" : "container mx-auto py-5"}>
             <div className="p-5 flex flex-col justify-center items-center">
                 <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
                 <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
@@ -582,12 +591,13 @@ const UserOrderList = (props) => {
                             :
                             <div className="flex flex-col justify-center items-center text-center my-5">
                                 <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
-                                <img src={nodata} className="w-2/3" />
+                                <img src={nodata} className="w-2/3" alt='placeholder'/>
                             </div>
                     }
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading} />
         </div>
     )
 };

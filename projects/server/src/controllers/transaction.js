@@ -5,6 +5,7 @@ const { dbConf, dbQuery } = require('../config/db');
 module.exports = {
   getTransaction: async (req, res) => {
     try {
+      // console.log(req.dataToken)
       if (req.dataToken.role.toLowerCase() === 'user') {
         // console.log(req.query)
 
@@ -105,7 +106,7 @@ module.exports = {
       // console.log(JSON.parse(req.body.datatransaction));
       // console.log(req.files[0].filename);
       // console.log(req.files);
-      // console.log(req.body);
+      // console.log(req.body.detail);
 
       if (req.files) {
         // status_id = 3 karena harus menunggu konfirmasi admin
@@ -138,6 +139,23 @@ module.exports = {
 
           await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id, product_id) VALUES
           ${temp.join(', ')};`)
+
+          let history = [];
+          req.body.detail.forEach((val, idx) => {
+            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(req.dataToken.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Penjualan','Pengurangan')`)
+          })
+
+          // console.log('history', history)
+
+          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          ${history.join(', ')};`)
+
+
+          // update stock baru (stock awal - quantity belanja)
+          req.body.detail.forEach(async (val, idx) => {
+            console.log(`UPDATE stock SET stock_unit = ${dbConf.escape(val.initial_stock - val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+            await dbQuery(`UPDATE stock SET stock_unit = ${dbConf.escape(val.initial_stock - val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+          })
         }
       }
 
