@@ -9,11 +9,13 @@ const paymentProofUploader = uploader('/paymentproof', 'paymentproof').array('pa
 
 // PRESCRIPTION
 
-route.get('/all', transactionController.getTransaction)
+route.get('/all', readToken, transactionController.getTransaction)
+
 route.post('/addprescription', prescriptionUploader, readToken, transactionController.addTransaction);
 route.post('/add', readToken, transactionController.addTransaction);
 
 // PAYMENT PROOF
 route.patch('/addproof', paymentProofUploader, readToken, transactionController.updateTransaction);
+route.patch('/update', transactionController.updateTransaction)
 
 module.exports = route
