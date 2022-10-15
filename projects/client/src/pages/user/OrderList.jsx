@@ -43,7 +43,7 @@ const UserOrderList = (props) => {
 
     React.useEffect(() => {
         getUserTransactionData();
-    }, [selected, range, activePage]);
+    }, [selected, range, activePage, showDetail]);
 
     const getUserTransactionData = async () => {
         try {
@@ -273,7 +273,7 @@ const UserOrderList = (props) => {
                         </div>
                         <div className="flex my-2">
                             <div className="w-1/5">
-                                <img src={API_URL + val.prescription_pic} className="w-full p-1" alt='prescription'/>
+                                <img src={API_URL + val.prescription_pic} className="w-full p-1" alt='prescription' />
                             </div>
                             <div className="w-4/5">
                                 <div className="h-2/4 flex">
@@ -371,7 +371,7 @@ const UserOrderList = (props) => {
                         </div>
                         <div className="flex my-2">
                             <div className="w-1/5">
-                                <img src={val.transaction_detail[0].product_image} className="w-full p-1" alt='product_image'/>
+                                <img src={val.transaction_detail[0].product_image} className="w-full p-1" alt='product_image' />
                             </div>
                             <div className="w-4/5">
                                 <div className="h-2/4 flex">
@@ -403,11 +403,18 @@ const UserOrderList = (props) => {
                                     </div>
                                 </div>
                                 <div className="h-1/4 flex">
-                                    <div className="w-2/3 px-3 flex items-center">
+                                    <div className="w-1/2 px-3 flex items-center">
                                         <p className="font-bold">Sub Total</p>
                                     </div>
-                                    <div className="w-1/3 flex justify-end items-center">
-                                        <p className="font-bold"><Currency price={val.total_price + val.delivery_price} /></p>
+                                    <div className="w-1/2 flex justify-end items-center">
+                                        <p className="font-bold">
+                                            {
+                                                val.status_id === 7 ?
+                                                    <p className="font-bold">Order Canceled</p>
+                                                    :
+                                                    <Currency price={val.total_price + val.delivery_price} />
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -426,7 +433,7 @@ const UserOrderList = (props) => {
                                     ""
                             }
                             {
-                                val.status_id === 7 || val.status_id === 9 ?
+                                val.status_id === 9 ?
                                     <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Buy Again</button>
                                     :
                                     ""
@@ -591,7 +598,7 @@ const UserOrderList = (props) => {
                             :
                             <div className="flex flex-col justify-center items-center text-center my-5">
                                 <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
-                                <img src={nodata} className="w-2/3" alt='placeholder'/>
+                                <img src={nodata} className="w-2/3" alt='placeholder' />
                             </div>
                     }
                 </div>

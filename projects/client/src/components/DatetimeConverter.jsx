@@ -8,7 +8,7 @@ const Datetime = (props) => {
     let dsplit = d2.split(' ');
 
     return (
-        <div>{dsplit[0]}, {dsplit[2]} {dsplit[1]} {dsplit[3]} - {dsplit[4]}</div>
+        <>{dsplit[0]}, {dsplit[2]} {dsplit[1]} {dsplit[3]} - {dsplit[4]}</>
     )
 };
 

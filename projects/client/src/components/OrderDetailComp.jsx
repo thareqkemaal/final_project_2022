@@ -6,6 +6,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import Datetime from "./DatetimeConverter";
 import Currency from "./CurrencyComp";
 import UploadPaymentProof from "./UploadPaymentProof";
+import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { Spinner } from 'flowbite-react';
+import LoadingComponent from "./Loading";
 
 const OrderDetail = ({ selected, showModal }) => {
 
@@ -15,6 +19,18 @@ const OrderDetail = ({ selected, showModal }) => {
     const [courier, setCourier] = React.useState('');
     const [delivery, setDelivery] = React.useState('');
     const [showProofModal, setShowProofModal] = React.useState(false);
+    const [showCancelModal, setShowCancelModal] = React.useState('');
+    const [reason, setReason] = React.useState('');
+    const [loading, setLoading] = React.useState(false);
+
+    const navigate = useNavigate();
+
+    const { iduser, username } = useSelector((state) => {
+        return {
+            iduser: state.userReducer.iduser,
+            username: state.userReducer.username
+        }
+    })
 
     React.useEffect(() => {
         // console.log('selected', selected);
@@ -57,6 +73,66 @@ const OrderDetail = ({ selected, showModal }) => {
         )
     };
 
+    const onCancelOrder = async () => {
+        try {
+            console.log('reason', reason);
+            console.log('data', data);
+            console.log('detail', detail);
+
+            // jika sudah ada item 
+            if (detail.length > 0) {
+                // cancel detail to update stock
+                let temp = [];
+                detail.forEach((val, idx) => {
+                    temp.push({
+                        product_name: val.product_name,
+                        product_qty: val.product_qty,
+                        product_price: val.product_price,
+                        product_id: val.product_id,
+                        product_unit: val.product_unit
+                    })
+                });
+                console.log(temp);
+
+                // cancel to update transaction
+                let update = {
+                    note: reason,
+                    id: data.idtransaction,
+                    iduser: iduser
+                }
+                setLoading(true);
+                let cancel = await axios.patch(API_URL + '/api/transaction/update', { userCancel: true, update, stock: temp });
+
+                if (cancel.data.success) {
+                    setTimeout(() => {
+                        setLoading(false);
+                        toast.error('Order Canceled', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        setShowCancelModal('');
+                        showModal(false);
+                        navigate(`/transaction/${username}`, { replace: true })
+                    }, 1500)
+                }
+            } else {
+                // jika batal dari resep dokter dan belum ada item
+
+
+            }
+
+
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     return (
         <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 ">
             <div className="relative p-4 w-1/2">
@@ -69,7 +145,13 @@ const OrderDetail = ({ selected, showModal }) => {
                         <div className="flex">
                             <div className="w-2/3 flex flex-col p-1 overflow-y-auto h-[51rem]">
                                 <div className="border shadow-md flex flex-col p-2 my-1">
-                                    <p className="text-start font-semibold text-main-500">{data.status_name}</p>
+                                    <p className={data.status_id === 7 ? "text-start font-semibold text-red-500" : "text-start font-semibold text-main-500"}>{data.status_name}</p>
+                                    {
+                                        data.status_id === 7 ?
+                                            <p className="text-start font-semibold">User {data.note}</p>
+                                            :
+                                            ""
+                                    }
                                     <div className="flex justify-between my-2 border-t">
                                         <p>No. Invoice</p>
                                         <p className="text-main-500 font-semibold">{data.invoice_number}</p>
@@ -178,9 +260,56 @@ const OrderDetail = ({ selected, showModal }) => {
                                     }
                                     {
                                         data.status_id === 3 || data.status_id === 4 || data.status_id === 5 ?
-                                            <button type='button'
+                                            <button type='button' onClick={() => setShowCancelModal('show')}
                                                 className="border w-auto p-3 rounded-lg bg-red-500 text-white font-semibold hover:bg-red-600 focus:ring-2 focus:ring-red-500"
                                             >Cancel Order</button>
+                                            :
+                                            ""
+                                    }
+                                    {
+                                        showCancelModal === 'show' ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                                <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center">
+                                                            <p className="text-lg font-normal text-black">Are you sure to cancel this order?</p>
+                                                            <div className='flex flex-col justify-center items-center my-3'>
+                                                                <p>Please select one of the reason below:</p>
+                                                                <select onChange={(e) => setReason(e.target.value)} defaultValue=''>
+                                                                    <option value=''>Please choose a reason</option>
+                                                                    <option value='Want to change item or quantity'>Want to change item or quantity</option>
+                                                                    <option value='Want to change delivery address'>Want to change delivery address</option>
+                                                                    <option value='Already have the product'>Already have the product</option>
+                                                                    <option value='Others/Change mind'>Others/Change mind</option>
+                                                                </select>
+                                                            </div>
+                                                            <button type="button" className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                                                                onClick={() => {
+                                                                    if (reason !== '') {
+                                                                        onCancelOrder()
+                                                                    } else {
+                                                                        toast.error('Please choose a reason first', {
+                                                                            theme: "colored",
+                                                                            position: "top-center",
+                                                                            autoClose: 2000,
+                                                                            hideProgressBar: false,
+                                                                            closeOnClick: true,
+                                                                            pauseOnHover: true,
+                                                                            draggable: false,
+                                                                            progress: undefined,
+                                                                        });
+                                                                    }
+                                                                }}
+                                                            >Yes, Cancel Order
+                                                            </button>
+                                                            <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
+                                                                onClick={() => setShowCancelModal('')}
+                                                            >No, Go Back
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             :
                                             ""
                                     }
@@ -232,6 +361,7 @@ const OrderDetail = ({ selected, showModal }) => {
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading} />
         </div>
     )
 };

@@ -273,7 +273,6 @@ const Checkout = (props) => {
                     product_unit: val.default_unit, 
                     product_image: val.picture, 
                     product_id: val.idproduct,
-                    initial_stock: val.stock_unit
                 })
             });
             // console.log(temp)
