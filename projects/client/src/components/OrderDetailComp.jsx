@@ -20,6 +20,7 @@ const OrderDetail = ({ selected, showModal }) => {
     const [delivery, setDelivery] = React.useState('');
     const [showProofModal, setShowProofModal] = React.useState(false);
     const [showCancelModal, setShowCancelModal] = React.useState('');
+    const [showAccept, setShowAccept] = React.useState('');
     const [reason, setReason] = React.useState('');
     const [loading, setLoading] = React.useState(false);
 
@@ -127,6 +128,35 @@ const OrderDetail = ({ selected, showModal }) => {
 
             }
 
+
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    const onAcceptDelivery = async () => {
+        try {
+            setLoading(true);
+            let patch = await axios.patch(API_URL +'/api/transaction/update', {acceptDeliv: true, id: data.idtransaction});
+
+            if (patch.data.success){
+                setTimeout(() => {
+                    setLoading(false);
+                    toast.success('Thank you for your trust to buy in our shop!', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                    setShowAccept('');
+                    showModal(false);
+                    navigate(`/transaction/${username}`, { replace: true })
+                }, 1500)
+            }
 
         } catch (error) {
             console.log(error)
@@ -315,9 +345,33 @@ const OrderDetail = ({ selected, showModal }) => {
                                     }
                                     {
                                         data.status_id === 8 ?
-                                            <button type='button'
+                                            <button type='button' onClick={() => setShowAccept('show')}
                                                 className="border w-auto p-3 rounded-lg bg-main-500 text-white font-semibold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
-                                            >Delivery Accepted</button>
+                                            >Accept Delivery</button>
+                                            :
+                                            ""
+                                    }
+                                    {
+                                        showAccept === 'show' ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                                <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center">
+                                                            <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
+                                                            <button type="button" className="text-white bg-main-500 hover:bg-main-600 focus:ring-2 focus:outline-none focus:ring-main-500 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                                                                onClick={() => {
+                                                                    onAcceptDelivery();
+                                                                }}
+                                                            >Yes, I have the package
+                                                            </button>
+                                                            <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
+                                                                onClick={() => setShowAccept('')}
+                                                            >No, Go Back
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             :
                                             ""
                                     }

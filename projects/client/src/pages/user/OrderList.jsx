@@ -13,6 +13,7 @@ import format from 'date-fns/format';
 import nodata from '../../assets/nodata.png';
 import OrderDetail from "../../components/OrderDetailComp";
 import LoadingComponent from "../../components/Loading";
+import { useSelector } from "react-redux";
 
 const UserOrderList = (props) => {
 
@@ -27,6 +28,7 @@ const UserOrderList = (props) => {
     const [totalPage, setTotalPage] = React.useState(0);
     const [showPageList, setShowPageList] = React.useState([]);
     const [activePage, setActivePage] = React.useState(1);
+    const [showAccept, setShowAccept] = React.useState(0);
 
     const [showFilterDate, setShowFilterDate] = React.useState(false);
     const [range, setRange] = React.useState([
@@ -38,12 +40,20 @@ const UserOrderList = (props) => {
         }
     ]);
 
+    const navigate = useNavigate();
+
+    const { username } = useSelector((state) => {
+        return {
+            username: state.userReducer.username
+        }
+    })
+
     const [showDetail, setShowDetail] = React.useState(false);
     const [selectedDetail, setSelectedDetail] = React.useState({});
 
     React.useEffect(() => {
         getUserTransactionData();
-    }, [selected, range, activePage, showDetail]);
+    }, [selected, range, activePage, showDetail, showAccept]);
 
     const getUserTransactionData = async () => {
         try {
@@ -335,11 +345,36 @@ const UserOrderList = (props) => {
                             }
                             {
                                 val.status_id === 8 ?
-                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
+                                    <button type='button' onClick={() => setShowAccept(val.idtransaction)}
+                                    className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
                                     :
                                     ""
                             }
                         </div>
+                        {
+                            showAccept === val.idtransaction ?
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                        <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                            <div className="p-6 text-center">
+                                                <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
+                                                <button type="button" className="text-white bg-main-500 hover:bg-main-600 focus:ring-2 focus:outline-none focus:ring-main-500 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                                                    onClick={() => {
+                                                        onAcceptDelivery(val.idtransaction);
+                                                    }}
+                                                >Yes, I have the package
+                                                </button>
+                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
+                                                    onClick={() => setShowAccept('')}
+                                                >No, Go Back
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                :
+                                ""
+                        }
                     </div>
                 )
             } else {
@@ -428,10 +463,12 @@ const UserOrderList = (props) => {
                             }
                             {
                                 val.status_id === 8 ?
-                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
+                                    <button type='button' onClick={() => setShowAccept(val.idtransaction)}
+                                    className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
                                     :
                                     ""
                             }
+
                             {
                                 val.status_id === 9 ?
                                     <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Buy Again</button>
@@ -439,6 +476,30 @@ const UserOrderList = (props) => {
                                     ""
                             }
                         </div>
+                        {
+                            showAccept === val.idtransaction ?
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                        <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                            <div className="p-6 text-center">
+                                                <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
+                                                <button type="button" className="text-white bg-main-500 hover:bg-main-600 focus:ring-2 focus:outline-none focus:ring-main-500 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
+                                                    onClick={() => {
+                                                        onAcceptDelivery(val.idtransaction);
+                                                    }}
+                                                >Yes, I have the package
+                                                </button>
+                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
+                                                    onClick={() => setShowAccept('')}
+                                                >No, Go Back
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                :
+                                ""
+                        }
                     </div>
                 )
             }
@@ -461,6 +522,34 @@ const UserOrderList = (props) => {
                 )
             }
         })
+    };
+
+    const onAcceptDelivery = async (idtransaction) => {
+        try {
+            setLoading(true);
+            let patch = await axios.patch(API_URL +'/api/transaction/update', {acceptDeliv: true, id: idtransaction});
+
+            if (patch.data.success){
+                setTimeout(() => {
+                    setLoading(false);
+                    toast.success('Thank you for your trust to buy in our shop!', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                    setShowAccept('');
+                    navigate(`/transaction/${username}`, { replace: true })
+                }, 1500)
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
     };
 
     return (

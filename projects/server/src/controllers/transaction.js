@@ -215,7 +215,9 @@ module.exports = {
 
           await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
           ${history.join(', ')};`)
-
+        } else if (req.body.acceptDeliv){
+          console.log(req.body)
+          await dbQuery(`UPDATE transaction SET status_id = 9 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         }
       }
       res.status(200).send({
