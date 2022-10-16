@@ -78,7 +78,7 @@ const UserCart = (props) => {
                         />
                     </div>
                     <div>
-                        <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name} />
+                        <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name}/>
                     </div>
                     <div className='w-full flex flex-col'>
                         <div className='flex justify-between h-2/3'>
@@ -311,7 +311,7 @@ const UserCart = (props) => {
                                     :
                                     <div className="flex flex-col justify-center items-center text-center my-5">
                                         <p className="font-bold text-2xl drop-shadow-lg text-main-500">Oops you cart is empty!</p>
-                                        <img src={nodata} className="w-2/3" />
+                                        <img src={nodata} className="w-2/3" alt='placeholder'/>
                                     </div>
 
                             }
