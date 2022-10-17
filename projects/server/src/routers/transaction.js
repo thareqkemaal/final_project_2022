@@ -7,7 +7,7 @@ const route = express.Router();
 const prescriptionUploader = uploader('/prescription', 'prescription').array('prescription_pic', 1);
 const paymentProofUploader = uploader('/paymentproof', 'paymentproof').array('paymentproof_pic', 1);
 
-route.get('/all', transactionController.getTransaction)
+route.get('/all', readToken, transactionController.getTransaction)
 
 // PRESCRIPTION
 
@@ -21,4 +21,6 @@ route.patch('/update', transactionController.updateTransaction)
 // REPORT
 route.get('/report', transactionController.getReport)
 
+// HISTORY
+route.get('/history', transactionController.getHistory)
 module.exports = route
