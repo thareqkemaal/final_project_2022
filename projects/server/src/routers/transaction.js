@@ -13,4 +13,7 @@ route.post('/add', readToken, transactionController.addTransaction);
 route.patch('/addproof', paymentProofUploader, readToken, transactionController.updateTransaction);
 route.patch('/update', transactionController.updateTransaction);
 
+// REPORT
+route.get('/report', transactionController.getReport)
+
 module.exports = route
