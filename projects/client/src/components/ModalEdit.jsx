@@ -9,6 +9,12 @@ import ModalAddNettoUnit from "./ModalAddNettoUnit";
 import ModalSettingCategory from "./ModalSettingCategory";
 
 const ModalEdit = ({ setModalEditOn, dataproduct, category, setLoading }) => {
+    let { iduser } = useSelector((state) => {
+        return {
+            iduser: state.userReducer.iduser,
+        }
+    })
+
     const [newCat, setNewCat] = React.useState('');
     const [product_name, setProduct_Name] = React.useState('');
     const [price, setPrice] = React.useState(null);
@@ -90,6 +96,7 @@ const ModalEdit = ({ setModalEditOn, dataproduct, category, setLoading }) => {
     const editProduct = () => {
         let formData = new FormData();
         formData.append('data', JSON.stringify({
+            iduser,
             price,
             category_id,
             netto_stock,

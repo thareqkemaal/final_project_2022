@@ -84,7 +84,6 @@ function App() {
           <Route element={<ProtectRouteAdmin />}>
               <Route path='/admin/dashboard' element={<DashboardPage />} />
               <Route path='/admin/transaction' element={<TransactionPage />} />
-              <Route path='/admin/transaction' element={<TransactionPage />} />\
               <Route path='/admin/report' element={<ReportPage />} />
               <Route path='/admin/stock_log' element={<HistoryPage />} />
           </Route>
