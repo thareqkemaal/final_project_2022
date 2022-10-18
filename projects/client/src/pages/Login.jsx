@@ -7,11 +7,14 @@ import { API_URL } from '../helper';
 import { useDispatch } from 'react-redux'
 import { loginAction } from '../action/useraction';
 import ForgotPass from '../components/ForgotPass';
+import Loading from '../components/Loading';
 
 const Login = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [visible,setVisible]=useState('password')
+  const [message,setMessage]=useState('')
+  const [loading, setLoading]=useState(false)
 
   const [email,setEmail]=useState('')
   const [password, setPassword]=useState('')
@@ -19,12 +22,14 @@ const Login = () => {
 
 
   const onLogin=()=>{
+    setLoading(true)
     axios.post(API_URL+'/api/user/login',{
       email,
       password
     })
     .then((res)=>{
       console.log(res)
+      setLoading(false)
       localStorage.setItem('medcarelog',res.data.token)
       delete res.data.token
       console.log(res.data.role)
@@ -36,6 +41,8 @@ const Login = () => {
       }
     }).catch((err)=>{
       console.log(err)
+      setLoading(false)
+      setMessage(err.response.data.message)
     })
   }
 
@@ -64,7 +71,7 @@ const Login = () => {
                 <div className='lg:px-10'>
                 <div className='font-bold text-2xl font-Public'>Login</div>
                 <div className='text-sm font-extralight text-gray-400 font-Public'>Don't have account ?
-                <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign In</span>
+                <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign Up</span>
                 </div>
                   <form>
                     <label className='block mb-3 my-14'>
@@ -98,12 +105,22 @@ const Login = () => {
                         <ForgotPass />
                       </div>
                     </div>
-                    <button className='text-white rounded-md bg-main-500 hover:bg-main-600 w-full py-2 my-7 font-Public' onClick={onLogin}>Login</button>
+                    <div className='h-20'>
+                      <p className='text-red-600 text-center leading-7'>{message}</p>
+                    </div>
+                    <button className='text-white rounded-md bg-main-500 hover:bg-main-600 w-full py-2 mt-5 font-Public' onClick={onLogin}>Login</button>
 
                 </div>
               </div>
             </div>
         </div>
+        {
+            loading &&
+        <div className='absolute top-1/3 right-[45%]'>
+            <Loading loading={loading}/>
+        </div>
+
+        }
     </div>
   )
 }

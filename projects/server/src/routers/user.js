@@ -17,5 +17,6 @@ route.patch('/edit-profile',upload,readToken,userController.editProfile);
 route.patch('/change-password',readToken,userController.changePass);
 route.post('/send-reset',userController.sendReset);
 route.post('/reset-password',readToken,userController.resetPass);
+route.patch('/change-email',readToken,userController.changeEmail);
 
 module.exports=route
