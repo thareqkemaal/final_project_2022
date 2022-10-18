@@ -189,6 +189,30 @@ module.exports = {
           await dbQuery(`UPDATE transaction SET status_id = 4, note = 'Less Payment Amount' WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         } else if (req.body.reason == 'Medicine Out of Stock') {
           await dbQuery(`UPDATE transaction SET status_id = 7, note = 'Medicine Out of Stock' WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
+        } else if (req.body.userCancel) {
+          console.log(req.body);
+          let update = req.body.update;
+          await dbQuery(`UPDATE transaction SET status_id = 7, note = ${dbConf.escape(update.note)} WHERE idtransaction = ${dbConf.escape(update.id)};`)
+          
+          // pengembalian stock (stock awal + quantity)
+          let updateStock = req.body.stock;
+          updateStock.forEach(async (val, idx) => {
+            console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+            await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+          });
+          
+          let history = [];
+          updateStock.forEach((val, idx) => {
+            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
+          })
+
+          // console.log('history', history)
+
+          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          ${history.join(', ')};`)
+        } else if (req.body.acceptDeliv){
+          console.log(req.body)
+          await dbQuery(`UPDATE transaction SET status_id = 9 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         }
       }
       res.status(200).send({
