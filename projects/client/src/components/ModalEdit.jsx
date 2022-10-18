@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
 import { API_URL } from "../helper";
-import { useSelector } from "react-redux";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AiFillEdit } from "react-icons/ai";
