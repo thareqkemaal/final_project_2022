@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
+import { useSelector } from 'react-redux'
 import { BiSearchAlt2, BiDetail } from 'react-icons/bi';
 import { BsFillChatDotsFill, BsClock, BsChevronDown } from 'react-icons/bs'
 import { MdOutlinePayments, MdOutlineHideImage, MdAdd, MdOutlineDeleteOutline, MdOutlineArrowForward } from 'react-icons/md'
@@ -16,22 +17,25 @@ import Currency from '../../components/CurrencyComp';
 import accept from '../../assets/accept.png'
 import cancel from '../../assets/cancel.png'
 import pickup from '../../assets/pickup.png'
-import { set } from 'date-fns';
 
 const TransactionPages = () => {
+  let { iduser } = useSelector((state) => {
+    return {
+      iduser: state.userReducer.iduser,
+    }
+  })
+  let check = []
+
   const [defaultSort, setDefaultSort] = React.useState('Date')
   const [loading, setLoading] = React.useState(true)
   const [drop, setDrop] = React.useState(true)
   const [dropCancel, setDropCancel] = React.useState(true)
-
   const [dropMed, setDropMed] = React.useState(true)
   const [dropRecipe, setDropRecipe] = React.useState(true)
-
   const [filterKey, setFilterKey] = React.useState(0)
   const [transaction, setTransaction] = React.useState([])
   const [filterTransaction, setFilterTransaction] = React.useState([])
   const [allTransaction, setAllTransaction] = React.useState([])
-
   const [product, setProduct] = React.useState([])
   const [selectedStatus, setSelectedStatus] = React.useState(3456789)
   const [isFilter, setIsFilter] = React.useState(false)
@@ -42,7 +46,6 @@ const TransactionPages = () => {
   const [modalAccept, setModalAccept] = React.useState('')
   const [modalNote, setModalNote] = React.useState(false)
   const [modalCancel, setModalCancel] = React.useState('')
-
   const [modalRecipe, setModalRecipe] = React.useState('')
   const [modalConv, setModalConv] = React.useState('')
   const [qtyConv, setQtyConv] = React.useState(0)
@@ -54,7 +57,6 @@ const TransactionPages = () => {
   const [qty, setQty] = React.useState(0)
   const [buyUnit, setBuyUnit] = React.useState('Select Unit')
   const [recipe, setRecipe] = React.useState([])
-
   const [range, setRange] = React.useState([
     {
       startDate: '',
@@ -128,12 +130,17 @@ const TransactionPages = () => {
                 <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
                 <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`} onClick={val.status_id == 3 ? () => setModalRecipe(val) : () => setModalDetail(val)}>{val.status_id == 3 ? `Make Recipe's Copy` : 'See Detail Order'}</button>
                 <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
-                  <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
-                  <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
-                    setLoading(true)
-                    setTimeout(() => setLoading(false), 1000)
-                    setTimeout(() => setModalDetail(val), 1000)
-                  }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                  {val.status_id == 3 ? null
+                    :
+                    <div>
+                      <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
+                      <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
+                        setLoading(true)
+                        setTimeout(() => setLoading(false), 1000)
+                        setTimeout(() => setModalDetail(val), 1000)
+                      }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                    </div>
+                  }
                 </div>
               </div>
             </div>
@@ -216,6 +223,7 @@ const TransactionPages = () => {
   }
 
   const handleFilter = () => {
+    let userToken = localStorage.getItem('medcarelog');
     setIsFilter(true)
     setStartPage(0)
     setEndPage(4)
@@ -240,7 +248,11 @@ const TransactionPages = () => {
       }
     }
     console.log(filterArray)
-    axios.get(API_URL + `/api/transaction/all?${filterArray.join('&')}`)
+    axios.get(API_URL + `/api/transaction/all?${filterArray.join('&')}`, {
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    })
       .then((res) => {
         setFilterTransaction(res.data)
         handleStatus(selectedStatus, res.data)
@@ -433,6 +445,7 @@ const TransactionPages = () => {
 
   const handleDeleteRecipe = (id) => {
     let index = recipe.findIndex((val) => val.idproduct == id)
+    modalRecipe.total_price = modalRecipe.total_price - (recipe[index].price * recipe[index].qty)
     recipe.splice(index, 1)
     getTrans()
   }
@@ -442,9 +455,15 @@ const TransactionPages = () => {
     setModalConv('')
     if (val[1]) {
       axios.patch(API_URL + `/api/product/unitconv`, {
+        iduser,
         idproduct: val[0].idproduct,
+        name: val[0].product_name,
         main: val[0].stock_unit - qtyConv,
         conv: val[1].stock_unit + (qtyConv * val[0].netto_stock),
+        change_main: qtyConv,
+        change_conv: qtyConv * val[0].netto_stock,
+        mainUnit: val[0].unit,
+        convUnit: val[1].unit,
         status: 'already'
       }).then((res) => {
         getProduct()
@@ -454,10 +473,15 @@ const TransactionPages = () => {
       })
     } else {
       axios.patch(API_URL + `/api/product/unitconv`, {
+        iduser,
         idproduct: val[0].idproduct,
+        name: val[0].product_name,
         main: val[0].stock_unit - qtyConv,
         conv: qtyConv * val[0].netto_stock,
+        change_main: qtyConv,
+        mainUnit: val[0].unit,
         convUnit: val[0].netto_unit,
+        change: qtyConv,
         status: 'new'
       }).then((res) => {
         getProduct()
@@ -904,7 +928,9 @@ const TransactionPages = () => {
                           <p className='font-thin text-lg flex'>{modalAccept.detail[0].product_qty} {modalAccept.detail[0].product_unit} x <p className='ml-2'><Currency price={modalAccept.detail[0].product_price} /></p></p>
                         </div>
                       }
-                      <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                      {recipe.length > 1 || modalAccept.detail.length > 1 ?
+                        <button type='button' className='mb-5 text-teal-500 flex items-center text-lg' onClick={() => setSee(true)}>See {modalAccept.status_id == 3 ? `${recipe.length - 1}` : `${modalAccept.detail.length - 1}`} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                        : null}
                     </div>}
                 </div>
                 <div className='bg-teal-100 flex justify-between rounded ml-5 mr-5 my-5 h-10'>
@@ -1095,14 +1121,19 @@ const TransactionPages = () => {
                     <ul className="py-1 text-sm text-gray-700 " aria-labelledby="dropdownCancel">
                       {product.map((val, idx) => {
                         if (val.isDefault == "true") {
-                          return <li className='hover:bg-gray-100'>
-                            <button className="py-2 pl-4" onClick={() => {
-                              setDropMed(true)
-                              setPickMed(val.product_name)
-                              setShowInput(false)
-                              setShowBtn(false)
-                            }} value={val.product_name}>{val.product_name}</button>
-                          </li>
+                          if (recipe.length > 0) {
+                            check = recipe.filter((name) => name.name == val.product_name)
+                          }
+                          if (check.length == 0) {
+                            return <li className='hover:bg-gray-100'>
+                              <button className="py-2 pl-4" onClick={() => {
+                                setDropMed(true)
+                                setPickMed(val.product_name)
+                                setShowInput(false)
+                                setShowBtn(false)
+                              }} value={val.product_name}>{val.product_name}</button>
+                            </li>
+                          }
                         }
                       })
                       }

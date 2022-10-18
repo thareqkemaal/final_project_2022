@@ -5,7 +5,6 @@ const { dbConf, dbQuery } = require('../config/db');
 module.exports = {
   getTransaction: async (req, res) => {
     try {
-      // console.log(req.dataToken)
       if (req.dataToken.role.toLowerCase() === 'user') {
         // console.log(req.query)
 
@@ -85,7 +84,6 @@ module.exports = {
         }
         let sqlGet = `Select *,date_format(date_order,'%e %b %Y, %H:%i') as date_order from transaction 
           ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
-
         let transaction = await dbQuery(sqlGet);
         if (transaction) {
           for (i = 0; i < transaction.length; i++) {
@@ -145,19 +143,12 @@ module.exports = {
             history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(req.dataToken.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Penjualan','Pengurangan')`)
           })
 
-          // console.log('history', history)
-
           await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
           ${history.join(', ')};`)
-
-
-          // update stock baru (stock awal - quantity belanja)
-          req.body.detail.forEach(async (val, idx) => {
-            console.log(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-            await dbQuery(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-          })
         }
       }
+
+
 
       res.status(200).send({
         success: true,
@@ -169,7 +160,6 @@ module.exports = {
       res.status(500).send(error)
     }
   },
-
   updateTransaction: async (req, res) => {
     try {
       if (req.files) {
@@ -187,6 +177,11 @@ module.exports = {
             })
             await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id)
             values ${detail.join(', ')}; `)
+
+            for (i = 0; i < req.body.recipe.length; i++) {
+              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
+            }
+
           } else {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
           }
@@ -194,36 +189,58 @@ module.exports = {
           await dbQuery(`UPDATE transaction SET status_id = 4, note = 'Less Payment Amount' WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         } else if (req.body.reason == 'Medicine Out of Stock') {
           await dbQuery(`UPDATE transaction SET status_id = 7, note = 'Medicine Out of Stock' WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
-        } else if (req.body.userCancel) {
-          console.log(req.body);
-          let update = req.body.update;
-          await dbQuery(`UPDATE transaction SET status_id = 7, note = ${dbConf.escape(update.note)} WHERE idtransaction = ${dbConf.escape(update.id)};`)
-          
-          // pengembalian stock (stock awal + quantity)
-          let updateStock = req.body.stock;
-          updateStock.forEach(async (val, idx) => {
-            console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-            await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-          });
-          
-          let history = [];
-          updateStock.forEach((val, idx) => {
-            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
-          })
-
-          // console.log('history', history)
-
-          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-          ${history.join(', ')};`)
-        } else if (req.body.acceptDeliv){
-          console.log(req.body)
-          await dbQuery(`UPDATE transaction SET status_id = 9 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         }
       }
       res.status(200).send({
         success: true,
         message: 'Transaction Updated'
       })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
+  getReport: async (req, res) => {
+    try {
+      console.log(req.query)
+      let revenue = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id where status_id = 9 group by date_format(date_order,'%b %Y') order by date_order;`)
+      let revenueSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id where status_id = 9 group by date_format(date_order,'%b %Y') order by revenue desc;`)
+      let transaction = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y ') order by date_order;`)
+      let transactionSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y ') order by transaction desc;`)
+      let user = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by date_order;`)
+      let userSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by user desc;`)
+      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id where date_format(date_order,'%b %Y') = '${req.query.month}' AND status_id = 9 group by product_name order by best_seller desc limit 10 ;`)
+      console.log(product)
+      res.status(200).send({
+        revenue,
+        revenueSales,
+        transaction,
+        transactionSales,
+        user,
+        userSales,
+        product
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+    }
+  },
+  getHistory: async (req, res) => {
+    try {
+      let filter = [];
+      for (const key in req.query) {
+        if (key == 'end') {
+          filter.push(`date < ${dbConf.escape(req.query[key])}`)
+        } else if (key == 'start') {
+          filter.push(`date > ${dbConf.escape(req.query[key])}`)
+        } else {
+          filter.push(`${key} LIKE ${dbConf.escape('%' + req.query[key] + '%')}`)
+        }
+      }
+      let history = await dbQuery(`select *,date_format(date,'%d %b %Y') as date_change from history_stock
+      ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc;`)
+      res.status(200).send(history)
+      console.log(history)
     } catch (error) {
       console.log(error)
       res.status(500).send(error)

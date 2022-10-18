@@ -11,7 +11,7 @@ route.post('/getproduct', productController.getProduct);
 route.post('/filterproduct/:id', productController.filterProduct);
 route.post('/getproductadmin', productController.getProductAdmin);
 route.post('/add', uploadProductPict, productController.addProduct, productController.addStock);
-route.patch('/edit/:id', uploadProductPict, productController.editProduct);
+route.patch('/edit/:id', uploadProductPict, productController.stockHistory, productController.editProduct);
 route.delete('/delete/:id', productController.deleteProduct);
 route.get('/getunit', productController.getUnit);
 route.post('/addunit', productController.addUnit);
