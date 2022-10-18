@@ -35,6 +35,7 @@ module.exports = {
             var source = fs.readFileSync(path.join(__dirname, '../template-email/emailConfirmation.hbs'), 'utf-8')
             var template = Handlebars.compile(source)
             var data = { 'fullname': fullname, 'frontend': process.env.FE_URL, 'token': token }
+
             await transport.sendMail({
               from: 'MEDCARE ADMIN',
               to: sqlGet[0].email,
@@ -212,6 +213,7 @@ module.exports = {
       var source = fs.readFileSync(path.join(__dirname, '../template-email/emailConfirmation.hbs'), 'utf-8')
       var template = Handlebars.compile(source)
       var data = { 'fullname': sqlInsert[0].fullname, 'frontend': process.env.FE_URL, 'token': sqlInsert[0].token }
+
       await transport.sendMail({
         from: 'MEDCARE ADMIN',
         to: sqlInsert[0].email,
