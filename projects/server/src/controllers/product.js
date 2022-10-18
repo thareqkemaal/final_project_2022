@@ -8,13 +8,12 @@ module.exports = {
         // tambah join stock
         dbConf.query(`Select * from product join stock on stock.product_id = product.idproduct
         ${filterName ? `where product_name like ('%${filterName}%')` : ''} 
-        order by ${sort ? `${sort}` : `idproduct`} asc 
-        limit ${dbConf.escape(query)}`,
+        order by ${sort ? `${sort}` : `idproduct`} 
+        ${query ? `asc limit ${dbConf.escape(query)}` : ''};`,
             (err, results) => {
                 if (err) {
                     return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
                 }
-
                 res.status(200).send(results);
             })
     },
@@ -140,13 +139,41 @@ module.exports = {
         let { product_id, stock_unit, unit } = resultAddproduct;
 
         dbConf.query(`Insert into stock (stock_unit, unit, isDefault, product_id)
-        values (${dbConf.escape(stock_unit)},${dbConf.escape(unit)},true,${dbConf.escape(product_id)})`),
+        values (${dbConf.escape(stock_unit)},${dbConf.escape(unit)},'true',${dbConf.escape(product_id)})`),
             (error, results) => {
                 if (err) {
                     return res.status(500).send(`Middlewear addProduct failed, error : ${error}`)
                 }
                 res.status(200).send(results)
             }
+    },
+    stockHistory: (req, res, next) => {
+        let idproduct = req.params.id;
+        dbConf.query(`Select *,p.product_name from stock s join product p on s.product_id = p.idproduct where s.product_id = ${idproduct} and s.isDefault ='true';`,
+            (err, results) => {
+                if (err) {
+                    return res.status(500).send(`Middlewear stockHistory failed, error : ${err}`)
+                }
+                if (results[0].stock_unit > req.body.data.stock_unit) {
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan');`,
+                        (error, results) => {
+                            if (error) {
+                                return res.status(500).send(`Middlewear stockHistory failed, error : ${error}`)
+                            }
+                            next()
+                        })
+                } else if (results[0].stock_unit < req.body.data.stock_unit) {
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+                (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(req.body.data.stock_unit - results[0].stock_unit)},'Manual Update','Penambahan');`,
+                        (error, results) => {
+                            if (error) {
+                                return res.status(500).send(`Middlewear stockHistory failed, error : ${error}`)
+                            }
+                            next()
+                        })
+                }
+            })
     },
     deleteProduct: (req, res) => {
         let idproduct = req.params.id;
@@ -190,7 +217,7 @@ module.exports = {
             s.unit=${dbConf.escape(unit)}
         WHERE
             p.idproduct = ${dbConf.escape(idproduct)}
-            AND s.product_id = ${dbConf.escape(idproduct)}`,
+            AND s.product_id = ${dbConf.escape(idproduct)} AND s.isDefault = 'true' `,
             (error, results) => {
                 if (error) {
                     res.status(500).send(`Middleware query edit product gagal :`, error);
@@ -279,47 +306,47 @@ module.exports = {
     },
     addCategory: (req, res) => {
         let category_name = req.body.category_name;
-        
+
         dbConf.query(`Select * from category where category_name=${dbConf.escape(category_name)}`,
-        (err,results)=>{
-            if(err){
-                res.send(500).status('Middlewear addCategory gagal :', error)
-            }
+            (err, results) => {
+                if (err) {
+                    res.send(500).status('Middlewear addCategory gagal :', error)
+                }
 
-            if(JSON.stringify(results) != '[]'){
-                res.status(200).send({
-                    message: false
-                })
-            } else {
-                dbConf.query(`Insert into category (category_name) values (${dbConf.escape(category_name)})`,
-                (err,results)=>{
-                    if(err){
-                        res.send(500).status('Middlewear addCategory gagal :', error)
-                    }
-
+                if (JSON.stringify(results) != '[]') {
                     res.status(200).send({
-                        ...results,
-                        message:true
+                        message: false
                     })
-                })
-            }
-        })
+                } else {
+                    dbConf.query(`Insert into category (category_name) values (${dbConf.escape(category_name)})`,
+                        (err, results) => {
+                            if (err) {
+                                res.send(500).status('Middlewear addCategory gagal :', error)
+                            }
+
+                            res.status(200).send({
+                                ...results,
+                                message: true
+                            })
+                        })
+                }
+            })
     },
     editCategory: (req, res) => {
         let idcategory = req.params.id;
         let category_name = req.body.category_name;
 
         dbConf.query(`Update category set category_name=${dbConf.escape(category_name)} where idcategory=${dbConf.escape(idcategory)}`,
-        (err,results)=>{
-            if(err){
-                res.status(500).send('Middlewear editcategory gagal :', err)
-            }
-            console.log(results)
-            res.send(200).status({
-                ...results,
-                message:true
+            (err, results) => {
+                if (err) {
+                    res.status(500).send('Middlewear editcategory gagal :', err)
+                }
+                console.log(results)
+                res.send(200).status({
+                    ...results,
+                    message: true
+                })
             })
-        })
     },
     deleteCategory: (req, res) => {
         let idcategory = req.params.id;
@@ -360,6 +387,7 @@ module.exports = {
     },
     deletecart: async (req, res) => {
         try {
+            console.log(req.params)
             await dbQuery(`DELETE FROM cart WHERE idcart=${dbConf.escape(req.params.idcart)};`);
 
             res.status(200).send({
@@ -408,6 +436,31 @@ module.exports = {
                 message: 'Product Added'
             })
 
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error);
+        }
+    },
+    unitConv: async (req, res) => {
+        try {
+            console.log(req.body)
+            if (req.body.status == 'already') {
+                await dbQuery(`UPDATE stock SET stock_unit=${dbConf.escape(req.body.main)} WHERE product_id=${dbConf.escape(req.body.idproduct)} AND isDefault='true';`);
+                await dbQuery(`UPDATE stock SET stock_unit=${dbConf.escape(req.body.conv)} WHERE product_id=${dbConf.escape(req.body.idproduct)} AND isDefault='false';`);
+                await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,qty, type,information) VALUES
+                (${dbConf.escape(req.body.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(req.body.mainUnit)},${dbConf.escape(req.body.change_main)},'Unit Conversion','Pengurangan'),
+                (${dbConf.escape(req.body.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(req.body.convUnit)},${dbConf.escape(req.body.change_conv)},'Unit Conversion','Penambahan');`)
+            } else {
+                await dbQuery(`UPDATE stock SET stock_unit=${dbConf.escape(req.body.main)} WHERE product_id=${dbConf.escape(req.body.idproduct)} AND isDefault='true';`);
+                await dbQuery(`insert into stock (stock_unit,unit,isDefault,product_id) values (${dbConf.escape(req.body.conv)},${dbConf.escape(req.body.convUnit)},'false',${dbConf.escape(req.body.idproduct)});`);
+                await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,qty, type,information) VALUES
+                (${dbConf.escape(req.body.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(req.body.mainUnit)},${dbConf.escape(req.body.change_main)},'Unit Conversion','Pengurangan'),
+                (${dbConf.escape(req.body.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(req.body.convUnit)},${dbConf.escape(req.body.conv)},'Unit Conversion','Penambahan');`)
+            }
+            res.status(200).send({
+                success: true,
+                message: 'Unit Conversion Success'
+            })
         } catch (error) {
             console.log(error);
             res.status(500).send(error);

@@ -9,6 +9,12 @@ import ModalAddNettoUnit from "./ModalAddNettoUnit";
 import ModalSettingCategory from "./ModalSettingCategory";
 
 const ModalEdit = ({ setModalEditOn, dataproduct, category, setLoading }) => {
+    let { iduser } = useSelector((state) => {
+        return {
+            iduser: state.userReducer.iduser,
+        }
+    })
+
     const [newCat, setNewCat] = React.useState('');
     const [product_name, setProduct_Name] = React.useState('');
     const [price, setPrice] = React.useState(null);
@@ -90,6 +96,7 @@ const ModalEdit = ({ setModalEditOn, dataproduct, category, setLoading }) => {
     const editProduct = () => {
         let formData = new FormData();
         formData.append('data', JSON.stringify({
+            iduser,
             price,
             category_id,
             netto_stock,
@@ -208,7 +215,7 @@ const ModalEdit = ({ setModalEditOn, dataproduct, category, setLoading }) => {
                                                 <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
                                                     Netto Stock
                                                 </label>
-                                                <input defaultValue={dataproduct.netto_stock} type="number" onChange={(e) => setNetto_Stock(e.target.value)} name="description" id="description" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Isi per obat" required />
+                                                <input defaultValue={dataproduct.netto_stock} type="number" onChange={(e) => setNetto_Stock(e.target.value)} name="description" id="description" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Isi per obat" required disabled />
                                             </div>
                                             <div>
                                                 <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex">

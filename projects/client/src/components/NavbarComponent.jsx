@@ -12,8 +12,6 @@ import { API_URL } from '../helper';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 
-
-
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -165,7 +163,14 @@ const NavbarComponent = (props) => {
                                       navigate('/product');
                                     }, 1500)
                                   }}>Product</button>
-                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Transaction</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => {
+                                    setLoading(true);
+                                    setTimeout(() => {
+                                      setDropdown(false);
+                                      setLoading(false);
+                                      navigate(`/transaction/${username}`);
+                                    }, 1500)
+                                  }}>Transaction</button>
                                   <form method="POST" action="#" role="none">
                                     <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
                                   </form>

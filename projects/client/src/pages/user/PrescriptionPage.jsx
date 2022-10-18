@@ -4,13 +4,11 @@ import { useNavigate } from 'react-router';
 import { API_URL } from '../../helper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import bni from '../../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
-import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
-import bri from '../../assets/bri.png';
 import LoadingComponent from "../../components/Loading";
 import NewAddressComponent from "../../components/NewAddressModalComp";
 import EditAddressComponent from "../../components/EditAddressModalComp";
 import Currency from "../../components/CurrencyComp";
+import placeholder from '../../assets/placeholder.png';
 
 const Prescription = (props) => {
 
@@ -55,7 +53,7 @@ const Prescription = (props) => {
                     'Authorization': `Bearer ${userToken}`
                 }
             });
-            //console.log('user address', getAddress.data);
+            console.log('user address', getAddress.data);
             setAllAddress(getAddress.data);
 
             let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
@@ -220,7 +218,7 @@ const Prescription = (props) => {
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
-                courier,
+                courier: courier + '/' + selectedDelivery.split(',')[1],
             }));
             formSubmit.append('prescription_pic', prescriptionPic);
 
@@ -363,7 +361,7 @@ const Prescription = (props) => {
                                     :
                                     ''
                             }
-                            <img src={showPic} className={showPic === '' ? 'hidden' : 'block max-w-lg'} alt='user_prescription' />
+                            <img src={showPic ? showPic : placeholder} className={loadPic ? 'hidden' : 'block max-w-lg'} alt='user_prescription' />
                         </div>
                     </div>
                 </div>

@@ -20,6 +20,8 @@ const ProductDetail = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const [loading, setLoading] = React.useState(false);
+    const [counter, setCounter] = React.useState(1);
+    const [productDetail, setProductDetail] = React.useState([]);
 
     const [productDetail,setProductDetail]=useState([])
     const [counter, setCounter]=useState(0)

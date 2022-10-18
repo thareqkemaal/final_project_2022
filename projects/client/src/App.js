@@ -15,6 +15,8 @@ import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
 import TransactionPage from './pages/admin/TransactionPage';
+import ReportPage from './pages/admin/ReportPage';
+import HistoryPage from './pages/admin/HistoryPage';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
@@ -26,6 +28,7 @@ import ProtectRoute from './components/ProtectRoute/ProtectRoute';
 import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 import EmailVerification from './pages/user/EmailVerification';
+import UserOrderList from './pages/user/OrderList';
 
 function App() {
   const dispatch = useDispatch()
@@ -67,12 +70,11 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-
           {/* Protect Route Ketika User Blm Login */}
           <Route element={<ProtectRoute />}>
             <Route path='/profile' element={<EditProfile />} />
             <Route path='/prescription' element={<Prescription />} />
-            <Route path='/prescription/success' element={<UploadSuccess />} />
+            <Route path='/success' element={<UploadSuccess />} />
             <Route path='/cart' element={<UserCart />} />
             <Route path='/checkout' element={<Checkout />} />
           </Route>
@@ -80,22 +82,26 @@ function App() {
           {/* Protect Route Page Admin */}
           <Route element={<ProtectRouteAdmin />}>
               <Route path='/admin/dashboard' element={<DashboardPage />} />
+              <Route path='/admin/transaction' element={<TransactionPage />} />
+              <Route path='/admin/report' element={<ReportPage />} />
+              <Route path='/admin/stock_log' element={<HistoryPage />} />
           </Route>
 
-          {/* Protect Route Ketika User Sudah Login */}
-          <Route element={<ProtectRouteLogin />}>
-              <Route path='/register' element={<Register />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/resetpass/:token' element={<ResetPass />} />
-          </Route>
+        {/* Protect Route Ketika User Sudah Login */}
+        <Route element={<ProtectRouteLogin />}>
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/resetpass/:token' element={<ResetPass />} />
+        </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/email-verification/:token' element={<EmailVerification />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/transaction/:user' element={<UserOrderList/>} />
       </Routes>
       <Footer />
-    </div>
+    </div >
   );
 }
 

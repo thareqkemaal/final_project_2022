@@ -343,7 +343,7 @@ const ProductAdminPage = (props) => {
                         :
                         <div className="text-center text-txt-500 font-bold text-lg">
                             Data Not Found
-                            <img src={require('./NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com'/>
+                            <img src={require('./NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
                         </div>
                     }
                 </div>
