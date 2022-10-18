@@ -21,7 +21,7 @@ const Checkout = (props) => {
 
     const [checkoutData, setCheckoutData] = React.useState([]);
     const [allAddress, setAllAddress] = React.useState([]);
-    const [selectedAddress, setSelectedAddress] = React.useState({});
+    const [selectedAddress, setSelectedAddress] = React.useState(null);
     const [showAddressModal, setShowAddressModal] = React.useState('');
     const [showNewAddressModal, setShowNewAddressModal] = React.useState('');
     const [showEditAddressModal, setShowEditAddressModal] = React.useState('');
@@ -65,20 +65,24 @@ const Checkout = (props) => {
                 }
             });
             //console.log('user address', getAddress.data);
-            setAllAddress(getAddress.data);
-
-            let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
-            let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
-
-
-            if (selectedAddress === {}) {
-                setSelectedAddress(getPrimaryAddress);
-            } else {
-                if (getSelectedAddress === getPrimaryAddress) {
+            if(getAddress.data.length > 0){
+                setAllAddress(getAddress.data);
+    
+                let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
+                let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
+    
+    
+                if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
-                    setSelectedAddress(getSelectedAddress);
+                    if (getSelectedAddress === getPrimaryAddress) {
+                        setSelectedAddress(getPrimaryAddress);
+                    } else {
+                        setSelectedAddress(getSelectedAddress);
+                    }
                 }
+            } else {
+                setSelectedAddress(null);
             }
 
         } catch (error) {
@@ -143,7 +147,7 @@ const Checkout = (props) => {
     };
 
     const printSelectedAddress = () => {
-        if (selectedAddress !== {}) {
+        if (selectedAddress !== null) {
             return (
                 <div>
                     <p className='text-transform: uppercase'>{selectedAddress.full_address}</p>
@@ -153,7 +157,7 @@ const Checkout = (props) => {
         } else {
             return (
                 <div>
-                    You don't have any address. Please click select address and click add new address.
+                    You don't have any address. Please click select change address and click add new address.
                 </div>
             )
         }
