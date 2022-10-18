@@ -247,16 +247,11 @@ module.exports = {
               }
               if(req.files.length>0){
                 dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-                      try {
-                        await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-                      } catch (error) {
-                          return res.status(500).send({
-                            message: error
-                          })
-                      }
+                await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }else{
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }
+
               let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
               WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
   
@@ -277,9 +272,7 @@ module.exports = {
                         to: newEmail,
                         subject: 'Change Email',
                         html: template(dataEmail)
-
                       })
-  
                       res.status(200).send({
                         ...resultUser[0],
                         cart:cartUser,
@@ -287,23 +280,18 @@ module.exports = {
                         token
                       })
             }else{
+            // Jikae email tidak berubah
               let dataInput = []
               for (const key in data) {
                 dataInput.push(`${key}=${dbConf.escape(data[key])}`)
               }
               if(req.files.length>0){
                 dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-                      try {
-                        await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-                      } catch (error) {
-                          return res.status(500).send({
-                            message: error
-                          })
-                      }
-                      // Jikae email tidak berubah
+                await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }else{
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }
+              
               let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
               WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
   
@@ -323,17 +311,19 @@ module.exports = {
                         address:addressUser,
                         token
                       })
-
             }
-
-          }else{res.status(401).send({
-          status:false,
-          message:'Email not available'
-        })}
-        }else{res.status(401).send({
-          status:false,
-          message:'Username not available'
-        })}
+          }else{
+            res.status(401).send({
+              status:false,
+              message:'Email not available'
+          })
+          }
+        }else{
+            res.status(401).send({
+            status:false,
+            message:'Username not available'
+          })
+        }
       } catch (error) {
         console.log(error)
         res.status(500).send({
@@ -363,7 +353,6 @@ module.exports = {
           success:false,
           message:'Change Password Failed'
         })
-        
       }
     },
 
