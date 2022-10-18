@@ -238,7 +238,7 @@ module.exports = {
         if(availableUsername.length<=0 || data.username === isUsername[0].username){
           if(availableEmail.length<=0||data.email === isEmail[0].email){
             // jika email berubah
-            if(data.email != isEmail.email){
+            if(data.email != isEmail[0].email){
               let newEmail = data.email
               data.email=isEmail[0].email
               let dataInput = []
@@ -302,7 +302,7 @@ module.exports = {
   
                       let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
   
-                      let token = createToken({...resultUser[0],newEmail})
+                      let token = createToken({...resultUser[0]})
 
                       res.status(200).send({
                         ...resultUser[0],
