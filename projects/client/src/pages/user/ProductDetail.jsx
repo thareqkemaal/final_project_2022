@@ -22,9 +22,6 @@ const ProductDetail = () => {
     const [loading, setLoading] = React.useState(false);
     const [counter, setCounter] = React.useState(1);
     const [productDetail, setProductDetail] = React.useState([]);
-
-    const [productDetail,setProductDetail]=useState([])
-    const [counter, setCounter]=useState(0)
     const [userCartData, setUserCartData] = React.useState([]);
 
 
