@@ -248,10 +248,10 @@ module.exports = {
               if(req.files.length>0){
                 dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
+                      
               }else{
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }
-
               let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
               WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
   
@@ -279,19 +279,18 @@ module.exports = {
                         address:addressUser,
                         token
                       })
-            }else{
-            // Jikae email tidak berubah
+                    }else{
+              // Jikae email tidak berubah
               let dataInput = []
               for (const key in data) {
                 dataInput.push(`${key}=${dbConf.escape(data[key])}`)
               }
               if(req.files.length>0){
                 dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-                await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
+                  await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }else{
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               }
-              
               let resultUser=await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
               WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
   
@@ -353,6 +352,7 @@ module.exports = {
           success:false,
           message:'Change Password Failed'
         })
+        
       }
     },
 

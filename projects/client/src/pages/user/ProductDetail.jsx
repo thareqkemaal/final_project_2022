@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import LoadingComponent from '../../components/Loading';
 
 const ProductDetail = () => {
@@ -23,6 +23,12 @@ const ProductDetail = () => {
     const [counter, setCounter] = React.useState(1);
     const [productDetail, setProductDetail] = React.useState([]);
     const [userCartData, setUserCartData] = React.useState([]);
+
+    const { status } = useSelector((state) => {
+        return {
+            status: state.userReducer.status_name
+        }
+    })
 
 
     const getDetailProduct = () => {
@@ -97,21 +103,49 @@ const ProductDetail = () => {
 
                             </div>
                             <div className='hidden md:flex'>
-                                <button type='button' onClick={() => onAddToCart(val.idproduct)}
+                                <button type='button' onClick={() => {
+                                    if (status !== 'Unverified') {
+                                        onAddToCart(val.idproduct)
+                                    } else if (status === 'Unverified') {
+                                        toast.info('Verified your account first!', {
+                                            theme: "colored",
+                                            position: "top-center",
+                                            autoClose: 2000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: false,
+                                            progress: undefined,
+                                        });
+                                    }
+                                }}
                                     className='w-32 border bg-white border-main-600 hover:bg-gray-100 focus:ring-main-500 text-white rounded-lg flex justify-center py-2'>
                                     <AiOutlineShoppingCart size={20} className='fill-main-500' />
                                     <p className='text-sm text-main-500 font-Public'>Cart</p>
                                 </button>
                                 <button type='button' onClick={() => {
-                                    setLoading(true);
-                                    setTimeout(() => {
-                                        setLoading(false);
-                                        let selected = [];
-                                        selected.push({ ...val, quantity: counter });
-                                        let totalPrice = val.price * counter;
-                                        let state = { selected, totalPrice };
-                                        navigate('/checkout', { state })
-                                    }, 2000)
+                                    if (status !== 'Unverified') {
+                                        setLoading(true);
+                                        setTimeout(() => {
+                                            setLoading(false);
+                                            let selected = [];
+                                            selected.push({ ...val, quantity: counter });
+                                            let totalPrice = val.price * counter;
+                                            let state = { selected, totalPrice };
+                                            navigate('/checkout', { state })
+                                        }, 2000)
+                                    } else if (status === 'Unverified') {
+                                        toast.info('Verified your account first!', {
+                                            theme: "colored",
+                                            position: "top-center",
+                                            autoClose: 2000,
+                                            hideProgressBar: false,
+                                            closeOnClick: true,
+                                            pauseOnHover: true,
+                                            draggable: false,
+                                            progress: undefined,
+                                        });
+                                    }
                                 }}
                                     className='w-32 mx-3 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-Public'
                                 >Buy</button>
