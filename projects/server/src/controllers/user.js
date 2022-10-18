@@ -22,7 +22,7 @@ module.exports = {
       const availableUsername = await dbQuery(`Select username from user where username = ${dbConf.escape(username)}`)
       if (availableUsername.length <= 0) {
         if (availableEmail.length <= 0) {
-          let sqlInsert = await dbQuery(`INSERT INTO USER (fullname,username, email, phone_number, password)values(${dbConf.escape(fullname)}, ${dbConf.escape(username)}, ${dbConf.escape(email)},${dbConf.escape(phone_number)},${dbConf.escape(hashPassword(password))})`)
+          let sqlInsert = await dbQuery(`INSERT INTO user (fullname,username, email, phone_number, password)values(${dbConf.escape(fullname)}, ${dbConf.escape(username)}, ${dbConf.escape(email)},${dbConf.escape(phone_number)},${dbConf.escape(hashPassword(password))})`)
           if (sqlInsert.insertId) {
             let sqlGet = await dbQuery(`Select iduser, email, status_id from user where iduser=${sqlInsert.insertId}`)
             let token = createToken({ ...sqlGet[0] }, '1h')
