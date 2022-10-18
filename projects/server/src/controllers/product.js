@@ -147,34 +147,6 @@ module.exports = {
                 res.status(200).send(results)
             }
     },
-    stockHistory: (req, res, next) => {
-        let idproduct = req.params.id;
-        dbConf.query(`Select *,p.product_name from stock s join product p on s.product_id = p.idproduct where s.product_id = ${idproduct} and s.isDefault ='true';`,
-            (err, results) => {
-                if (err) {
-                    return res.status(500).send(`Middlewear stockHistory failed, error : ${err}`)
-                }
-                if (results[0].stock_unit > req.body.data.stock_unit) {
-                    dbConf.query(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan');`,
-                        (error, results) => {
-                            if (error) {
-                                return res.status(500).send(`Middlewear stockHistory failed, error : ${error}`)
-                            }
-                            next()
-                        })
-                } else if (results[0].stock_unit < req.body.data.stock_unit) {
-                    dbConf.query(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-                (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(req.body.data.stock_unit - results[0].stock_unit)},'Manual Update','Penambahan');`,
-                        (error, results) => {
-                            if (error) {
-                                return res.status(500).send(`Middlewear stockHistory failed, error : ${error}`)
-                            }
-                            next()
-                        })
-                }
-            })
-    },
     deleteProduct: (req, res) => {
         let idproduct = req.params.id;
 
