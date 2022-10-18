@@ -32,7 +32,7 @@ module.exports = {
             let token = createToken({ ...sqlGet[0] }, '1h')
             
             // Send Email
-            var source = fs.readFileSync(path.join(__dirname,'../../template-email/emailConfirmation.hbs'),'utf-8')
+            var source = fs.readFileSync(path.join(__dirname,'../template-email/emailConfirmation.hbs'),'utf-8')
             var template =Handlebars.compile(source)
             var data = {'fullname':fullname,'frontend':process.env.FE_URL,'token':token}
             await transport.sendMail({
@@ -209,7 +209,7 @@ module.exports = {
   resendVerif: async (req, res) => {
     try {
       let sqlInsert = await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
-      var source = fs.readFileSync(path.join(__dirname,'../../template-email/emailConfirmation.hbs'),'utf-8')
+      var source = fs.readFileSync(path.join(__dirname,'../template-email/emailConfirmation.hbs'),'utf-8')
       var template =Handlebars.compile(source)
       var data = {'fullname':sqlInsert[0].fullname,'frontend':process.env.FE_URL,'token':sqlInsert[0].token}
       await transport.sendMail({

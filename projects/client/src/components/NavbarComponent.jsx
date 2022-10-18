@@ -18,12 +18,12 @@ const NavbarComponent = (props) => {
 
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
-  const [disable, setDisable]=useState(false)  
+  const [disable, setDisable] = useState(false)
 
-  const {status,email}=useSelector((state)=>{
-    return{
-      status:state.userReducer.status_name,
-      email:state.userReducer.email
+  const { status, email } = useSelector((state) => {
+    return {
+      status: state.userReducer.status_name,
+      email: state.userReducer.email
     }
   })
 
@@ -31,7 +31,6 @@ const NavbarComponent = (props) => {
   let { username, role, profile_pic } = useSelector((state) => {
     return {
       username: state.userReducer.username,
-      status: state.userReducer.status,
       role: state.userReducer.role,
       profile_pic: state.userReducer.profile_pic,
     }
@@ -66,7 +65,7 @@ const NavbarComponent = (props) => {
             pauseOnHover: true,
             draggable: false,
             progress: undefined,
-        })
+          })
         })
     } catch (error) {
       toast.error(`${error.response.data.message}`, {
@@ -78,7 +77,7 @@ const NavbarComponent = (props) => {
         pauseOnHover: true,
         draggable: false,
         progress: undefined,
-    })
+      })
     }
   }
 
@@ -86,10 +85,10 @@ const NavbarComponent = (props) => {
   return (
     <div>
       {
-        status === 'Unverified'&&
-      <button className='w-full bg-red-700 hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-700' onClick={resendVerif} disabled={disable}>
-        <p className='text-center font-Public'>Click here to verified your account</p>
-      </button>
+        status === 'Unverified' &&
+        <button className='w-full bg-red-700 hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-700' onClick={resendVerif} disabled={disable}>
+          <p className='text-center font-Public'>Click here to verified your account</p>
+        </button>
       }
       <div className='shadow-md shadow-teal-50 mb-8'>
         <div className='container md:px-14 md:mx-auto'>
@@ -122,11 +121,24 @@ const NavbarComponent = (props) => {
                     <div className='relative flex items-center w-24 justify-between'>
                       {/* kemal tambah button cart */}
                       <button type='button' onClick={() => {
-                        setLoading(true);
-                        setTimeout(() => {
-                          setLoading(false);
-                          navigate('/cart');
-                        }, 1500)
+                        if (status !== 'Unverified') {
+                          setLoading(true);
+                          setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                          }, 1500)
+                        } else if (status === 'Unverified') {
+                          toast.info('Verified your account first!', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                          });
+                        }
                       }}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
                         <div className='border-0 bg-red-600 font-bold text-white text-xs rounded-full w-fit p-1 px-2 z-10 absolute left-5 bottom-5'>{cart.length}</div>
@@ -164,12 +176,25 @@ const NavbarComponent = (props) => {
                                     }, 1500)
                                   }}>Product</button>
                                   <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => {
-                                    setLoading(true);
-                                    setTimeout(() => {
-                                      setDropdown(false);
-                                      setLoading(false);
-                                      navigate(`/transaction/${username}`);
-                                    }, 1500)
+                                    if (status !== 'Unverified') {
+                                      setLoading(true);
+                                      setTimeout(() => {
+                                        setDropdown(false);
+                                        setLoading(false);
+                                        navigate(`/transaction/${username}`);
+                                      }, 1500)
+                                    } else if (status === 'Unverified') {
+                                      toast.info('Verified your account first!', {
+                                        theme: "colored",
+                                        position: "top-center",
+                                        autoClose: 2000,
+                                        hideProgressBar: false,
+                                        closeOnClick: true,
+                                        pauseOnHover: true,
+                                        draggable: false,
+                                        progress: undefined,
+                                      });
+                                    }
                                   }}>Transaction</button>
                                   <form method="POST" action="#" role="none">
                                     <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
@@ -204,7 +229,7 @@ const NavbarComponent = (props) => {
           </div>
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
       <LoadingComponent loading={loading} className='z-50' />
     </div>
   )

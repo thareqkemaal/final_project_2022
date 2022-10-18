@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const ProductPage = (props) => {
     const [data, setData] = React.useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -28,6 +28,12 @@ const ProductPage = (props) => {
     const dispatch = useDispatch();
 
     const [userCartData, setUserCartData] = React.useState([]);
+
+    const { status } = useSelector((state) => {
+        return {
+            status: state.userReducer.status_name
+        }
+    })
 
 
     const getProduct = () => {
@@ -74,9 +80,9 @@ const ProductPage = (props) => {
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
-                return <div key={val.idproduct}  className="row-span-3">
+                return <div key={val.idproduct} className="row-span-3">
                     <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-auto" >
-                        <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} onClick={()=>navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)} />
+                        <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} onClick={() => navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)} />
                         <div className="" >
                             {val.product_name.length <= 21
                                 ?
@@ -101,9 +107,39 @@ const ProductPage = (props) => {
                         {
                             val.product_name.length <= 21
                                 ? <button type="button" className="mb-3 mt-7 md:mt-9 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => {
+                                        if (status !== 'Unverified') {
+                                            onAddToCart(val.idproduct)
+                                        } else if (status === 'Unverified') {
+                                            toast.info('Verified your account first!', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        }
+                                    }}>Keranjang</button>
                                 : <button type="button" className="my-3 md:my-5 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => {
+                                        if (status !== 'Unverified') {
+                                            onAddToCart(val.idproduct)
+                                        } else if (status === 'Unverified') {
+                                            toast.info('Verified your account first!', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        }
+                                    }}>Keranjang</button>
                         }
 
                     </div>
@@ -148,11 +184,11 @@ const ProductPage = (props) => {
     }, [])
 
     const onResetFilter = () => {
-        setLoading(false);  
-        setSort(''); 
-        setDefaultSort('Terpopuler'); 
-        setFilterName(''); 
-        setQuery(10) 
+        setLoading(false);
+        setSort('');
+        setDefaultSort('Terpopuler');
+        setFilterName('');
+        setQuery(10)
     }
 
     const printCategory = () => {
@@ -160,12 +196,12 @@ const ProductPage = (props) => {
             if (val.idcategory != idPage) {
                 return <div key={val.idcategory}>
                     {/* Desktop */}
-                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter()}} className="hidden md:flex text-md mb-2 text-txt-500">
+                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="hidden md:flex text-md mb-2 text-txt-500">
                         {val.category_name}
                     </button>
                     {/* Mobile */}
                     <li className="mr-2 md:hidden">
-                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter()}} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
                             {val.category_name}
                         </button>
                     </li>
@@ -293,7 +329,7 @@ const ProductPage = (props) => {
 
         <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
             <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
-            <button className="flex-none" onClick={() => { setIdPage(undefined); navigate('/product');  onResetFilter() }}>Obat</button>
+            <button className="flex-none" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }}>Obat</button>
         </div>
 
         <div className="grid grid-flow-col gap-4">
@@ -359,7 +395,7 @@ const ProductPage = (props) => {
                         <form>
                             <div className="flex">
                                 <div className="relative w-full">
-                                    <input id="search" onChange={(e) => setFilterName(e.target.value) } type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
+                                    <input id="search" onChange={(e) => setFilterName(e.target.value)} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
                                     <button onClick={() => { setLoading(false); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                         <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         <span className="sr-only">Search</span>
@@ -414,7 +450,7 @@ const ProductPage = (props) => {
                         </div>
                     </div>
 
-                    <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700"/>
+                    <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
                     <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
                         {printProduct()}
@@ -430,7 +466,7 @@ const ProductPage = (props) => {
                 </div>
             </div>
         </div>
-        <ToastContainer/>
+        <ToastContainer />
     </div>
 }
 
