@@ -14,14 +14,16 @@ import { useDispatch } from 'react-redux';
 import LoadingComponent from '../../components/Loading';
 
 const ProductDetail = () => {
+
     const { search } = useLocation()
 
     const navigate = useNavigate()
     const dispatch = useDispatch();
-    const [userCartData, setUserCartData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [counter, setCounter] = React.useState(1);
     const [productDetail, setProductDetail] = React.useState([]);
+    const [userCartData, setUserCartData] = React.useState([]);
+
 
     const getDetailProduct = () => {
         axios.post(API_URL + `/api/product/getproductadmin${search.split('&')[0]}`, {
@@ -60,41 +62,44 @@ const ProductDetail = () => {
                 <div>
                     <div className='py-5 divide-y divide-[#F8F8F8] md:grid md:grid-cols-3' key={val.idproduct}>
                         <div className='bg-white  max-w-full max-h-[184-x] lg:px-20'>
-                            <div className='w-full h-[200px] top-[100px]'>
-                                <img src={val.picture} className='absolute w-[206.52px] h-[159.34px] right-114.84[px] left-[84.63px] md:left-[70.63px] lg:left-[160px] ' />
+                            <div className='w-full h-[200px] top-[100px] shadow-lg rounded-2xl mb-5'>
+                                <img src={val.picture} className='w-[206.52px] h-[159.34px] mx-auto ' />
                             </div>
-                            <div className='hidden  mx-auto px-3 md:grid grid-cols-2 gap-2'>
-                                <button className='bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-full py-[5px] font-Public text-sm'>Chat admin</button>
-                                <button className='bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-full py-[5px] font-Public text-sm'>Bagikan</button>
+                            <div className='hidden mx-auto md:flex justify-start'>
+                                <button className='bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-full py-[5px] w-36 h-12 font-Public text-sm leading-4'>Chat admin</button>
+                                <button className='bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-full py-[5px] w-36 h-12 ml-2 font-Public text-sm leading-4'>Bagikan</button>
                             </div>
                         </div>
-                        <div className='py-5 px-5 text-xs divide-y divide-[#F8F8F8] md:col-span-2 md:px-10'>
+                        <div className=' px-5 text-xs divide-y divide-[#F8F8F8] md:col-span-2 md:px-10'>
                             <div>
-                                <p className='font-Public text-blue-900 '>{val.product_name}</p>
-                                <p className='text-sm text-blue-900 font-Public'>{index.map(e => desc[e])}</p>
-                                <p className='text-base bg-gradient-to-t from-[#000C36] via-[#2B4179] to-[#7987BC] bg-clip-text text-transparent font-Public'>Rp. {val.price.toLocaleString('ID')}</p>
-                                <p className='font-Public text-blue-900'>Available Stock = {val.stock_unit}</p>
+                                <p className='font-Public text-txt-500 text-sm leading-5 font-bold '>{val.product_name}</p>
+                                <p className='text-xl text-txt-500 font-Public font-normal leading-7'>{index.map(e => desc[e])}</p>
+                                <p className='text-2xl leading-7 font-bold bg-gradient-to-t from-[#000C36] via-[#2B4179] to-[#7987BC] bg-clip-text text-transparent font-Public'>Rp. {val.price.toLocaleString('ID')}</p>
+                                {/* <p className='font-Public text-txt-500'>Available Stock = {val.stock_unit}</p> */}
                             </div>
-                            <div className=' bg-gray-100  w-32 h-9 mt-5 rounded-sm mb-3'>
-                                <div className='flex justify-between px-2 my-2'>
-                                    <ImMinus size={20} className='fill-main-500 ' onClick={() => {
-                                        if (counter >= 2) {
-                                            setCounter(counter - 1)
-                                        }
-                                    }} />
-                                    <div className='font-Public text-base text-center bg-white w-8 h-full text-main-500'>{counter}</div>
-                                    <ImPlus size={20} className='fill-main-500' onClick={() => {
-                                        if (counter < val.stock_unit) {
-                                            setCounter(counter + 1)
-                                        }
-                                    }} />
+                            <div className='flex'>
+                                <div className=' bg-[#F6FAFB]  w-32 h-9 mt-5 rounded-sm mb-3'>
+                                    <div className='flex justify-between px-2'>
+                                        <ImMinus size={20} className='fill-main-500 my-2' onClick={() => {
+                                            if (counter >= 2) {
+                                                setCounter(counter - 1)
+                                            }
+                                        }} />
+                                        <div className='font-Public text-base leading-5 text-center w-14 h-8 text-main-500 my-2 font-bold'>{counter}</div>
+                                        <ImPlus size={20} className='fill-main-500 my-2' onClick={() => {
+                                            if (counter < val.stock_unit) {
+                                                setCounter(counter + 1)
+                                            }
+                                        }} />
+                                    </div>
                                 </div>
+                                <div className='mt-7 font-normal text-xs leading-5 text-[#737A8D] ml-2 '> Available Stock {val.stock_unit}</div>
 
                             </div>
                             <div className='hidden md:flex'>
                                 <button type='button' onClick={() => onAddToCart(val.idproduct)}
                                     className='w-32 border bg-white border-main-600 hover:bg-gray-100 focus:ring-main-500 text-white rounded-lg flex justify-center py-2'>
-                                    <AiOutlineShoppingCart size={20} className='fill-teal-500' />
+                                    <AiOutlineShoppingCart size={20} className='fill-main-500' />
                                     <p className='text-sm text-main-500 font-Public'>Cart</p>
                                 </button>
                                 <button type='button' onClick={() => {
@@ -118,17 +123,17 @@ const ProductDetail = () => {
                                     style="underline"
                                 >
                                     <Tabs.Item title='Description'>
-                                        <div className='text-justify text-sm font-Public text-[#4F618E]'>
+                                        <div className='text-justify text-sm font-normal leading-5 text-[#4F618E]'>
                                             {val.description}
                                         </div>
                                     </Tabs.Item>
                                     <Tabs.Item title='How To Use'>
-                                        <div className='text-justify text-sm font-Public text-[#4F618E]'>
+                                        <div className='text-justify text-sm font-normal leading-5 text-[#4F618E]'>
                                             {val.aturan_pakai}
                                         </div>
                                     </Tabs.Item>
                                     <Tabs.Item title='Dosis'>
-                                        <div className='text-justify text-sm font-Public text-[#4F618E]'>
+                                        <div className='text-justify text-sm font-normal leading-5 text-[#4F618E]'>
                                             {val.dosis}
                                         </div>
                                     </Tabs.Item>
@@ -255,7 +260,7 @@ const ProductDetail = () => {
         <div>
             <div className=' container mx-auto md:px-10'>
                 {printProductDetail()}
-                <p className='mt-5 text-sm font-Public font-bold text-blue-900'>Product Terkait</p>
+                <p className='mt-28 text-sm font-Public font-bold text-txt-500'>Product Terkait</p>
                 <div className='bg-gradient-to-t from-teal-50 to-white'>
                     <ProductCategory
                         id={search.split('&')[1]}

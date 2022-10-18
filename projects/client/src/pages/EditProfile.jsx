@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Tabs } from 'flowbite-react'
 import { MdDashboard } from 'react-icons/md';
-import { BsFillPencilFill, BsEye } from 'react-icons/bs';
 import { HiUserCircle, HiAdjustments } from 'react-icons/hi';
 import { useSelector, useDispatch } from 'react-redux'
 import { API_URL } from '../helper'
@@ -13,7 +12,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import AddressComponent from '../components/AdressComponent';
 import ChangePassword from '../components/ChangePassword';
-import { compareAsc, format } from 'date-fns'
+import { format } from 'date-fns'
+import Loading from '../components/Loading';
 
 
 const EditProfile = () => {
@@ -22,6 +22,10 @@ const EditProfile = () => {
     
     const dispatch = useDispatch()
     const hiddenFileInput = useRef(null)
+
+    const [disabled,setDisabled]=useState(true)
+    const [loading, setLoading]=useState(false)
+
     
     let{fullname,username,email,phone_number, profile_pic, gender, birthdate}=useSelector((state)=>{
         return{
@@ -46,58 +50,97 @@ const EditProfile = () => {
     const[newProfilPict, setNewProfilPict]=useState('')
 
     useEffect(()=>{
-        setInput({
-            fullname: fullname,
-            username:username,
-            email:email,
-            gender:gender?gender:'select gender',
-            birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
-            phone_number: phone_number,
-        })
+            setInput({
+                fullname: fullname,
+                username:username,
+                email:email,
+                gender:gender?gender:'select gender',
+                birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
+                phone_number: phone_number,
+            })
     },[fullname,username,email,phone_number, gender, birthdate])
-    
-    
+
     const updateProfile = ()=>{
+        setLoading(true)
         let medcarelog = localStorage.getItem('medcarelog')
         let formData = new FormData()
-        formData.append('data',JSON.stringify(input))
-        formData.append('images',newProfilPict)
-        axios.patch(API_URL+`/api/user/edit-profile`,formData,{
-            headers:{
-                'Authorization': `Bearer ${medcarelog}`
-            }
-        })
-        .then((res)=>{
-            dispatch(UpdateProfile(res.data))
-            toast.success('Success', {
-                theme: "colored",
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
+
+        // if(input.email === email){
+            formData.append('data',JSON.stringify(input))
+            formData.append('images',newProfilPict)
+            axios.patch(API_URL+`/api/user/edit-profile`,formData,{
+                headers:{
+                    'Authorization': `Bearer ${medcarelog}`
+                }
             })
-        })
-        .catch((err)=>{
-            toast.error(`${err.response.data.message}`, {
-                theme: "colored",
-                position: "top-center",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
+            .then((res)=>{
+                setLoading(false)
+                dispatch(UpdateProfile(res.data))
+                if(email!= input.email){
+                    toast.info('Success to change your email cek your inbox ', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    })
+                }else{
+                    toast.success('Success', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    })
+                }
+                setDisabled(true)
+                if(email != input.email){
+                    setInput({
+                        fullname: fullname,
+                        username:username,
+                        email:email,
+                        gender:gender?gender:'select gender',
+                        birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
+                        phone_number: phone_number,
+                        })
+                }
             })
-        })
+            .catch((err)=>{
+                toast.error(`${err.response.data.message}`, {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                })
+            })
     }
 
     const onChange = (e)=>{
-        console.log(e.target.value)
         const {value,name}=e.target
         setInput({...input, [name]:value})
+    }
+
+    const onCancel = ()=>{
+        setInput({
+            fullname:fullname,
+            username:username,
+            email:email,
+            gender:gender,
+            birthdate:birthdate,
+            phone_number: phone_number
+        })
+        setNewProfilPict('')
+        setDisabled(true)
     }
 
     const handleClick = () => {
@@ -106,7 +149,16 @@ const EditProfile = () => {
 
     const onChangeNewProfilePic = (files) => {
         if(files.size>=1000000 ){
-            return alert('Size kebesaran')
+            return toast.error(`Max 1 Mb`, {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+            })
         }
         switch(files.type.split('/')[1].toLowerCase()){
             case 'jpg':
@@ -127,7 +179,7 @@ const EditProfile = () => {
     }
 
     return (
-        <div>
+        <div className='container mx-auto px-16'>
             <Tabs.Group
                 aria-label="Tabs with icons"
                 style="underline"
@@ -164,47 +216,54 @@ const EditProfile = () => {
                                 />
                                 </>
                             }
-                            <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} />
+                            <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} disabled={disabled} className='disabled:cursor-not-allowed' />
                         </div>
                         <form>
-                            {/* Tolong pakai yang tidak ada command di atas label nya pak */}
                             
                             {/* fullname */}
                             <label className=' block mb-3 '>
                                 <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='fullname' onChange={onChange} defaultValue={input.fullname} />
+                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='fullname' onChange={onChange} disabled={disabled} value={input.fullname} />
                             </label>
                             {/* Username */}
                             <label className=' block mb-3 '>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Username</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='username' defaultValue={input.username} onChange={onChange} />
+                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='username' value={input.username.trim()} disabled={disabled}  onChange={onChange} />
                             </label>
                             {/* Email */}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Email</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public' name='email' defaultValue={input.email} onChange={onChange} />
+                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='email' value={input.email} disabled={disabled}  onChange={onChange} />
                             </label>
                             {/* Phone */}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Phone Number</span>
-                                <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a })} />
+                                <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a })} disabled={disabled} className='disabled:text-gray-600'  />
                             </label>
                             {/* Birth date */}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Birth Date</span>
-                                <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public' defaultValue={input.birthdate} name='birthdate' onChange={onChange} type='date' />
+                                <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' value={input.birthdate} name='birthdate' onChange={onChange} disabled={disabled}  type='date' />
                             </label>
                             {/* gender*/}
                             <label className='block mb-3'>
                                 <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Gender</span>
-                                <select onChange={onChange} value={input.gender} name='gender' className='h-10 rounded-md font-Public'>
+                                <select onChange={onChange} value={input.gender} disabled={disabled}  name='gender' className='h-10 rounded-md font-Public disabled:text-gray-600 disabled:cursor-not-allowed'>
                                     <option disabled value='select gender' className='font-Public'>Select Gender</option>
                                     <option value='male' className='font-Public'>Male</option>
                                     <option value='female' className='font-Public'>Female</option>
                                 </select>
                             </label>
                         </form>
-                        <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={updateProfile}>Save</button>
+                        {
+                            disabled ?
+                            <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={()=>setDisabled(false)}>Edit</button>
+                            :
+                            <>
+                            <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={updateProfile}>Save</button>
+                            <button className=' mt-5 border bg-red-500 hover:bg-red-700 rounded-md py-2 ml-2 text-white px-10 font-Public' onClick={onCancel}>Cancel</button>
+                            </>
+                        }
                     </div>
                 </Tabs.Item>
                 <Tabs.Item
@@ -222,6 +281,13 @@ const EditProfile = () => {
                     <AddressComponent />
                 </Tabs.Item>
             </Tabs.Group>
+            {
+            loading &&
+        <div className='absolute top-1/3 right-[45%]'>
+            <Loading loading={loading}/>
+        </div>
+
+        }
             <ToastContainer />
         </div>
     )

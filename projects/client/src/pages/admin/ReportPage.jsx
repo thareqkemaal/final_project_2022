@@ -1,6 +1,6 @@
 import React from 'react'
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS } from 'chart.js/auto'
+// import { Chart as ChartJS } from 'chart.js/auto'
 import axios from 'axios'
 import { API_URL } from '../../helper';
 import AdminComponent from '../../components/AdminComponent'
