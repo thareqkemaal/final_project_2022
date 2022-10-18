@@ -684,7 +684,7 @@ const TransactionPages = () => {
           </div>
           <div>
             <div className={`${transaction.length == 0 ? 'items-center text-center mt-20' : 'hidden'}`}>
-              <img src={background} className='mx-auto my-auto items-center w-[50%] h-auto rounded-full'  alt='backgroundimage' />
+              <img src={background} className='mx-auto my-auto items-center w-[50%] h-auto rounded-full' alt='backgroundimage' />
               <p className="sm:text-3xl font-bold mt-5 mb-3 text-txt-500 mx-auto"> No Order Yet  </p>
             </div>
             {printTrans()}
@@ -1058,7 +1058,7 @@ const TransactionPages = () => {
           </div>
           <div className="">
             <div className='items-center justify-center'>
-              <img src={`${modalNote == 'success' || modalNote == 'gopayment' ? accept : modalNote == 'pickup' ? pickup : cancel}`} className={`${modalNote == 'pickup' ? 'w-md' : 'max-w-md'} h-md mx-auto`}/>
+              <img src={`${modalNote == 'success' || modalNote == 'gopayment' ? accept : modalNote == 'pickup' ? pickup : cancel}`} className={`${modalNote == 'pickup' ? 'w-md' : 'max-w-md'} h-md mx-auto`} />
               <p className='sm:text-3xl font-bold pb-3 text-center'>{`${modalNote == 'success' ? 'Order Processing Success' : modalNote == 'gopayment' ? 'Success Making Order, Waiting for User Payment' : modalNote == 'pickup' ? 'Courier Will Pickup your Order' : cancelReason == 'Less Payment Amount' ? 'Status back to WAITING FOR PAYMENT' : 'Order Has Been Canceled'}`}</p>
             </div>
           </div>
