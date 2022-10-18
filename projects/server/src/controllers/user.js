@@ -32,7 +32,7 @@ module.exports = {
             let token = createToken({ ...sqlGet[0] }, '1h')
             
             // Send Email
-            var source = fs.readFileSync(path.join(__dirname,'../../template-email/emailConfirmation.hbs'),'utf-8')
+            var source = fs.readFileSync(path.join(__dirname,'../template-email/emailConfirmation.hbs'),'utf-8')
             var template =Handlebars.compile(source)
             var data = {'fullname':fullname,'frontend':process.env.FE_URL,'token':token}
             await transport.sendMail({
@@ -209,7 +209,7 @@ module.exports = {
   resendVerif: async (req, res) => {
     try {
       let sqlInsert = await dbQuery(`Select iduser,fullname,email,token, status_id From user WHERE email='${req.query.email}'`)
-      var source = fs.readFileSync(path.join(__dirname,'../../template-email/emailConfirmation.hbs'),'utf-8')
+      var source = fs.readFileSync(path.join(__dirname,'../template-email/emailConfirmation.hbs'),'utf-8')
       var template =Handlebars.compile(source)
       var data = {'fullname':sqlInsert[0].fullname,'frontend':process.env.FE_URL,'token':sqlInsert[0].token}
       await transport.sendMail({
@@ -269,7 +269,7 @@ module.exports = {
                       let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
   
                       let token = createToken({...resultUser[0],newEmail})
-                      var source = fs.readFileSync(path.join(__dirname,'../../template-email/changeEmailConfirmation.hbs'),'utf-8')
+                      var source = fs.readFileSync(path.join(__dirname,'../template-email/changeEmailConfirmation.hbs'),'utf-8')
                       var template =Handlebars.compile(source)
                       var dataEmail = {'fullname':resultUser[0].fullname,'fe_url':process.env.FE_URL,'token':token}
                       await transport.sendMail({
@@ -372,7 +372,7 @@ module.exports = {
       let userEmail = await dbQuery(`Select iduser, email,username from user where email = ${dbConf.escape(req.body.email)} `)
       if(userEmail[0].email){
         let token = createToken({ ...userEmail[0]})
-        var source = fs.readFileSync(path.join(__dirname,'../../template-email/resetPasswordConfirmation.hbs'),'utf-8')
+        var source = fs.readFileSync(path.join(__dirname,'../template-email/resetPasswordConfirmation.hbs'),'utf-8')
         var template =Handlebars.compile(source)
         var data = {'username':userEmail[0].username,'fe_url':process.env.FE_URL,'token':token}
         await transport.sendMail({
