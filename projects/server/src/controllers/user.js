@@ -267,35 +267,43 @@ module.exports = {
                       c.product_id, c. quantity, p.price*c.quantity as total_price from user u
                       JOIN cart c ON u.iduser=c.user_id
                       JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
+ 
+                      let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
+  
+                      let token = createToken({...resultUser[0],newEmail})
+                      var source = fs.readFileSync(path.join(__dirname,'../template-email/changeEmailConfirmation.hbs'),'utf-8')
+                      var template =Handlebars.compile(source)
+                      var dataEmail = {'fullname':resultUser[0].fullname,'fe_url':process.env.FE_URL,'token':token}
+                      await transport.sendMail({
+                        from: 'MEDCARE ADMIN',
+                        to: newEmail,
+                        subject: 'Change Email',
+                        html: template(dataEmail)
 
-            let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
-
-            let token = createToken({ ...resultUser[0], newEmail })
-            var source = fs.readFileSync(path.join(__dirname, '../template-email/changeEmailConfirmation.hbs'), 'utf-8')
-            var template = Handlebars.compile(source)
-            var dataEmail = { 'fullname': resultUser[0].fullname, 'fe_url': process.env.FE_URL, 'token': token }
-            await transport.sendMail({
-              from: 'MEDCARE ADMIN',
-              to: newEmail,
-              subject: 'Change Email',
-              html: template(dataEmail)
-
-            })
-
-            res.status(200).send({
-              ...resultUser[0],
-              cart: cartUser,
-              address: addressUser,
-              token
-            })
-          } else {
-            let dataInput = []
-            for (const key in data) {
-              dataInput.push(`${key}=${dbConf.escape(data[key])}`)
-            }
-            if (req.files.length > 0) {
-              dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-              try {
+                      })
+  
+                      res.status(200).send({
+                        ...resultUser[0],
+                        cart:cartUser,
+                        address:addressUser,
+                        token
+                      })
+            }else{
+              let dataInput = []
+              for (const key in data) {
+                dataInput.push(`${key}=${dbConf.escape(data[key])}`)
+              }
+              if(req.files.length>0){
+                dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
+                      try {
+                        await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
+                      } catch (error) {
+                          return res.status(500).send({
+                            message: error
+                          })
+                      }
+                      // Jikae email tidak berubah
+              }else{
                 await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
               } catch (error) {
                 return res.status(500).send({

@@ -13,7 +13,7 @@ const ProtectRoute = () => {
 
     console.log(iduser)
 
-    if(role === 'User'){
+    if(role === 'User' || !iduser){
         return navigate('/')
     }
 
