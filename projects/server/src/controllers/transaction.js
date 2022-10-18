@@ -82,7 +82,7 @@ module.exports = {
             filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
           }
         }
-        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as date_order from transaction 
+        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as dateOrder from transaction 
           ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
         let transaction = await dbQuery(sqlGet);
         if (transaction) {
@@ -193,14 +193,14 @@ module.exports = {
           console.log(req.body);
           let update = req.body.update;
           await dbQuery(`UPDATE transaction SET status_id = 7, note = ${dbConf.escape(update.note)} WHERE idtransaction = ${dbConf.escape(update.id)};`)
-          
+
           // pengembalian stock (stock awal + quantity)
           let updateStock = req.body.stock;
           updateStock.forEach(async (val, idx) => {
             console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
             await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
           });
-          
+
           let history = [];
           updateStock.forEach((val, idx) => {
             history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
@@ -210,7 +210,7 @@ module.exports = {
 
           await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
           ${history.join(', ')};`)
-        } else if (req.body.acceptDeliv){
+        } else if (req.body.acceptDeliv) {
           console.log(req.body)
           await dbQuery(`UPDATE transaction SET status_id = 9 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         }

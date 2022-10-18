@@ -108,10 +108,12 @@ const EditProfile = () => {
                         gender:gender?gender:'select gender',
                         birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
                         phone_number: phone_number,
-                        })
+                    })
+                    setLoading(false)
                 }
             })
             .catch((err)=>{
+                setLoading(false)
                 toast.error(`${err.response.data.message}`, {
                     theme: "colored",
                     position: "top-center",

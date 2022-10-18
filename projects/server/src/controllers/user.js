@@ -15,6 +15,7 @@ module.exports = {
       res.status(500).send(error)
     }
   },
+
   register: async (req, res) => {
     try {
       let { fullname, username, email, phone_number, password } = req.body;
@@ -34,7 +35,6 @@ module.exports = {
             var source = fs.readFileSync(path.join(__dirname, '../template-email/emailConfirmation.hbs'), 'utf-8')
             var template = Handlebars.compile(source)
             var data = { 'fullname': fullname, 'frontend': process.env.FE_URL, 'token': token }
-
             await transport.sendMail({
               from: 'MEDCARE ADMIN',
               to: sqlGet[0].email,
@@ -117,6 +117,7 @@ module.exports = {
       res.status(500).send(error)
     }
   },
+
   keeplogin: async (req, res) => {
     try {
       let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
@@ -148,7 +149,9 @@ module.exports = {
       console.log('ERROR QUERY SQL :', error);
       res.status(500).send(error)
     }
+
   },
+
   verification: async (req, res) => {
     let isToken = await dbQuery(`SELECT * FROM user where token =${dbConf.escape(req.token)}`)
     try {
@@ -209,7 +212,6 @@ module.exports = {
       var source = fs.readFileSync(path.join(__dirname, '../template-email/emailConfirmation.hbs'), 'utf-8')
       var template = Handlebars.compile(source)
       var data = { 'fullname': sqlInsert[0].fullname, 'frontend': process.env.FE_URL, 'token': sqlInsert[0].token }
-
       await transport.sendMail({
         from: 'MEDCARE ADMIN',
         to: sqlInsert[0].email,
@@ -236,7 +238,7 @@ module.exports = {
       if (availableUsername.length <= 0 || data.username === isUsername[0].username) {
         if (availableEmail.length <= 0 || data.email === isEmail[0].email) {
           // jika email berubah
-          if (data.email != isEmail.email) {
+          if (data.email != isEmail[0].email) {
             let newEmail = data.email
             data.email = isEmail[0].email
             let dataInput = []
@@ -245,13 +247,8 @@ module.exports = {
             }
             if (req.files.length > 0) {
               dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-              try {
-                await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-              } catch (error) {
-                return res.status(500).send({
-                  message: error
-                })
-              }
+              await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
+
             } else {
               await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
             }
@@ -275,9 +272,7 @@ module.exports = {
               to: newEmail,
               subject: 'Change Email',
               html: template(dataEmail)
-
             })
-
             res.status(200).send({
               ...resultUser[0],
               cart: cartUser,
@@ -285,95 +280,82 @@ module.exports = {
               token
             })
           } else {
+            // Jikae email tidak berubah
             let dataInput = []
             for (const key in data) {
               dataInput.push(`${key}=${dbConf.escape(data[key])}`)
             }
             if (req.files.length > 0) {
               dataInput.push(`profile_pic=${dbConf.escape(`/img_profile${req.files[0].filename}`)}`)
-              try {
-                await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-              } catch (error) {
-                return res.status(500).send({
-                  message: error
-                })
-              }
-              // Jikae email tidak berubah
+              await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
             } else {
               await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-            } catch (error) {
-              return res.status(500).send({
-                message: error
-              })
             }
-            // Jikae email tidak berubah
-          } else {
-          await dbQuery(`UPDATE user set ${dataInput.join(',')}where iduser =${req.dataToken.iduser}`)
-        }
-        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+            let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
               WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
 
-        let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
+            let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
                       p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
                       c.product_id, c. quantity, p.price*c.quantity as total_price from user u
                       JOIN cart c ON u.iduser=c.user_id
                       JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
-        let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
+            let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
 
-        let token = createToken({ ...resultUser[0], newEmail })
+            let token = createToken({ ...resultUser[0] })
 
-        res.status(200).send({
-          ...resultUser[0],
-          cart: cartUser,
-          address: addressUser,
-          token
+            res.status(200).send({
+              ...resultUser[0],
+              cart: cartUser,
+              address: addressUser,
+              token
+            })
+          }
+        } else {
+          res.status(401).send({
+            status: false,
+            message: 'Email not available'
+          })
+        }
+      } else {
+        res.status(401).send({
+          status: false,
+          message: 'Username not available'
         })
       }
-    } else {
-      res.status(401).send({
-        status: false,
-        message: 'Email not available'
+    } catch (error) {
+      console.log(error)
+      res.status(500).send({
+        message: error
       })
     }
-} else {
-  res.status(401).send({
-    status: false,
-    message: 'Username not available'
-  })
-}
-    } catch (error) {
-  console.log(error)
-  res.status(500).send({
-    message: error
-  })
-}
   },
 
-changePass: async (req, res) => {
-  try {
-    let { password, newPassword } = req.body
-    userPass = await dbQuery(`Select * from user where password=${dbConf.escape(hashPassword(password))}`)
-    if (userPass.length > 0) {
-      await dbQuery(`UPDATE user set password=${dbConf.escape(hashPassword(newPassword))} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-      res.status(200).send({
-        success: true,
-        message: 'Change Password Success'
-      })
-    } else {
-      res.status(401).send({
+  changePass: async (req, res) => {
+    try {
+      let { password, newPassword } = req.body
+      userPass = await dbQuery(`Select * from user where password=${dbConf.escape(hashPassword(password))}`)
+      if (userPass.length > 0) {
+        await dbQuery(`UPDATE user set password=${dbConf.escape(hashPassword(newPassword))} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        res.status(200).send({
+          success: true,
+          message: 'Change Password Success'
+        })
+      } else {
+        res.status(401).send({
+          success: false,
+          message: 'Please Input Correct Password'
+        })
+      }
+    } catch (error) {
+      res.status(500).send({
         success: false,
-        message: 'Please Input Correct Password'
+        message: 'Change Password Failed'
       })
-    }
-  } catch (error) {
-    res.status(500).send({
-      success: false,
-      message: 'Change Password Failed'
-    })
 
-  }
-},
+    }
+  },
+
   sendReset: async (req, res) => {
     try {
       let userEmail = await dbQuery(`Select iduser, email,username from user where email = ${dbConf.escape(req.body.email)} `)
@@ -408,63 +390,63 @@ changePass: async (req, res) => {
     }
   },
 
-    resetPass: async (req, res) => {
-      try {
-        let dataUser = await dbQuery(`Select * from user where iduser=${dbConf.escape(req.dataToken.iduser)}`)
-        if (dataUser.length > 0) {
-          await dbQuery(`UPDATE user set password=${dbConf.escape(hashPassword(req.body.password))} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-          res.status(200).send({
-            success: true,
-            message: 'Reset Password Success'
-          })
-        } else {
-          res.status(401).send({
-            success: false,
-            message: 'error'
-          })
-
-        }
-
-      } catch (error) {
-        console.log(error)
-        res.status(500).send(error)
+  resetPass: async (req, res) => {
+    try {
+      let dataUser = await dbQuery(`Select * from user where iduser=${dbConf.escape(req.dataToken.iduser)}`)
+      if (dataUser.length > 0) {
+        await dbQuery(`UPDATE user set password=${dbConf.escape(hashPassword(req.body.password))} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        res.status(200).send({
+          success: true,
+          message: 'Reset Password Success'
+        })
+      } else {
+        res.status(401).send({
+          success: false,
+          message: 'error'
+        })
 
       }
-    },
-      changeEmail: async (req, res) => {
-        try {
-          if (req.dataToken.iduser) {
-            await dbQuery(`UPDATE user set email=${dbConf.escape(req.dataToken.newEmail)} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-            let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
+
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error)
+
+    }
+  },
+
+  changeEmail: async (req, res) => {
+    try {
+      if (req.dataToken.iduser) {
+        await dbQuery(`UPDATE user set email=${dbConf.escape(req.dataToken.newEmail)} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
         WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
-            let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
+        let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
         p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
         c.product_id, c. quantity, p.price*c.quantity as total_price from user u
         JOIN cart c ON u.iduser=c.user_id
         JOIN product p ON p.idproduct = c.product_id WHERE c.user_id = ${dbConf.escape(resultUser[0].iduser)}`)
 
-            let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
+        let addressUser = await dbQuery(`Select * from address a JOIN status s on a.status_id = s.idstatus where a.user_id=${dbConf.escape(resultUser[0].iduser)}`)
 
-            let token = createToken({ ...resultUser[0] })
-            res.status(200).send({
-              ...resultUser[0],
-              cart: cartUser,
-              address: addressUser,
-              token
-            })
+        let token = createToken({ ...resultUser[0] })
+        res.status(200).send({
+          ...resultUser[0],
+          cart: cartUser,
+          address: addressUser,
+          token
+        })
 
-          } else {
-            res.status(401).send({
-              success: false,
-              message: 'Change Email denied'
-            })
-          }
+      } else {
+        res.status(401).send({
+          success: false,
+          message: 'Change Email denied'
+        })
+      }
 
-        } catch (error) {
-          console.log(error)
-        }
-      },
-
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
 
 }

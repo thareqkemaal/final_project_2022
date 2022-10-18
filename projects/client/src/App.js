@@ -71,9 +71,6 @@ function App() {
       <Routes>
         <Route path='/' element={<LandingPages />} />
         {/* Protect Route Ketika User Blm Login */}
-        <Route path='/admin/transaction' element={<TransactionPage />} />
-        <Route path='/admin/report' element={<ReportPage />} />
-        <Route path='/admin/stock_log' element={<HistoryPage />} />
         <Route element={<ProtectRoute />}>
           <Route path='/profile' element={<EditProfile />} />
           <Route path='/prescription' element={<Prescription />} />
@@ -85,6 +82,9 @@ function App() {
         {/* Protect Route Page Admin */}
         <Route element={<ProtectRouteAdmin />}>
           <Route path='/admin/dashboard' element={<DashboardPage />} />
+          <Route path='/admin/transaction' element={<TransactionPage />} />
+          <Route path='/admin/report' element={<ReportPage />} />
+          <Route path='/admin/stock_log' element={<HistoryPage />} />
         </Route>
 
         {/* Protect Route Ketika User Sudah Login */}
