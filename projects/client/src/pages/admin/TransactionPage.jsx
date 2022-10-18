@@ -101,7 +101,6 @@ const TransactionPages = () => {
       .then((res) => {
         console.log(res.data)
         setProduct(res.data)
-        setTimeout(() => setLoading(false), 1000)
       })
       .catch((error) => {
         console.log('Print product error', error);
@@ -124,7 +123,7 @@ const TransactionPages = () => {
           <div className='ml-5 grid grid-cols-5 gap-0'>
             <div className='flex col-span-2'>
               <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 overflow-hidden mt-3'>
-                <img class="w-full h-auto rounded my-3" src={val.prescription_pic ? val.prescription_pic : val.detail[0].product_image} alt="image description" />
+                <img class="w-full h-auto rounded my-3" src={val.prescription_pic ? val.prescription_pic.includes('https') ? val.prescription_pic : API_URL + val.prescription_pic : val.detail[0].product_image.includes('https') ? val.detail[0].product_image : API_URL + val.detail[0].product_image} alt="image description" />
               </div>
               <div className='my-3 mx-5'>
                 <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
@@ -134,11 +133,14 @@ const TransactionPages = () => {
                     :
                     <div>
                       <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
-                      <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
-                        setLoading(true)
-                        setTimeout(() => setLoading(false), 1000)
-                        setTimeout(() => setModalDetail(val), 1000)
-                      }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                      {val.detail.length > 1 ?
+                        <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
+                          setLoading(true)
+                          setTimeout(() => setLoading(false), 1000)
+                          setTimeout(() => setModalDetail(val), 1000)
+                        }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                        : null
+                      }
                     </div>
                   }
                 </div>
@@ -275,6 +277,7 @@ const TransactionPages = () => {
     setModalAccept('')
     if (val.status_id == 3) {
       axios.patch(API_URL + `/api/transaction/update`, {
+        iduser,
         id: val.idtransaction,
         status: val.status_id,
         order: status,
@@ -293,6 +296,7 @@ const TransactionPages = () => {
       })
     } else {
       axios.patch(API_URL + `/api/transaction/update`, {
+        iduser,
         id: val.idtransaction,
         status: val.status_id,
         order: status
@@ -468,6 +472,7 @@ const TransactionPages = () => {
       }).then((res) => {
         getProduct()
         setQtyConv(0)
+        setTimeout(() => setLoading(false), 1000)
       }).catch((err) => {
         console.log(err)
       })
@@ -486,6 +491,7 @@ const TransactionPages = () => {
       }).then((res) => {
         getProduct()
         setQtyConv(0)
+        setTimeout(() => setLoading(false), 1000)
       }).catch((err) => {
         console.log(err)
       })
@@ -758,7 +764,7 @@ const TransactionPages = () => {
                     <div className='grid grid-cols-10 divide-x divide-dashed justify-between '>
                       <div className='flex p-1 ml-2 col-span-7'>
                         <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 my-3'>
-                          <img className="w-full h-auto rounded my-3" src={modalDetail.prescription_pic ? modalDetail.prescription_pic : val.product_image} alt="image prescription" />
+                          <img className="w-full h-auto rounded my-3" src={modalDetail.prescription_pic ? modalDetail.prescription_pic.includes('https') ? modalDetail.prescription_pic : API_URL + modalDetail.prescription_pic : val.product_image.includes('https') ? val.product_image : API_URL + val.product_image} alt="image prescription" />
                         </div>
                         <div className='my-3 mx-5'>
                           <p className='font-bold text-large'>{val.product_name}</p>

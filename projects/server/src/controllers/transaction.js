@@ -173,14 +173,21 @@ module.exports = {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1},total_price=${req.body.price} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
             let detail = []
             req.body.recipe.map((val, idx) => {
-              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)})`)
+              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)},${dbConf.escape(val.idproduct)})`)
             })
-            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id)
+            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id,product_id)
             values ${detail.join(', ')}; `)
 
             for (i = 0; i < req.body.recipe.length; i++) {
               await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
             }
+            let history = [];
+            req.body.recipe.forEach((val, idx) => {
+              history.push(`(${dbConf.escape(val.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(val.unit)},${dbConf.escape(val.qty)},'Penjualan dari Resep','Pengurangan')`)
+            })
+
+            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          ${history.join(', ')};`)
 
           } else {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
