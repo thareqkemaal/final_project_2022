@@ -101,7 +101,8 @@ const UserOrderList = (props) => {
             console.log('jumlah data', get.data.count);
             console.log('jumlah page', Math.ceil(get.data.count / 5));
 
-            if (get.data.results) {
+            if (get.data.results !== undefined) {
+                setLoading(false);
                 let arr = [];
                 if (get.data.count > 10) {
                     if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
@@ -136,6 +137,7 @@ const UserOrderList = (props) => {
 
                 setTotalPage(Math.ceil(get.data.count / 5));
                 setUserTransactionData(get.data.results);
+            } else {
                 setLoading(false);
             }
         } catch (error) {

@@ -3,7 +3,7 @@ import { API_URL } from '../helper'
 
 
 const Avatar = (props) => {
-  console.log(props.onClick)
+  // console.log(props.onClick)
   return (
     <div>
           <div className='relative inline-block' onClick={props.onClick}>
