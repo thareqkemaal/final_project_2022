@@ -5,10 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-const NewAddressComponent = ({ showModal, setAddress }) => {
-
-    //////// KEMAL BAGIAN ADDRESS APKG2-15, MELIPUTI SEMUA FUNGSI CRUD ADDRESS DI PROFILING ////////
-    const [addressData, setAddressData] = React.useState([]);
+const NewAddressComponent = ({ showModal }) => {
 
     // INPUT NEW ADDRESS
     const [countFullAddress, setCountFullAddress] = React.useState(0);
@@ -29,26 +26,9 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
     const [filterCity, setFilterCity] = React.useState([]);
 
     React.useEffect(() => {
-        getAddress();
         getDataCity();
         getDataProvince();
     }, []);
-
-    const getAddress = async () => {
-        try {
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + '/api/address/get', {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            });
-
-            console.log("data address profiling", get.data);
-            setAddressData(get.data);
-        } catch (error) {
-            console.log(error)
-        }
-    };
 
     const getDataProvince = async () => {
         try {
@@ -145,7 +125,6 @@ const NewAddressComponent = ({ showModal, setAddress }) => {
                         progress: undefined,
                     });
                     showModal('');
-                    setAddress();
                     setInputFullAddress('');
                     setInputDistrict('');
                     setInputPostalCode('');

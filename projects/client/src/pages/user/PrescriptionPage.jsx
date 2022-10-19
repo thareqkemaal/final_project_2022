@@ -54,14 +54,14 @@ const Prescription = (props) => {
                 }
             });
 
-            if (getAddress.data.length > 0){
+            if (getAddress.data.length > 0) {
                 console.log('user address', getAddress.data);
                 setAllAddress(getAddress.data);
-    
+
                 let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
                 let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
-    
-    
+
+
                 if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
@@ -181,11 +181,11 @@ const Prescription = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value}/></option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value}/></option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 }
             }
@@ -388,9 +388,14 @@ const Prescription = (props) => {
                                     <select type='text' onChange={(e) => { getDelivery(e.target.value); setCourier(e.target.value) }}
                                         className='w-full border border-main-600 rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'>
                                         <option value=''>Select Courier</option>
-                                        <option value='jne'>JNE</option>
-                                        <option value='tiki'>TIKI</option>
-                                        <option value='pos'>POS Indonesia</option>
+                                        {
+                                            allAddress.length > 0 &&
+                                            <>
+                                                <option value='jne'>JNE</option>
+                                                <option value='tiki'>TIKI</option>
+                                                <option value='pos'>POS Indonesia</option>
+                                            </>
+                                        }
                                     </select>
                             }
                         </div>
@@ -421,55 +426,22 @@ const Prescription = (props) => {
                             <p>Delivery</p>
                             {
                                 selectedDelivery ?
-                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
+                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])} /></p>
                                     :
-                                    <p><Currency price={0}/></p>
+                                    <p><Currency price={0} /></p>
                             }
                         </div>
                         <div className='flex justify-between my-4'>
                             <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
+                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery} /></p>
                         </div>
                         <div>
                             <button type='button'
                                 className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                 onClick={() => {
-                                    if (selectedAddress === {}) {
-                                        toast.error('Please select an Address', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (prescriptionPic === '') {
-                                        toast.error('You have not upload an image', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (courier === '') {
-                                        toast.error('Please Choose Courier', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (selectedDelivery === '') {
-                                        toast.error('Please Choose Delivery', {
+                                    if (allAddress.length === 0) {
+                                        toast.error('Please choose address', {
                                             theme: "colored",
                                             position: "top-center",
                                             autoClose: 2000,
@@ -480,7 +452,53 @@ const Prescription = (props) => {
                                             progress: undefined,
                                         });
                                     } else {
-                                        setShowConfirmModal('show');
+                                        if (selectedAddress === {}) {
+                                            toast.error('Please select an Address', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (prescriptionPic === '') {
+                                            toast.error('You have not upload an image', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (courier === '') {
+                                            toast.error('Please Choose Courier', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (selectedDelivery === '') {
+                                            toast.error('Please Choose Delivery', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else {
+                                            setShowConfirmModal('show');
+                                        }
                                     }
                                 }
                                 }
