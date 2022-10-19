@@ -5,10 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-const EditAddressComponent = ({ selected, showModal, setAddress }) => {
+const EditAddressComponent = ({ selected, showModal }) => {
 
-    //////// KEMAL BAGIAN ADDRESS APKG2-15, MELIPUTI SEMUA FUNGSI CRUD ADDRESS DI PROFILING ////////
-    const [addressData, setAddressData] = React.useState([]);
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
     // INPUT EDIT ADDRESS
@@ -32,26 +30,9 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
 
     React.useEffect(() => {
         setSelectedEdit(selected);
-        getAddress();
         getDataCity();
         getDataProvince();
     }, []);
-
-    const getAddress = async () => {
-        try {
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + '/api/address/get', {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            });
-
-            console.log("data address profiling", get.data);
-            setAddressData(get.data);
-        } catch (error) {
-            console.log(error)
-        }
-    };
 
     const getDataProvince = async () => {
         try {
@@ -146,7 +127,6 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                         progress: undefined,
                     });
                     showModal('');
-                    setAddress();
                     setInputEditFullAddress('');
                     setInputEditDistrict('');
                     setInputEditPostalCode('');
