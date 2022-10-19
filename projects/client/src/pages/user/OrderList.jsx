@@ -51,6 +51,7 @@ const UserOrderList = (props) => {
     const [showDetail, setShowDetail] = React.useState(false);
     const [selectedDetail, setSelectedDetail] = React.useState({});
     const [inputSearch, setInputSearch] = React.useState('');
+    const [totalData, setTotalData] = React. useState(0);
 
     React.useEffect(() => {
         if (inputSearch === '') {
@@ -141,6 +142,7 @@ const UserOrderList = (props) => {
                 setShowPageList(arr);
 
                 setTotalPage(Math.ceil(get.data.count / 5));
+                setTotalData(get.data.count);
                 setUserTransactionData(get.data.results);
             } else {
                 setLoading(false);
@@ -244,6 +246,7 @@ const UserOrderList = (props) => {
 
                 setTotalPage(Math.ceil(get.data.count / 5));
                 setUserTransactionData(get.data.results);
+                setTotalData(get.data.count);
                 setLoading(false);
             } else {
                 setLoading(false);
@@ -656,6 +659,7 @@ const UserOrderList = (props) => {
 
                 setTotalPage(Math.ceil(get.data.count / 5));
                 setUserTransactionData(get.data.results);
+                setTotalData(get.data.count);
                 setLoading(false);
             } else {
                 setLoading(false);
@@ -677,7 +681,7 @@ const UserOrderList = (props) => {
 
 
     return (
-        <div className={showDetail ? "overflow-y-hidden container mx-auto py-5 h-[55vh]" : "container mx-auto py-5"}>
+        <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
             <div className="p-5 flex flex-col justify-center items-center">
                 <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
                 <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
@@ -705,17 +709,19 @@ const UserOrderList = (props) => {
                         userTransactionData.length > 0 ?
                             <>
                                 <div className="my-3 p-2 flex justify-between">
-                                    <div className="flex w-1/2 justify-between items-center">
-                                        <p className="font-semibold text-main-500">Type of Order</p>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                            className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >All Type</button>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                            className={selected.type === "prescription" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >Doctor Prescription</button>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                            className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >Free Drugs</button>
+                                    <div className="flex w-4/5 items-center">
+                                        <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
+                                        <div>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >All Type</button>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >Doctor Prescription</button>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >Free Drugs</button>
+                                        </div>
                                     </div>
                                     <div className="flex items-center w-1/5 justify-between">
                                         <p className="font-semibold text-main-500">Sort by:</p>
@@ -815,6 +821,9 @@ const UserOrderList = (props) => {
                                 </div>
                                 <div>
                                     {printTransaction()}
+                                </div>
+                                <div className="text-center my-3">
+                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
                                 </div>
                                 <div className="w-full flex justify-center items-center">
                                     <ul className="list-none flex">

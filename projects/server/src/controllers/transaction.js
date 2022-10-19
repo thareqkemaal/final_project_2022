@@ -153,8 +153,6 @@ module.exports = {
         }
       }
 
-
-
       res.status(200).send({
         success: true,
         message: 'Add Transaction Success'
@@ -208,18 +206,6 @@ module.exports = {
           console.log(req.body);
           let update = req.body.update;
           await dbQuery(`UPDATE transaction SET status_id = 7, note = ${dbConf.escape(update.note)} WHERE idtransaction = ${dbConf.escape(update.id)};`)
-
-          // pengembalian stock (stock awal + quantity)
-          let updateStock = req.body.stock;
-          updateStock.forEach(async (val, idx) => {
-            console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-            await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-          });
-
-          let history = [];
-          updateStock.forEach((val, idx) => {
-            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
-          })
 
           if (req.body.stock) {
             // pengembalian stock (stock awal + quantity)
