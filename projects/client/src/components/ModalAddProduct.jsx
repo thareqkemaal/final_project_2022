@@ -134,7 +134,7 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                     {/* <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900">
                                         Category
                                     </label> */}
-                                    <label className="mb-2 text-sm font-medium text-gray-900 flex">
+                                    <label className="mb-2 text-sm font-medium text-gray-900 flex after:content-['*'] after:text-red-500 after:ml-0.5">
                                         Category  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
                                             {<AiFillEdit onClick={() => setModalSetCategoryOn(true)} size={13} className="mx-2" />}
                                         </button>
@@ -145,13 +145,13 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label htmlFor="product_name" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
+                                    <label htmlFor="product_name" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                         Product Name
                                     </label>
                                     <input type="text" onChange={(e) => setProduct_Name(e.target.value)} name="product_name" id="product_name" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh : Sanmol 6 Kapsul" required />
                                 </div>
                                 <div>
-                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
+                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                         Price
                                     </label>
                                     <div className="flex">
@@ -162,13 +162,13 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
+                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                         Description
                                     </label>
                                     <textarea onChange={(e) => setDescription(e.target.value)} className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5' placeholder="Tulis deskripsi singkat dari obat untuk inhtmlFormasi pembeli" type='text' />
                                 </div>
                                 <div>
-                                    <label htmlFor="dosis" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
+                                    <label htmlFor="dosis" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                         Dosis
                                     </label>
                                     <input type="text" onChange={(e) => setDosis(e.target.value)} name="dosis" id="dosis" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Anjuran dosis penggunaan obat" required />
@@ -177,7 +177,7 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                             <div className="ml-8">
                                 <div>
                                     <div>
-                                        <label htmlFor="aturan_pakai" className="block mb-2 text-sm font-medium text-gray-900">
+                                        <label htmlFor="aturan_pakai" className="block mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                             Aturan Pakai
                                         </label>
                                         <input type="text" onChange={(e) => setAturan_Pakai(e.target.value)} name="aturan_pakai" id="aturan_pakai" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mb-4" placeholder="Anjuran aturan pemakaian obat" required />
@@ -185,13 +185,13 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                     <div className="columns-2">
                                         <div>
                                             <div>
-                                                <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900">
+                                                <label htmlFor="category" className="block mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                                     Main Stock
                                                 </label>
                                                 <input type="number" onChange={(e) => setStock_Unit(e.target.value)} name="category" id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Jumlah stok obat" required />
                                             </div>
                                             <div>
-                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex">
+                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex after:content-['*'] after:text-red-500 after:ml-0.5">
                                                     Main Unit  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
                                                         {<AiFillEdit onClick={() => { setModalAddMainUnitOn(true); setUnit_Type('main') }} size={13} className="mx-2" />}
                                                     </button>
@@ -205,13 +205,13 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
 
                                         <div>
                                             <div>
-                                                <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">
+                                                <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">
                                                     Netto Stock
                                                 </label>
                                                 <input type="number" onChange={(e) => setNetto_Stock(e.target.value)} name="description" id="description" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Isi per obat" required />
                                             </div>
                                             <div>
-                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex">
+                                                <label className="mt-4 mb-2 text-sm font-medium text-gray-900 flex after:content-['*'] after:text-red-500 after:ml-0.5">
                                                     Netto Unit  <button type="button" className="w-6 text-btn-500 rounded-md font-bold">
                                                         {<AiFillEdit onClick={() => { setModalAddNettoUnitOn(true); setUnit_Type('netto') }} size={13} className="mx-2" />}
                                                     </button>
@@ -225,7 +225,7 @@ const ModalAddProduct = ({ setModalAddOn, category, setLoading }) => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">Product Image</label>
+                                    <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900 after:content-['*'] after:text-red-500 after:ml-0.5">Product Image</label>
 
                                     <div className="flex justify-center items-center w-full">
                                         <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-30 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">

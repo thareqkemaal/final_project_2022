@@ -8,10 +8,14 @@ const { uploader } = require('../config/upload');
 const uploadProductPict = uploader('/imgProductPict', 'IMGPRODUCTPICT').array('images', 1);
 
 route.post('/getproduct', productController.getProduct);
-route.post('/filterproduct/:id', productController.filterProduct);
-route.post('/getproductadmin', productController.getProductAdmin);
+// Tika Change #1 : delete router /filterproduct (tidak digunakan lagi)
+// Tika Change #2 : delete router /getproductadmin (tidak digunakan lagi)
 route.post('/add', uploadProductPict, productController.addProduct, productController.addStock);
-route.patch('/edit/:id', uploadProductPict, productController.editProduct);
+
+// Tika Change #3 : update route edit product (add route ke mw stockHistory)
+// Before : route.patch('/edit/:id', uploadProductPict, productController.editProduct);
+// After : route berikut (line 18)
+route.patch('/edit/:id', uploadProductPict, productController.stockHistory, productController.editProduct);
 route.delete('/delete/:id', productController.deleteProduct);
 route.get('/getunit', productController.getUnit);
 route.post('/addunit', productController.addUnit);

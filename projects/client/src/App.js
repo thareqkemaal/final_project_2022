@@ -25,6 +25,9 @@ import ResetPass from './pages/user/ResetPass';
 import ProtectRoute from './components/ProtectRoute/ProtectRoute';
 import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
+import ProductAdminPage from './pages/admin/ProductAdminPage';
+import EditProductPage from './pages/admin/EditProductPage';
+import AddProductPage from './pages/admin/AddProductPage';
 
 function App() {
   const dispatch = useDispatch()
@@ -69,30 +72,33 @@ function App() {
       <Routes>
         <Route path='/' element={<LandingPages />} />
 
-          {/* Protect Route Ketika User Blm Login */}
-          <Route element={<ProtectRoute />}>
-            <Route path='/profile' element={<EditProfile />} />
-            <Route path='/prescription' element={<Prescription />} />
-            <Route path='/prescription/success' element={<UploadSuccess />} />
-            <Route path='/cart' element={<UserCart />} />
-            <Route path='/checkout' element={<Checkout />} />
-          </Route>
-          
-          {/* Protect Route Page Admin */}
-          <Route element={<ProtectRouteAdmin />}>
-              <Route path='/admin/dashboard' element={<DashboardPage />} />
-          </Route>
+        {/* Protect Route Ketika User Blm Login */}
+        <Route element={<ProtectRoute />}>
+          <Route path='/profile' element={<EditProfile />} />
+          <Route path='/prescription' element={<Prescription />} />
+          <Route path='/prescription/success' element={<UploadSuccess />} />
+          <Route path='/cart' element={<UserCart />} />
+          <Route path='/checkout' element={<Checkout />} />
+        </Route>
 
-          {/* Protect Route Ketika User Sudah Login */}
-          <Route element={<ProtectRouteLogin />}>
-              <Route path='/register' element={<Register />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/resetpass/:token' element={<ResetPass />} />
-          </Route>
+        {/* Protect Route Page Admin */}
+        <Route element={<ProtectRouteAdmin />}>
+          <Route path='/admin/dashboard' element={<DashboardPage />} />
+        <Route path='/admin/product' element={<ProductAdminPage />} />
+        <Route path='/admin/product/add' element={<AddProductPage/>} />
+        <Route path='/admin/product/edit' element={<EditProductPage/>} />
+        </Route>
+
+        {/* Protect Route Ketika User Sudah Login */}
+        <Route element={<ProtectRouteLogin />}>
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/resetpass/:token' element={<ResetPass />} />
+        </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/product' element={<ProductPage />} />
-        <Route path='/product/detail' element={<ProductDetail/>} />
+        <Route path='/product/detail' element={<ProductDetail />} />
       </Routes>
       <Footer />
     </div>
