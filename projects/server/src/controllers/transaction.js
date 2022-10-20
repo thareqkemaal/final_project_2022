@@ -75,21 +75,33 @@ module.exports = {
         let filter = [];
         for (const key in req.query) {
           if (key == 'end') {
-            filter.push(`date_order < ${dbConf.escape(req.query[key])}`)
+            let conv = new Date(new Date(req.query[key]).getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString('en-CA')
+            filter.push(`date_order < ${dbConf.escape(conv)}`)
           } else if (key == 'start') {
             filter.push(`date_order > ${dbConf.escape(req.query[key])}`)
+          } else if (key == 'status') {
+            filter.push(`status_name LIKE ${dbConf.escape('%' + req.query[key] + '%')}`)
+          } else if (key == 'sort' || key == 'page' || key == 'limit') {
+
           } else {
             filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
           }
         }
-        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as dateOrder from transaction 
-          ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
+        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as dateOrder from transaction join status on transaction.status_id=status.idstatus
+          ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order ${req.query.sort ? 'asc' : 'desc'} ${req.query.limit == 'no' ? '' : 'limit 5'} ${req.query.limit == 'no' ? '' : req.query.page && req.query.page != 1 ? `offset ${(req.query.page - 1) * 5}` : 'offset 0'};`;
+        let sqlCount = `Select count(*) as total from transaction join status on transaction.status_id=status.idstatus
+        ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} ;`
+        console.log(sqlGet)
         let transaction = await dbQuery(sqlGet);
+        let count = await dbQuery(sqlCount)
         if (transaction) {
           for (i = 0; i < transaction.length; i++) {
             transaction[i].detail = await dbQuery(`SELECT * FROM transaction_detail where transaction_id=${transaction[i].idtransaction};`)
           }
-          await res.status(200).send(transaction)
+          await res.status(200).send({
+            transaction,
+            count
+          })
         }
       }
 
@@ -140,16 +152,13 @@ module.exports = {
 
           let history = [];
           req.body.detail.forEach((val, idx) => {
-            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(req.dataToken.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Penjualan','Pengurangan')`)
+            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(req.dataToken.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Penjualan','Pengurangan')`)
           })
 
-          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity,date, type,information) VALUES
           ${history.join(', ')};`)
         }
       }
-
-
-
       res.status(200).send({
         success: true,
         message: 'Add Transaction Success'
@@ -183,10 +192,10 @@ module.exports = {
             }
             let history = [];
             req.body.recipe.forEach((val, idx) => {
-              history.push(`(${dbConf.escape(val.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(val.unit)},${dbConf.escape(val.qty)},'Penjualan dari Resep','Pengurangan')`)
+              history.push(`(${dbConf.escape(val.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(val.unit)},${dbConf.escape(val.qty)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Penjualan dari Resep','Pengurangan')`)
             })
 
-            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity,date, type,information) VALUES
           ${history.join(', ')};`)
 
           } else {
@@ -210,12 +219,12 @@ module.exports = {
 
           let history = [];
           updateStock.forEach((val, idx) => {
-            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
+            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Pembatalan','Penjumlahan')`)
           })
 
           // console.log('history', history)
 
-          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity,date, type,information) VALUES
           ${history.join(', ')};`)
         } else if (req.body.acceptDeliv) {
           console.log(req.body)
@@ -233,15 +242,13 @@ module.exports = {
   },
   getReport: async (req, res) => {
     try {
-      console.log(req.query)
       let revenue = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id where status_id = 9 group by date_format(date_order,'%b %Y') order by date_order;`)
       let revenueSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,sum(product_qty*product_price) as revenue FROM transaction join transaction_detail on transaction.idtransaction=transaction_detail.transaction_id where status_id = 9 group by date_format(date_order,'%b %Y') order by revenue desc;`)
       let transaction = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y ') order by date_order;`)
       let transactionSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y ') order by transaction desc;`)
       let user = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by date_order;`)
       let userSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by user desc;`)
-      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id where date_format(date_order,'%b %Y') = '${req.query.month}' AND status_id = 9 group by product_name order by best_seller desc limit 10 ;`)
-      console.log(product)
+      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id join stock on transaction_detail.product_id=stock.product_id where status_id = 9 AND stock.isDefault='true' ${req.query.month ? `AND date_format(date_order,'%b %Y') = '${req.query.month}'` : ''} group by product_name order by best_seller desc;`)
       res.status(200).send({
         revenue,
         revenueSales,
@@ -261,17 +268,23 @@ module.exports = {
       let filter = [];
       for (const key in req.query) {
         if (key == 'end') {
-          filter.push(`date < ${dbConf.escape(req.query[key])}`)
+          let conv = new Date(new Date(req.query[key]).getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString('en-CA')
+          filter.push(`date < ${dbConf.escape(conv)}`)
         } else if (key == 'start') {
           filter.push(`date > ${dbConf.escape(req.query[key])}`)
+        } else if (key == 'page') {
+
         } else {
           filter.push(`${key} LIKE ${dbConf.escape('%' + req.query[key] + '%')}`)
         }
       }
-      let history = await dbQuery(`select *,date_format(date,'%d %b %Y') as date_change from history_stock
-      ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc;`)
-      res.status(200).send(history)
-      console.log(history)
+      let history = await dbQuery(`select *,date_format(date,'%d %b %Y') as date_change from history_stock join user on history_stock.user_id=user.iduser
+      ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc limit 20 ${req.query.page && req.query.page != 1 ? `offset ${(req.query.page - 1) * 20}` : 'offset 0'} ;`)
+      let count = await dbQuery(`select count(*) as total from history_stock ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc;`)
+      res.status(200).send({
+        history,
+        count
+      })
     } catch (error) {
       console.log(error)
       res.status(500).send(error)
