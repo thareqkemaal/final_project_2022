@@ -61,6 +61,7 @@ const ReportPage = () => {
     const getReport = (month, reset) => {
         axios.get(API_URL + `/api/transaction/report?month=${month}`)
             .then((res) => {
+                console.log(res.data.product)
                 setAllReport(res.data)
                 let total_revenue = 0
                 let total_product = 0
@@ -74,6 +75,7 @@ const ReportPage = () => {
                     let transactionSalesArray = res.data.transactionSales.slice(0, 12)
                     let userArray = res.data.user.slice(-12)
                     let userSalesArray = res.data.userSales.slice(0, 12)
+                    let product = res.data.product.slice(0, 10)
                     setRevenueReport({
                         labels: revenueArray.map((val) => val.month),
                         datasets: [{
@@ -95,10 +97,10 @@ const ReportPage = () => {
                         }]
                     })
                     setProductReport({
-                        labels: res.data.product.map((val) => val.product_name),
+                        labels: product.map((val) => val.product_name),
                         datasets: [{
                             label: "Best Seller",
-                            data: res.data.product.map((val) => val.best_seller),
+                            data: product.map((val) => val.best_seller),
                             backgroundColor: [
                                 'rgba(75, 192, 192, 0.2)'
                             ]
@@ -312,9 +314,10 @@ const ReportPage = () => {
                                     </ul>
                                 </div>
                             </div>
-                            <button type='button' className='transition mr-4 mt-5 h-10 bg-main-500 border border-main-500 focus:ring-main-500 rounded-lg py-1 px-2 hover:-translate-y-1  w-20 sm:w-30 text-white' onClick={() => {
+                            <button type='button' className={`${startRevenue != 'Start Month' && endRevenue != 'End Month' ? 'hover:-translate-y-1 bg-main-500 border-main-500 focus:ring-main-500' : 'bg-gray-300'} 'transition mr-4 mt-5 h-10  border rounded-lg py-1 px-2   w-20 sm:w-30 text-white`} onClick={() => {
                                 handleFilterRev(sort)
-                            }}>Filter</button>
+                            }}
+                                disabled={startRevenue != 'Start Month' && endRevenue != 'End Month' ? false : true}>Filter</button>
                             <button type='button' className='transition mr-4 mt-5 h-10 bg-main-500 border border-main-500 focus:ring-main-500 rounded-lg py-1 px-2 hover:-translate-y-1  w-20 sm:w-30  text-white' onClick={() => {
                                 setLoading(true)
                                 setStartRevenue('Start Month')
@@ -427,12 +430,6 @@ const ReportPage = () => {
                                 <p className="sm:text-3xl font-bold mt-5 mb-3 pl-5">{totalProduct}</p>
                             </div>
                         </div>
-                        {/* <div className='ml-5' style={{ width: 600 }}>
-                            <Line data={transactionReport} options={options} />
-                        </div>
-                        <div className='ml-5' style={{ width: 600 }}>
-                            <Line data={userReport} options={options} />
-                        </div> */}
                     </div>
                 </div>
                 <Loading loading={loading} />
