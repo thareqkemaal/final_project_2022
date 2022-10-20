@@ -150,7 +150,7 @@ const EditAddressComponent = ({ selected, showModal }) => {
                                 <p className='text-2xl font-bold text-main-500'>Edit Address</p>
                             </div>
                             <div className='my-4'>
-                                <div className='flex flex-col items-start px-3 mb-2'><p>Full Address :</p>
+                                <div className='flex flex-col items-start px-3 mb-2'><p>Full Address<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <div className='w-full'>
                                             <textarea maxLength={200} type='text'
@@ -164,7 +164,7 @@ const EditAddressComponent = ({ selected, showModal }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>Province (Provinsi) :</p>
+                                    <p>Province (Provinsi)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <select type='text' onChange={(e) => { handleFilterCity(e.target.value); setSelectedEditProvinceID(e.target.value); if (e.target.value > 0) { setCheckEditProvince('') } }}
                                             className={checkEditProvince === 'show' ? 'w-full border border-red-600 rounded-lg px-3 h-10 mt-2' :
@@ -181,7 +181,7 @@ const EditAddressComponent = ({ selected, showModal }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>City (Kota) :</p>
+                                    <p>City (Kota)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <select type='text' onChange={(e) => { setSelectedEditCityID(e.target.value); if (e.target.value > 0) { setCheckEditCity('') } }}
                                             className={checkEditCity === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -198,7 +198,7 @@ const EditAddressComponent = ({ selected, showModal }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>District (Kecamatan/Kabupaten) :</p>
+                                    <p>District (Kecamatan/Kabupaten)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <input type='text'
                                             className={checkEditDistrict === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -208,7 +208,7 @@ const EditAddressComponent = ({ selected, showModal }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start  px-3 mb-2'>
-                                    <p>Postal Code (Kode Pos) :</p>
+                                    <p>Postal Code (Kode Pos)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <input type='text'
                                             className={checkEditPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
