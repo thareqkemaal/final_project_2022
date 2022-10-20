@@ -58,8 +58,6 @@ const onSubmit = async ()=>{
         progress: undefined,
     })
     navigate('/login')
-
-    
     setPassword('')
     setRepeatPassword('')
     }).catch((err)=>{
@@ -76,6 +74,7 @@ const onSubmit = async ()=>{
     })
     })
   }else{
+    setLoading(false)
     toast.error(`Cek repeat password`, {
       theme: "colored",
       position: "top-center",

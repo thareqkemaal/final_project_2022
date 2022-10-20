@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Tabs } from 'flowbite-react'
-import { MdDashboard } from 'react-icons/md';
-import { HiUserCircle, HiAdjustments } from 'react-icons/hi';
+import Tabs  from '../components/Tabs'
 import { useSelector, useDispatch } from 'react-redux'
 import { API_URL } from '../helper'
 import { UpdateProfile } from '../action/useraction';
@@ -10,10 +8,9 @@ import Avatar from '../components/Avatar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import AddressComponent from '../components/AdressComponent';
-import ChangePassword from '../components/ChangePassword';
 import { format } from 'date-fns'
 import Loading from '../components/Loading';
+
 
 
 const EditProfile = () => {
@@ -38,6 +35,7 @@ const EditProfile = () => {
             profile_pic:state.userReducer.profile_pic,
         }
     })
+    
 
     const [input, setInput]=useState({
         fullname:'',
@@ -181,116 +179,94 @@ const EditProfile = () => {
     }
 
     return (
-        <div className='container mx-auto px-16'>
-            <Tabs.Group
-                aria-label="Tabs with icons"
-                style="underline"
-            >
-                <Tabs.Item
-                    title="Profile"
-                    icon={HiUserCircle}
-                >
-                    <div className='container mx-auto lg:px-96'>
-                        <div className='flex justify-center mt-5'>
+        <div>
+                <Tabs/>
+            <div className='container mx-auto px-16'>
+                <div className='container mx-auto lg:px-96'>
+                            <div className='flex justify-center mt-5'>
+                                {
+                                    profile_pic || newProfilPict ?
+                                    <>
+                                    <Avatar
+                                        onClick={handleClick}
+                                        src={newProfilPict ? URL.createObjectURL(newProfilPict) :API_URL + profile_pic}
+                                        w={20}
+                                        h={20}
+                                        b={1}
+                                        width={6}
+                                        height={6}
+                                    />
+                                    </>
+                                    :
+                                    <>
+                                    <Avatar
+                                        onClick={handleClick}
+                                        src={'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
+                                        w={20}
+                                        h={20}
+                                        b={1}
+                                        width={6}
+                                        height={6}
+                                    />
+                                    </>
+                                }
+                                <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} disabled={disabled} className='disabled:cursor-not-allowed' />
+                            </div>
+                            <form>
+                                
+                                {/* fullname */}
+                                <label className=' block mb-3 '>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
+                                    <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='fullname' onChange={onChange} disabled={disabled} value={input.fullname} />
+                                </label>
+                                {/* Username */}
+                                <label className=' block mb-3 '>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Username</span>
+                                    <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='username' value={input.username.trim()} disabled={disabled}  onChange={onChange} />
+                                </label>
+                                {/* Email */}
+                                <label className='block mb-3'>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Email</span>
+                                    <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='email' value={input.email} disabled={disabled}  onChange={onChange} />
+                                </label>
+                                {/* Phone */}
+                                <label className='block mb-3'>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Phone Number</span>
+                                    <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a })} disabled={disabled} className='disabled:text-gray-600'  />
+                                </label>
+                                {/* Birth date */}
+                                <label className='block mb-3'>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Birth Date</span>
+                                    <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' value={input.birthdate} name='birthdate' onChange={onChange} disabled={disabled}  type='date' />
+                                </label>
+                                {/* gender*/}
+                                <label className='block mb-3'>
+                                    <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Gender</span>
+                                    <select onChange={onChange} value={input.gender} disabled={disabled}  name='gender' className='h-10 rounded-md font-Public disabled:text-gray-600 disabled:cursor-not-allowed'>
+                                        <option disabled value='select gender' className='font-Public'>Select Gender</option>
+                                        <option value='male' className='font-Public'>Male</option>
+                                        <option value='female' className='font-Public'>Female</option>
+                                    </select>
+                                </label>
+                            </form>
                             {
-                                profile_pic || newProfilPict ?
-                                <>
-                                <Avatar
-                                    onClick={handleClick}
-                                    src={newProfilPict ? URL.createObjectURL(newProfilPict) :API_URL + profile_pic}
-                                    w={20}
-                                    h={20}
-                                    b={1}
-                                    width={6}
-                                    height={6}
-                                />
-                                </>
+                                disabled ?
+                                <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={()=>setDisabled(false)}>Edit</button>
                                 :
                                 <>
-                                <Avatar
-                                    onClick={handleClick}
-                                    src={'https://cdn-icons-png.flaticon.com/512/149/149071.png'}
-                                    w={20}
-                                    h={20}
-                                    b={1}
-                                    width={6}
-                                    height={6}
-                                />
+                                <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={updateProfile}>Save</button>
+                                <button className=' mt-5 border bg-red-500 hover:bg-red-700 rounded-md py-2 ml-2 text-white px-10 font-Public' onClick={onCancel}>Cancel</button>
                                 </>
                             }
-                            <input onChange={(e) => onChangeNewProfilePic(e.target.files[0])} type='file' ref={hiddenFileInput} style={{ display: 'none' }} disabled={disabled} className='disabled:cursor-not-allowed' />
                         </div>
-                        <form>
-                            
-                            {/* fullname */}
-                            <label className=' block mb-3 '>
-                                <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='fullname' onChange={onChange} disabled={disabled} value={input.fullname} />
-                            </label>
-                            {/* Username */}
-                            <label className=' block mb-3 '>
-                                <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Username</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='username' value={input.username.trim()} disabled={disabled}  onChange={onChange} />
-                            </label>
-                            {/* Email */}
-                            <label className='block mb-3'>
-                                <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Email</span>
-                                <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='email' value={input.email} disabled={disabled}  onChange={onChange} />
-                            </label>
-                            {/* Phone */}
-                            <label className='block mb-3'>
-                                <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Phone Number</span>
-                                <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a })} disabled={disabled} className='disabled:text-gray-600'  />
-                            </label>
-                            {/* Birth date */}
-                            <label className='block mb-3'>
-                                <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Birth Date</span>
-                                <input className='border border-gray-400 w-2/6 rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' value={input.birthdate} name='birthdate' onChange={onChange} disabled={disabled}  type='date' />
-                            </label>
-                            {/* gender*/}
-                            <label className='block mb-3'>
-                                <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Gender</span>
-                                <select onChange={onChange} value={input.gender} disabled={disabled}  name='gender' className='h-10 rounded-md font-Public disabled:text-gray-600 disabled:cursor-not-allowed'>
-                                    <option disabled value='select gender' className='font-Public'>Select Gender</option>
-                                    <option value='male' className='font-Public'>Male</option>
-                                    <option value='female' className='font-Public'>Female</option>
-                                </select>
-                            </label>
-                        </form>
-                        {
-                            disabled ?
-                            <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={()=>setDisabled(false)}>Edit</button>
-                            :
-                            <>
-                            <button className=' mt-5 border bg-teal-500 hover:bg-teal-700 rounded-md py-2 text-white px-10 font-Public' onClick={updateProfile}>Save</button>
-                            <button className=' mt-5 border bg-red-500 hover:bg-red-700 rounded-md py-2 ml-2 text-white px-10 font-Public' onClick={onCancel}>Cancel</button>
-                            </>
-                        }
-                    </div>
-                </Tabs.Item>
-                <Tabs.Item
-                    active={true}
-                    title="Password"
-                    icon={MdDashboard}
-                >
-                    <ChangePassword/>
-                </Tabs.Item>
-                {/* KEMAL BAGIAN ADDRESS APKG2-15 */}
-                <Tabs.Item
-                    title="Address"
-                    icon={HiAdjustments}
-                >
-                    <AddressComponent />
-                </Tabs.Item>
-            </Tabs.Group>
-            {
-            loading &&
-        <div className='absolute top-1/3 right-[45%]'>
-            <Loading loading={loading}/>
-        </div>
-
-        }
-            <ToastContainer />
+                {
+                loading &&
+            <div className='absolute top-1/3 right-[45%]'>
+                <Loading loading={loading}/>
+            </div>
+            }
+                <ToastContainer />
+            </div>
         </div>
     )
 }

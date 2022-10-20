@@ -8,6 +8,8 @@ import EditAddressComponent from './EditAddressModalComp';
 import LoadingComponent from './Loading';
 import { useSelector } from 'react-redux';
 import placeholder from '../assets/placeholder.png';
+import Tabs from './Tabs';
+
 
 
 const AddressComponent = (props) => {
@@ -169,6 +171,7 @@ const AddressComponent = (props) => {
 
     return (
         <div>
+            <Tabs/>
             <div className='container mx-auto'>
                 <p className='flex items-center justify-center text-main-500 font-bold text-2xl my-3'>ADDRESS</p>
                 <div className='flex justify-center'>
