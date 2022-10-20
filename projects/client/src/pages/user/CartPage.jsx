@@ -29,38 +29,42 @@ const UserCart = (props) => {
 
     const getCartData = async () => {
         try {
+            setLoading(true)
             let userToken = localStorage.getItem('medcarelog');
             let getCart = await axios.get(API_URL + '/api/product/getcartdata', {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
             });
-            console.log('user cart', getCart.data);
-            setCartData(getCart.data);
-            dispatch(updateCart(getCart.data));
+            if (getCart.data) {
+                console.log('user cart', getCart.data);
+                setCartData(getCart.data);
+                dispatch(updateCart(getCart.data));
 
-            let total = 0;
-            let count = 0;
-            getCart.data.forEach((val, idx) => {
-                if (val.selected === 'true') {
-                    total += (val.price * val.quantity);
-                    count += 1;
+                let total = 0;
+                let count = 0;
+                getCart.data.forEach((val, idx) => {
+                    if (val.selected === 'true') {
+                        total += (val.price * val.quantity);
+                        count += 1;
+                    }
+                });
+                setTotalPrice(total);
+                setCountItem(count);
+
+                let temp = [];
+                getCart.data.forEach((val, idx) => {
+                    if (val.selected === 'true') {
+                        temp.push(true)
+                    }
+                });
+
+                if (temp.length === getCart.data.length && getCart.data.length !== 0) {
+                    setIsCheckAll('true')
+                } else {
+                    setIsCheckAll('false')
                 }
-            });
-            setTotalPrice(total);
-            setCountItem(count);
-
-            let temp = [];
-            getCart.data.forEach((val, idx) => {
-                if (val.selected === 'true') {
-                    temp.push(true)
-                }
-            });
-
-            if (temp.length === getCart.data.length && getCart.data.length !== 0) {
-                setIsCheckAll('true')
-            } else {
-                setIsCheckAll('false')
+                setLoading(false)
             }
 
         } catch (error) {
@@ -78,7 +82,7 @@ const UserCart = (props) => {
                         />
                     </div>
                     <div>
-                        <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name}/>
+                        <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name} />
                     </div>
                     <div className='w-full flex flex-col'>
                         <div className='flex justify-between h-2/3'>
@@ -311,7 +315,7 @@ const UserCart = (props) => {
                                     :
                                     <div className="flex flex-col justify-center items-center text-center my-5">
                                         <p className="font-bold text-2xl drop-shadow-lg text-main-500">Oops you cart is empty!</p>
-                                        <img src={nodata} className="w-2/3" alt='placeholder'/>
+                                        <img src={nodata} className="w-2/3" alt='placeholder' />
                                     </div>
 
                             }

@@ -101,8 +101,8 @@ function App() {
         <Route path='/verification/:token' element={<Verified />} />
         <Route path='/email-verification/:token' element={<EmailVerification />} />
         <Route path='/product' element={<ProductPage />} />
-        <Route path='/product/detail' element={<ProductDetail/>} />
-        <Route path='/transaction/:user' element={<UserOrderList/>} />
+        <Route path='/product/detail' element={<ProductDetail />} />
+        <Route path='/transaction/:user' element={<UserOrderList />} />
       </Routes>
       <Footer />
     </div >

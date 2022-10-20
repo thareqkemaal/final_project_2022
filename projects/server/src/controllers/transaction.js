@@ -12,6 +12,7 @@ module.exports = {
         let filter = [];
         let sort = [];
         let pagination = [];
+        let search = [];
         for (let key in data) {
           if (key === 'status_id') {
             if (data[key].length > 1) {
@@ -33,25 +34,29 @@ module.exports = {
             pagination.push(`LIMIT ${data[key]}`)
           } else if (key === 'offset') {
             pagination.push(`OFFSET ${data[key]}`)
+          } else if (key === 'search'){
+            search.push(`invoice_number LIKE '${'%' + data[key]}'`);
+            search.push(`invoice_number LIKE '${data[key] + '%'}'`);
+            search.push(`invoice_number LIKE '${'%' + data[key] + '%'}'`);
           }
         }
         // console.log(filter)
         // console.log(sort)
 
-        // console.log(`SELECT * FROM transaction t 
-        //   JOIN status s ON t.status_id = s.idstatus 
-        //   WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+        console.log(`SELECT * FROM transaction t 
+          JOIN status s ON t.status_id = s.idstatus 
+          WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
 
         let getSql = await dbQuery(`SELECT * FROM transaction t 
         JOIN status s ON t.status_id = s.idstatus 
-        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
 
         let countSql = await dbQuery(`SELECT COUNT(*) AS count FROM transaction t 
         JOIN status s ON t.status_id = s.idstatus 
-        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
-
+        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
+        
+        // console.log(getSql)
         if (getSql.length > 0) {
-          // console.log(getSql)
           let comb = getSql.map(async (val, idx) => {
             // console.log(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
             let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
@@ -67,9 +72,9 @@ module.exports = {
           });
         } else {
           res.status(200).send({
-            failed: true,
-            message: 'Data Not Found'
-          })
+            results: getSql,
+            count: countSql[0].count
+          });
         }
       } else {
         let filter = [];
@@ -82,7 +87,7 @@ module.exports = {
             filter.push(`${key} = ${dbConf.escape(req.query[key])}`)
           }
         }
-        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as date_order from transaction 
+        let sqlGet = `Select *,date_format(date_order,'%d %b %Y, %H:%i') as dateOrder from transaction 
           ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date_order desc ;`;
         let transaction = await dbQuery(sqlGet);
         if (transaction) {
@@ -111,8 +116,8 @@ module.exports = {
         // from prescription page
         let data = JSON.parse(req.body.datatransaction);
 
-        await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, user_address, order_weight, delivery_price, shipping_courier, prescription_pic)
-        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)}, ${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.address)}, ${dbConf.escape(data.weight)},
+        await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, date_order, user_address, order_weight, delivery_price, shipping_courier, prescription_pic)
+        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)}, ${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 3, ${dbConf.escape(data.date_order)}, ${dbConf.escape(data.address)}, ${dbConf.escape(data.weight)},
         ${dbConf.escape(data.delivery)}, ${dbConf.escape(data.courier)}, '/prescription/${req.files[0].filename}');`)
       } else {
         // status_id = 4 menunggu pembayaran
@@ -120,8 +125,8 @@ module.exports = {
 
         let data = req.body.formSubmit;
 
-        await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, user_address, total_price, order_weight, delivery_price, shipping_courier)
-        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)},${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 4, ${dbConf.escape(data.address)}, ${dbConf.escape(data.total)}, ${dbConf.escape(data.weight)},
+        await dbQuery(`INSERT INTO transaction (user_id, user_name,user_phone_number, invoice_number, status_id, date_order, user_address, total_price, order_weight, delivery_price, shipping_courier)
+        VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.dataToken.fullname)},${dbConf.escape(req.dataToken.phone_number)}, ${dbConf.escape(data.invoice)}, 4, ${dbConf.escape(data.date_order)}, ${dbConf.escape(data.address)}, ${dbConf.escape(data.total)}, ${dbConf.escape(data.weight)},
         ${dbConf.escape(data.delivery)}, ${dbConf.escape(data.courier)});`)
 
         let get = await dbQuery(`SELECT idtransaction FROM transaction WHERE invoice_number = ${dbConf.escape(data.invoice)};`)
@@ -148,8 +153,6 @@ module.exports = {
         }
       }
 
-
-
       res.status(200).send({
         success: true,
         message: 'Add Transaction Success'
@@ -162,9 +165,12 @@ module.exports = {
   },
   updateTransaction: async (req, res) => {
     try {
+      console.log(req.body)
       if (req.files) {
+        // send payment proof
         let data = JSON.parse(req.body.datatransaction);
-        await dbQuery(`UPDATE transaction SET payment_proof_pic='/paymentproof/${req.files[0].filename}' WHERE idtransaction = ${dbConf.escape(data.transactionId)};`)
+        await dbQuery(`UPDATE transaction SET payment_proof_pic='/paymentproof/${req.files[0].filename}' WHERE idtransaction = ${dbConf.escape(data.idtransaction)};`)
+        await dbQuery(`UPDATE transaction SET status_id = 5 WHERE idtransaction = ${dbConf.escape(data.idtransaction)};`);
       } else if (req.body) {
         if (req.body.order == 'ok') {
           if (req.body.status == 6) {
@@ -173,14 +179,21 @@ module.exports = {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1},total_price=${req.body.price} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
             let detail = []
             req.body.recipe.map((val, idx) => {
-              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)})`)
+              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)},${dbConf.escape(val.idproduct)})`)
             })
-            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id)
+            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id,product_id)
             values ${detail.join(', ')}; `)
 
             for (i = 0; i < req.body.recipe.length; i++) {
               await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
             }
+            let history = [];
+            req.body.recipe.forEach((val, idx) => {
+              history.push(`(${dbConf.escape(val.name)},${dbConf.escape(req.body.iduser)},${dbConf.escape(val.unit)},${dbConf.escape(val.qty)},'Penjualan dari Resep','Pengurangan')`)
+            })
+
+            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+          ${history.join(', ')};`)
 
           } else {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
@@ -193,24 +206,26 @@ module.exports = {
           console.log(req.body);
           let update = req.body.update;
           await dbQuery(`UPDATE transaction SET status_id = 7, note = ${dbConf.escape(update.note)} WHERE idtransaction = ${dbConf.escape(update.id)};`)
-          
-          // pengembalian stock (stock awal + quantity)
-          let updateStock = req.body.stock;
-          updateStock.forEach(async (val, idx) => {
-            console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-            await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-          });
-          
-          let history = [];
-          updateStock.forEach((val, idx) => {
-            history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
-          })
 
-          // console.log('history', history)
+          if (req.body.stock) {
+            // pengembalian stock (stock awal + quantity)
+            let updateStock = req.body.stock;
+            updateStock.forEach(async (val, idx) => {
+              console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+              await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+            });
 
-          await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-          ${history.join(', ')};`)
-        } else if (req.body.acceptDeliv){
+            let history = [];
+            updateStock.forEach((val, idx) => {
+              history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
+            })
+
+            // console.log('history', history)
+
+            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+            ${history.join(', ')};`)
+          }
+        } else if (req.body.acceptDeliv) {
           console.log(req.body)
           await dbQuery(`UPDATE transaction SET status_id = 9 WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
         }
