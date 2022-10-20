@@ -170,7 +170,7 @@ const ProductCategory = (props) => {
                                 <img src={val.picture} alt='medcare.com' className='object-cover h-[147px]' />
                             </div>
                             <div className='py-2 h-28'>
-                                <div className='w-40 h-10'>
+                                <div className='w-full h-10'>
                                     <p className=' px-5 text-txt-500 font-bold leading-5 text-sm font-Public'>{val.product_name}</p>
                                 </div>
                                 <div className='w-20 my-3 px-5 flex '>

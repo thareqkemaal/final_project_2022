@@ -29,6 +29,8 @@ import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 import EmailVerification from './pages/user/EmailVerification';
 import UserOrderList from './pages/user/OrderList';
+import ChangePassword from './components/ChangePassword';
+import AddressComponent from './components/AdressComponent';
 
 function App() {
   const dispatch = useDispatch()
@@ -77,6 +79,8 @@ function App() {
             <Route path='/success' element={<UploadSuccess />} />
             <Route path='/cart' element={<UserCart />} />
             <Route path='/checkout' element={<Checkout />} />
+            <Route path='/change-pass' element={<ChangePassword/>} />
+            <Route path='/address' element={<AddressComponent/>} />
           </Route>
           
           {/* Protect Route Page Admin */}

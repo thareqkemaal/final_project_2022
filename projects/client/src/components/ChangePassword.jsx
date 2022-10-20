@@ -4,6 +4,7 @@ import axios from 'axios'
 import { API_URL } from '../helper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Tabs from './Tabs';
 
 const ChangePassword = () => {
     const [visible, setVisible]=useState('password')
@@ -107,7 +108,8 @@ const ChangePassword = () => {
 
   return (
     <div>
-           <div className='container mx-auto lg:px-96 '>
+            <Tabs/>
+           <div className='container mx-auto lg:px-96 pt-5 '>
                         <label className=' block mb-3 '>
                             <span className='block text-sm font-medium text-slate-700 mb-1'>Password</span>
                             <div className='relative'>
