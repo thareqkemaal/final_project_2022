@@ -23,7 +23,7 @@ const ProductCategory = (props) => {
         }
     })
 
-    console.log(props)
+    // console.log(props)
 
     const getCategoryProduct = () => {
         axios.post(API_URL + `/api/product/getproductadmin?${props.id}`, {

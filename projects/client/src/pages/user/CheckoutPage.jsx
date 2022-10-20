@@ -46,7 +46,7 @@ const Checkout = (props) => {
 
     const { username } = useSelector((state) => {
         return {
-            username : state.userReducer.username
+            username: state.userReducer.username
         }
     })
 
@@ -58,6 +58,7 @@ const Checkout = (props) => {
 
     const getAddress = async () => {
         try {
+            setLoading(true)
             let userToken = localStorage.getItem('medcarelog');
             let getAddress = await axios.get(API_URL + '/api/address/get', {
                 headers: {
@@ -65,13 +66,13 @@ const Checkout = (props) => {
                 }
             });
             //console.log('user address', getAddress.data);
-            if(getAddress.data.length > 0){
+            if (getAddress.data.length > 0) {
                 setAllAddress(getAddress.data);
-    
+
                 let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
                 let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
-    
-    
+
+
                 if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
@@ -81,8 +82,10 @@ const Checkout = (props) => {
                         setSelectedAddress(getSelectedAddress);
                     }
                 }
+                setLoading(false);
             } else {
                 setSelectedAddress(null);
+                setLoading(false);
             }
 
         } catch (error) {
@@ -244,6 +247,10 @@ const Checkout = (props) => {
             let presCode = 1; // kode invoice untuk cart
             let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
+            // DATE_ORDER
+            let get = new Date().getTime();
+            let date_order = new Date(get);
+
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
             let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
@@ -261,21 +268,23 @@ const Checkout = (props) => {
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier: courier + '/' + selectedDelivery.split(',')[1],
-                total: state.totalPrice
+                total: state.totalPrice,
+                date_order: date_order.toLocaleString('sv-SE')
             }
 
             console.log(checkoutData);
+            console.log('form submit', formSubmit);
 
             // Data untuk ke transaction_detail
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({ 
-                    product_name: val.product_name, 
-                    product_qty: val.quantity, 
-                    product_price: val.price, 
-                    product_unit: val.default_unit, 
-                    product_image: val.picture, 
+                temp.push({
+                    product_name: val.product_name,
+                    product_qty: val.quantity,
+                    product_price: val.price,
+                    product_unit: val.default_unit,
+                    product_image: val.picture,
                     product_id: val.idproduct,
                 })
             });
@@ -291,7 +300,7 @@ const Checkout = (props) => {
 
             if (res.data.success) {
                 state.selected.forEach(async (val, idx) => {
-                    if (val.idcart){
+                    if (val.idcart) {
                         await axios.delete(API_URL + `/api/product/deletecart/${val.idcart}`)
                     }
                 });
@@ -391,9 +400,14 @@ const Checkout = (props) => {
                                         <select type='text' onChange={(e) => { getDelivery(e.target.value); setCourier(e.target.value) }}
                                             className='w-full border border-main-600 rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'>
                                             <option value=''>Select Courier</option>
-                                            <option value='jne'>JNE</option>
-                                            <option value='tiki'>TIKI</option>
-                                            <option value='pos'>POS Indonesia</option>
+                                            {
+                                                allAddress.length > 0 &&
+                                                <>
+                                                    <option value='jne'>JNE</option>
+                                                    <option value='tiki'>TIKI</option>
+                                                    <option value='pos'>POS Indonesia</option>
+                                                </>
+                                            }
                                         </select>
                                 }
                             </div>
@@ -438,30 +452,8 @@ const Checkout = (props) => {
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                     onClick={() => {
-                                        if (selectedAddress === {}) {
-                                            toast.error('Please select an Address', {
-                                                theme: "colored",
-                                                position: "top-center",
-                                                autoClose: 2000,
-                                                hideProgressBar: false,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: false,
-                                                progress: undefined,
-                                            });
-                                        } else if (courier === '') {
-                                            toast.error('Please Choose Courier', {
-                                                theme: "colored",
-                                                position: "top-center",
-                                                autoClose: 2000,
-                                                hideProgressBar: false,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: false,
-                                                progress: undefined,
-                                            });
-                                        } else if (selectedDelivery === '') {
-                                            toast.error('Please Choose Delivery', {
+                                        if (allAddress.length === 0) {
+                                            toast.error('Please choose address', {
                                                 theme: "colored",
                                                 position: "top-center",
                                                 autoClose: 2000,
@@ -472,7 +464,42 @@ const Checkout = (props) => {
                                                 progress: undefined,
                                             });
                                         } else {
-                                            setShowPaymentModal('show')
+                                            if (selectedAddress === {}) {
+                                                toast.error('Please select an Address', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else if (courier === '') {
+                                                toast.error('Please Choose Courier', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else if (selectedDelivery === '') {
+                                                toast.error('Please Choose Delivery', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else {
+                                                setShowPaymentModal('show')
+                                            }
                                         }
                                     }}>Select Payment</button>
                                 {/* MODAL SELECT PAYMENT */}
@@ -506,7 +533,7 @@ const Checkout = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                          S  </div>
+                                                S  </div>
                                         </div>
                                         :
                                         ""

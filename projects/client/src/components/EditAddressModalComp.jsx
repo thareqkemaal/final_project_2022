@@ -5,10 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-const EditAddressComponent = ({ selected, showModal, setAddress }) => {
+const EditAddressComponent = ({ selected, showModal }) => {
 
-    //////// KEMAL BAGIAN ADDRESS APKG2-15, MELIPUTI SEMUA FUNGSI CRUD ADDRESS DI PROFILING ////////
-    const [addressData, setAddressData] = React.useState([]);
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
     // INPUT EDIT ADDRESS
@@ -32,26 +30,9 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
 
     React.useEffect(() => {
         setSelectedEdit(selected);
-        getAddress();
         getDataCity();
         getDataProvince();
     }, []);
-
-    const getAddress = async () => {
-        try {
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + '/api/address/get', {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            });
-
-            console.log("data address profiling", get.data);
-            setAddressData(get.data);
-        } catch (error) {
-            console.log(error)
-        }
-    };
 
     const getDataProvince = async () => {
         try {
@@ -146,7 +127,6 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                         progress: undefined,
                     });
                     showModal('');
-                    setAddress();
                     setInputEditFullAddress('');
                     setInputEditDistrict('');
                     setInputEditPostalCode('');
@@ -170,7 +150,7 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                                 <p className='text-2xl font-bold text-main-500'>Edit Address</p>
                             </div>
                             <div className='my-4'>
-                                <div className='flex flex-col items-start px-3 mb-2'><p>Full Address :</p>
+                                <div className='flex flex-col items-start px-3 mb-2'><p>Full Address<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <div className='w-full'>
                                             <textarea maxLength={200} type='text'
@@ -184,7 +164,7 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>Province (Provinsi) :</p>
+                                    <p>Province (Provinsi)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <select type='text' onChange={(e) => { handleFilterCity(e.target.value); setSelectedEditProvinceID(e.target.value); if (e.target.value > 0) { setCheckEditProvince('') } }}
                                             className={checkEditProvince === 'show' ? 'w-full border border-red-600 rounded-lg px-3 h-10 mt-2' :
@@ -201,7 +181,7 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>City (Kota) :</p>
+                                    <p>City (Kota)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <select type='text' onChange={(e) => { setSelectedEditCityID(e.target.value); if (e.target.value > 0) { setCheckEditCity('') } }}
                                             className={checkEditCity === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -218,7 +198,7 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start px-3 mb-2'>
-                                    <p>District (Kecamatan/Kabupaten) :</p>
+                                    <p>District (Kecamatan/Kabupaten)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <input type='text'
                                             className={checkEditDistrict === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
@@ -228,7 +208,7 @@ const EditAddressComponent = ({ selected, showModal, setAddress }) => {
                                     </div>
                                 </div>
                                 <div className='flex flex-col items-start  px-3 mb-2'>
-                                    <p>Postal Code (Kode Pos) :</p>
+                                    <p>Postal Code (Kode Pos)<a className='text-red-600'>*</a> :</p>
                                     <div className='w-full flex'>
                                         <input type='text'
                                             className={checkEditPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :

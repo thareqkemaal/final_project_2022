@@ -21,7 +21,7 @@ const UserOrderList = (props) => {
 
     const [userTransactionData, setUserTransactionData] = React.useState([]);
     const [selected, setSelected] = React.useState({
-        tab: 'waiting',
+        tab: 'all',
         type: 'all',
         sort: 'new'
     });
@@ -50,9 +50,15 @@ const UserOrderList = (props) => {
 
     const [showDetail, setShowDetail] = React.useState(false);
     const [selectedDetail, setSelectedDetail] = React.useState({});
+    const [inputSearch, setInputSearch] = React.useState('');
+    const [totalData, setTotalData] = React. useState(0);
 
     React.useEffect(() => {
-        getUserTransactionData();
+        if (inputSearch === '') {
+            getUserTransactionData();
+        } else {
+            handleSearch();
+        }
     }, [selected, range, activePage, showDetail, showAccept]);
 
     const getUserTransactionData = async () => {
@@ -101,7 +107,8 @@ const UserOrderList = (props) => {
             console.log('jumlah data', get.data.count);
             console.log('jumlah page', Math.ceil(get.data.count / 5));
 
-            if (get.data.results) {
+            if (get.data.results !== undefined) {
+                setLoading(false);
                 let arr = [];
                 if (get.data.count > 10) {
                     if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
@@ -135,7 +142,9 @@ const UserOrderList = (props) => {
                 setShowPageList(arr);
 
                 setTotalPage(Math.ceil(get.data.count / 5));
+                setTotalData(get.data.count);
                 setUserTransactionData(get.data.results);
+            } else {
                 setLoading(false);
             }
         } catch (error) {
@@ -201,6 +210,7 @@ const UserOrderList = (props) => {
             console.log('jumlah data', get.data.count);
             console.log('jumlah page', Math.ceil(get.data.count / 5));
 
+
             if (get.data.results.length > 0) {
                 let arr = [];
                 if (get.data.count > 10) {
@@ -236,8 +246,9 @@ const UserOrderList = (props) => {
 
                 setTotalPage(Math.ceil(get.data.count / 5));
                 setUserTransactionData(get.data.results);
+                setTotalData(get.data.count);
                 setLoading(false);
-            } else if (get.data.failed) {
+            } else {
                 setLoading(false);
                 toast.error("Data not found!", {
                     theme: "colored",
@@ -261,7 +272,10 @@ const UserOrderList = (props) => {
                 return (
                     <div key={val.idtransaction} className='px-10 py-5 my-4 border rounded-lg shadow-md'>
                         <div className="border-b-2 flex justify-between pb-3 items-center">
-                            <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
+                            <div className="w-1/2 flex">
+                                <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
+                                <p className="mx-4 font-semibold">{val.invoice_number}</p>
+                            </div>
                             {
                                 val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
                                     <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
@@ -346,7 +360,7 @@ const UserOrderList = (props) => {
                             {
                                 val.status_id === 8 ?
                                     <button type='button' onClick={() => setShowAccept(val.idtransaction)}
-                                    className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
+                                        className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
                                     :
                                     ""
                             }
@@ -365,7 +379,7 @@ const UserOrderList = (props) => {
                                                 >Yes, I have the package
                                                 </button>
                                                 <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
-                                                    onClick={() => setShowAccept('')}
+                                                    onClick={() => setShowAccept(0)}
                                                 >No, Go Back
                                                 </button>
                                             </div>
@@ -464,7 +478,7 @@ const UserOrderList = (props) => {
                             {
                                 val.status_id === 8 ?
                                     <button type='button' onClick={() => setShowAccept(val.idtransaction)}
-                                    className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
+                                        className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Delivery Accepted</button>
                                     :
                                     ""
                             }
@@ -490,7 +504,7 @@ const UserOrderList = (props) => {
                                                 >Yes, I have the package
                                                 </button>
                                                 <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 focus:z-10 "
-                                                    onClick={() => setShowAccept('')}
+                                                    onClick={() => setShowAccept(0)}
                                                 >No, Go Back
                                                 </button>
                                             </div>
@@ -527,9 +541,9 @@ const UserOrderList = (props) => {
     const onAcceptDelivery = async (idtransaction) => {
         try {
             setLoading(true);
-            let patch = await axios.patch(API_URL +'/api/transaction/update', {acceptDeliv: true, id: idtransaction});
+            let patch = await axios.patch(API_URL + '/api/transaction/update', { acceptDeliv: true, id: idtransaction });
 
-            if (patch.data.success){
+            if (patch.data.success) {
                 setTimeout(() => {
                     setLoading(false);
                     toast.success('Thank you for your trust to buy in our shop!', {
@@ -542,7 +556,7 @@ const UserOrderList = (props) => {
                         draggable: false,
                         progress: undefined,
                     });
-                    setShowAccept('');
+                    getUserTransactionData();
                     navigate(`/transaction/${username}`, { replace: true })
                 }, 1500)
             }
@@ -552,28 +566,142 @@ const UserOrderList = (props) => {
         }
     };
 
+    const handleSearch = async () => {
+        try {
+            console.log(inputSearch);
+            console.log(selected);
+            console.log('range', range)
+
+            setLoading(true);
+            let temp = [];
+
+            if (selected.type === 'prescription') {
+                temp.push('prescription_pic=is_not_null')
+            } else if (selected.type === 'free') {
+                temp.push('prescription_pic=is_null')
+            }
+
+            if (selected.sort === 'new') {
+                temp.push('date_order=desc')
+            } else if (selected.sort === 'old') {
+                temp.push('date_order=asc')
+            }
+
+            if (range[0].startDate !== '' && range[0].endDate !== '') {
+                if (range[0].startDate === range[0].endDate) {
+                    temp.push(`date_filter=${range[0].startDate.toLocaleDateString("sv-SE")}`)
+                } else {
+                    if (range[0].startDate !== '') {
+                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                    }
+
+                    if (range[0].endDate !== '') {
+                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                    }
+                }
+            }
+
+            if (inputSearch !== '') {
+                temp.push(`search=${inputSearch}`);
+            }
+
+            if (activePage >= 1) {
+                temp.push(`limit=5`);
+                temp.push(`offset=${(activePage - 1) * 5}`)
+            }
+
+
+            console.log(temp.join('&'));
+
+            let userToken = localStorage.getItem('medcarelog');
+            let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            })
+            console.log('data filter', get.data.results);
+            console.log('jumlah data', get.data.count);
+            console.log('jumlah page', Math.ceil(get.data.count / 5));
+
+
+            if (get.data.results.length > 0) {
+                let arr = [];
+                if (get.data.count > 10) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                        arr[2] = activePage + 1;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                        arr[2] = activePage + 2;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 2;
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else if (get.data.count > 5) {
+                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                        arr[0] = activePage - 1;
+                        arr[1] = activePage;
+                    } else if (activePage === 1) {
+                        arr[0] = activePage;
+                        arr[1] = activePage + 1;
+                    } else if (activePage === Math.ceil(get.data.count / 5)) {
+                        arr[1] = activePage - 1;
+                        arr[2] = activePage;
+                    }
+                } else {
+                    arr[0] = activePage;
+                }
+                console.log(arr);
+                setShowPageList(arr);
+
+                setTotalPage(Math.ceil(get.data.count / 5));
+                setUserTransactionData(get.data.results);
+                setTotalData(get.data.count);
+                setLoading(false);
+            } else {
+                setLoading(false);
+                toast.error("Data not found!", {
+                    theme: "colored",
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: false,
+                    progress: undefined,
+                });
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+
     return (
-        <div className={showDetail ? "overflow-y-hidden container mx-auto py-5 h-[55vh]" : "container mx-auto py-5"}>
+        <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
             <div className="p-5 flex flex-col justify-center items-center">
                 <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
                 <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
                     <div className="border-b-2">
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'all' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
                         >All</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'waiting' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'waiting' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Waiting</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'process' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'process' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >In Process</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'delivery' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'delivery' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >On Delivery</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'finished' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'finished' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Finished</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'cancel' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
+                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'cancel' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
                             className={selected.tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Canceled</button>
                     </div>
@@ -581,22 +709,24 @@ const UserOrderList = (props) => {
                         userTransactionData.length > 0 ?
                             <>
                                 <div className="my-3 p-2 flex justify-between">
-                                    <div className="flex w-1/2 justify-between items-center">
-                                        <p className="font-semibold text-main-500">Type of Order</p>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                            className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >All Type</button>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                            className={selected.type === "prescription" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >Doctor Prescription</button>
-                                        <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }}
-                                            className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                        >Free Drugs</button>
+                                    <div className="flex w-4/5 items-center">
+                                        <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
+                                        <div>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >All Type</button>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >Doctor Prescription</button>
+                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
+                                                className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                            >Free Drugs</button>
+                                        </div>
                                     </div>
                                     <div className="flex items-center w-1/5 justify-between">
                                         <p className="font-semibold text-main-500">Sort by:</p>
                                         <select className="border rounded-lg border-main-500 text-gray-500"
-                                            onChange={(e) => { setSelected({ ...selected, sort: e.target.value }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); }} defaultValue={'new'}>
+                                            onChange={(e) => { setSelected({ ...selected, sort: e.target.value }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }} defaultValue={'new'}>
                                             <option value="new">Newest</option>
                                             <option value="old">Oldest</option>
                                         </select>
@@ -660,7 +790,40 @@ const UserOrderList = (props) => {
                                     }
                                 </div>
                                 <div>
+                                    <div className="p-2 flex items-center">
+                                        <p className="font-semibold text-main-500 mr-2">Search :</p>
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={inputSearch}
+                                                className="text-center"
+                                                placeholder='Search'
+                                                onChange={(e) => setInputSearch(e.target.value)}
+                                            />
+                                        </div>
+                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => {
+                                                setActivePage(1);
+                                                handleSearch();
+                                            }}>Search</button>
+                                        <button type="button" className="ml-2 hover:underline"
+                                            onClick={() => {
+                                                setInputSearch('');
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setSelected({ ...selected });
+                                            }}
+                                        >Clear</button>
+                                    </div>
+                                </div>
+                                <div>
                                     {printTransaction()}
+                                </div>
+                                <div className="text-center my-3">
+                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
                                 </div>
                                 <div className="w-full flex justify-center items-center">
                                     <ul className="list-none flex">

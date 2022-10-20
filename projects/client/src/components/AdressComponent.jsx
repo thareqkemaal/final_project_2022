@@ -5,9 +5,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NewAddressComponent from "../components/NewAddressModalComp";
 import EditAddressComponent from './EditAddressModalComp';
+import LoadingComponent from './Loading';
+import { useSelector } from 'react-redux';
+import placeholder from '../assets/placeholder.png';
 
 
 const AddressComponent = (props) => {
+
+    const [loading, setLoading] = React.useState(false);
 
     //////// KEMAL BAGIAN ADDRESS APKG2-15, MELIPUTI SEMUA FUNGSI CRUD ADDRESS DI PROFILING ////////
     const [addressData, setAddressData] = React.useState([]);
@@ -16,12 +21,19 @@ const AddressComponent = (props) => {
     const [modalDelete, setModalDelete] = React.useState(0);
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
+    const { status } = useSelector((state) => {
+        return {
+            status: state.userReducer.status_name
+        }
+    })
+
     React.useEffect(() => {
         getAddress();
-    }, []);
+    }, [showNewAddressModal, showEditAddressModal]);
 
     const getAddress = async () => {
         try {
+            setLoading(true);
             let userToken = localStorage.getItem('medcarelog');
             let get = await axios.get(API_URL + '/api/address/get', {
                 headers: {
@@ -29,8 +41,12 @@ const AddressComponent = (props) => {
                 }
             });
 
-            console.log("data address profiling", get.data);
-            setAddressData(get.data);
+            if (get.data) {
+                // console.log("data address profiling", get.data);
+                setAddressData(get.data);
+                setLoading(false);
+            }
+
         } catch (error) {
             console.log(error)
         }
@@ -100,14 +116,27 @@ const AddressComponent = (props) => {
     const onSelectPrimary = async (id) => {
         try {
             let userToken = localStorage.getItem('medcarelog');
-            let update = await axios.patch(API_URL + '/api/address/update', { setPrimary: id }, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            });
 
-            if (update.data.success) {
-                getAddress();
+            if (addressData.length === 1) {
+                let update = await axios.patch(API_URL + '/api/address/update', { setPrimary: addressData[0].idaddress }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                });
+
+                if (update.data.success) {
+                    getAddress();
+                }
+            } else {
+                let update = await axios.patch(API_URL + '/api/address/update', { setPrimary: id }, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                });
+
+                if (update.data.success) {
+                    getAddress();
+                }
             }
         } catch (error) {
             console.log(error)
@@ -145,21 +174,48 @@ const AddressComponent = (props) => {
                 <div className='flex justify-center'>
                     <div className='border-2 w-2/3 rounded-lg p-4 shadow-lg'>
                         <div className='flex justify-end'>
-                            <button type='button' onClick={() => setShowNewAddressModal('show')}
+                            <button type='button' onClick={() => {
+                                if (status !== 'Unverified') {
+                                    setShowNewAddressModal('show')
+                                } else {
+                                    toast.info('Verified your account first!', {
+                                        theme: "colored",
+                                        position: "top-center",
+                                        autoClose: 2000,
+                                        hideProgressBar: false,
+                                        closeOnClick: true,
+                                        pauseOnHover: true,
+                                        draggable: false,
+                                        progress: undefined,
+                                    });
+                                }
+                            }
+                            }
                                 className='border p-3 rounded-lg bg-main-500 text-white font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-5'>Add New Address</button>
                         </div>
-                        {printAddress()}
+                        {
+                            addressData.length > 0 ?
+                                <>
+                                    {printAddress()}
+                                </>
+                                :
+                                <div className='my-3'>
+                                    <p className='text-center font-bold text-2xl text-main-500 drop-shadow-lg'>Oops you dont have any address data yet</p>
+                                    <img src={placeholder} />
+                                </div>
+
+                        }
                         {/* MODAL ALAMAT BARU */}
                         {
                             showNewAddressModal === 'show' ?
-                                <NewAddressComponent showModal={setShowNewAddressModal} setAddress={getAddress()} />
+                                <NewAddressComponent showModal={setShowNewAddressModal} />
                                 :
                                 ""
                         }
                         {/* MODAL EDIT ALAMAT */}
                         {
                             showEditAddressModal === 'show' ?
-                                <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} setAddress={getAddress()} />
+                                <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} />
                                 :
                                 ""
                         }
@@ -167,6 +223,7 @@ const AddressComponent = (props) => {
                 </div>
             </div>
             <ToastContainer />
+            <LoadingComponent loading={loading} />
         </div>
     )
 }
