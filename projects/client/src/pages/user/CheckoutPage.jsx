@@ -247,6 +247,10 @@ const Checkout = (props) => {
             let presCode = 1; // kode invoice untuk cart
             let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
+            // DATE_ORDER
+            let get = new Date().getTime();
+            let date_order = new Date(get);
+
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
             let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
@@ -264,10 +268,12 @@ const Checkout = (props) => {
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier: courier + '/' + selectedDelivery.split(',')[1],
-                total: state.totalPrice
+                total: state.totalPrice,
+                date_order: date_order.toLocaleString('sv-SE')
             }
 
             console.log(checkoutData);
+            console.log('form submit', formSubmit);
 
             // Data untuk ke transaction_detail
             // product_name, product_qty, product_qty, product_price, product_image

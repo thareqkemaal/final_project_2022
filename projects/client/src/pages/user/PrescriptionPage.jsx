@@ -204,6 +204,10 @@ const Prescription = (props) => {
             let presCode = 2; // kode invoice untuk resep
             let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
+            // DATE_ORDER
+            let get = new Date().getTime();
+            let date_order = new Date(get);
+
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
             let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
@@ -224,6 +228,7 @@ const Prescription = (props) => {
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
                 courier: courier + '/' + selectedDelivery.split(',')[1],
+                date_order: date_order.toLocaleString('sv-SE')
             }));
             formSubmit.append('prescription_pic', prescriptionPic);
 
