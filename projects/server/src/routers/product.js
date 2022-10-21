@@ -15,6 +15,7 @@ route.post('/add', uploadProductPict, productController.addProduct, productContr
 // Tika Change #3 : update route edit product (add route ke mw stockHistory)
 // Before : route.patch('/edit/:id', uploadProductPict, productController.editProduct);
 // After : route berikut (line 18)
+
 route.patch('/edit/:id', uploadProductPict, productController.stockHistory, productController.editProduct);
 route.delete('/delete/:id', productController.deleteProduct);
 route.get('/getunit', productController.getUnit);
@@ -33,4 +34,7 @@ route.delete('/deletecart/:idcart', productController.deletecart);
 route.patch('/updatecart', readToken, productController.updatecart);
 route.post('/addcart', readToken, productController.addCart);
 
+
+// Conversion Unit
+route.patch('/unitconv', productController.unitConv);
 module.exports = route;

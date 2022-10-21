@@ -17,7 +17,7 @@ const Register = () => {
     const [mediumPass, setMediumPass] = useState(false)
     const [strongPass, setStrongPass] = useState(false)
     const [visible,setVisible]=useState('password')
-    // const [phone_number, setPhone_Number] = useState('')
+    const [protectPass, setProtectPass]=useState('')
     const [agree, setAgree]=useState(false)
     const [avalaibleUsername, setAvalaibleUsername]=useState(false)
     const [avalaibleEmail, setAvalaibleEmail]=useState(false)
@@ -32,6 +32,8 @@ const Register = () => {
         phone_number:'',
     })
 
+    console.log(input.phone_number)
+
 
 
     const onChange =(event)=>{
@@ -39,20 +41,23 @@ const Register = () => {
 
         if(name === 'password') {
             const isweekPass= value.length>0
-            const isMediumPass = value.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{6,})")
+            const isMediumPass = value.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,})")
             const isStrongPass = value.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
 
             if(isweekPass){
                 setWeakPass(true)
+                setProtectPass('Week')
             }else{
                 setWeakPass(false)
             }
             if(isMediumPass){
                 setMediumPass(true)
+                setProtectPass('Medium')
             }else{
                 setMediumPass(false)
             }
             if(isStrongPass){
+                setProtectPass('Strong')
                 setStrongPass(true)
             }else{
                 setStrongPass(false)
@@ -70,13 +75,14 @@ const Register = () => {
     }
 
     const onSubmit = ()=>{
+        setAvalaibleEmail(false)
+        setAvalaibleUsername(false)
         setLoading(true)
         let {fullname,username,email,password,phone_number}=input
         axios.post(API_URL + '/api/user/register',{
             fullname,
             username,
             email,
-            phone_number,
             password,
             phone_number
         })
@@ -113,7 +119,7 @@ const Register = () => {
             }
         }).catch((err)=>{
             setLoading(false)
-            toast.error(`${err}`, {
+            toast.error(`${err.response.data.message}`, {
                 theme: "colored",
                 position: "top-center",
                 autoClose: 2000,
@@ -173,45 +179,47 @@ const Register = () => {
                             </div>
                         </div>
                         <form action='' >
-                            <label for='fullname' className="block mb-3 ">
+                            <label htmlFor='fullname' className="block mb-3 ">
                                 <span className="block text-sm font-medium text-gray-700 after:content-['*'] after:text-red-500 after:ml-0.5 font-Public" >
                                     Fullname
                                 </span>
-                                <input requried value={input.fullname} id='fullname' name='fullname' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="John Doe"/>
+                                <input requried='true' value={input.fullname} id='fullname' name='fullname' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="John Doe"/>
                             </label>
-                            <label for='username' className="block mb-3 ">
+                            <label htmlFor='username' className="block mb-3 ">
                                 <span className="block text-sm font-medium text-gray-700 after:content-['*'] after:text-red-500 after:ml-0.5 font-Public" >
                                     Username
                                 </span>
-                                <input requried value={input.username} type='text' id='username' name='username' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="JohnDoe"/>
+                                <input requried='true' value={input.username.trim()} type='text' id='username' name='username' onChange={onChange} className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1' placeholder="JohnDoe"/>
                                 {
                                     avalaibleUsername &&
                                     <p className='text-red-600 text-xs font-Public'>Username is used</p>
                                 }
                             </label>
-                            <label for='email' className='block mb-3'>
+                            <label htmlFor='email' className='block mb-3'>
                                 <span className="block text-sm font-medium text-gray-700 after:content-['*'] after:text-red-500 after:ml-0.5 font-Public">
                                 Email<span className='text-red-500'></span>
                                 </span>
-                                <input requried  value={input.email} id='email' name='email' onChange={onChange} type='email' className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1 invalid:text-red-500 invalid:border-red-500 invalid:ring-red-500 invalid:focus:border-red-500 invalid:focus:ring-red-500 peer' placeholder="you@example.com"/>
-                                    <p className='text-red-600 text-xs font-Public invisible peer-invalid:'>email invalid</p>
-                                {
-                                    avalaibleEmail &&
-                                    <p className='text-red-600 text-xs font-Public'>Email is used</p>
-                                }
+                                <div className='relative'>
+                                    <input requried='true'  value={input.email} id='email' name='email' onChange={onChange} type='email' className='mt-1 px-3 py-2 bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1 invalid:text-red-500 invalid:border-red-500 invalid:ring-red-500 invalid:focus:border-red-500 invalid:focus:ring-red-500 peer' placeholder="you@example.com"/>
+                                        <p className='text-red-600 text-xs font-Public invisible peer-invalid:visible'>email invalid</p>
+                                    {
+                                        avalaibleEmail &&
+                                        <p className='text-red-600 text-xs font-Public absolute top-10'>Email is used</p>
+                                    }
+                                </div>
                             </label>
-                            <label for='phone' className='block mb-3'>
+                            <label htmlFor='phone' className='block mb-3'>
                                 <span className='block text-sm font-medium text-gray-700 font-Public'>
                                 Phone Number<span className='text-red-500'>*</span>
                                 </span>
-                                <PhoneInput international defaultCountry='ID' value={input.phone_number} id='phone' name='phone_number' onChange={(a)=>setInput({...input, phone_number:a})} placeholder='081234566'/>
+                                <PhoneInput international defaultCountry='ID' value={input.phone_number} id='phone' name='phone_number' onChange={(a)=>setInput({...input, phone_number:a+''})} placeholder='081234566'/>
                             </label>
-                            <label for='password' className='block'>
+                            <label htmlFor='password' className='block'>
                                 <span className='block text-sm font-medium text-gray-700 font-Public'>
                                 Password<span className='text-red-500'>*</span>
                                 </span>
                                 <div className='relative'>
-                                    <input requried value={input.password} id='password' name='password' onChange={onChange} type={visible} className='mt-1 px-3 py-2  bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1'/>
+                                    <input requried='true' value={input.password} id='password' name='password' onChange={onChange} type={visible} className='mt-1 px-3 py-2  bg-white border shadow-sm border-gray-300 placeholder-gray-400 focus:outline-none focus:border-blue-600 focus:ring-blue-600 block w-full rounded-md sm:text-sm focus:ring-1'/>
                                     {
                                         visible === 'password'
                                         ?
@@ -219,9 +227,14 @@ const Register = () => {
                                         :
                                         <BsEyeSlash className='absolute top-3 right-3' size={20} onClick={showPass}/>
                                     }
+                                         {
+                                    input.password.length >0 &&
+                                    <p className={`${protectPass === 'Week'?'text-red-600':protectPass ==='Medium'?'text-yellow-300':'text-green-500'} text-xs font-Public`}>Your Password {protectPass}</p>
+                                }
                                 </div>
                             </label>
                             <div className='grid grid-cols-3 gap-1 mt-2'>
+                           
                                 {
                                     weakPass ?
                                     <div className='max-w-full bg-red-500 rounded-full h-2'></div>
@@ -240,10 +253,11 @@ const Register = () => {
                                     :
                                     <div className='max-w-full border border-blue-500  rounded-full h-2'></div>
                                 }
+                             
                             </div>
                         </form>
                         <div className='flex my-4'>
-                            <input requried type={'checkbox'} name='agree' id='agree' onClick={(e)=>setAgree(e.target.checked)} />
+                            <input requried='true' type={'checkbox'} name='agree' id='agree' onClick={(e)=>setAgree(e.target.checked)} />
                             <div className='flex ml-3 text-xs font-Public'>
                                 <div>Saya setuju dengan </div>
                                 <div className='ml-1 text-teal-500 font-bold font-Public'>persyaratan</div>

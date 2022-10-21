@@ -5,8 +5,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
-import { useDispatch } from 'react-redux';
 import { AiFillCloseCircle } from "react-icons/ai";
+import { useDispatch, useSelector } from 'react-redux';
 
 const ProductPage = (props) => {
     const [data, setData] = React.useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -29,6 +29,12 @@ const ProductPage = (props) => {
     const dispatch = useDispatch();
 
     const [userCartData, setUserCartData] = React.useState([]);
+
+    const { status } = useSelector((state) => {
+        return {
+            status: state.userReducer.status_name
+        }
+    })
 
     const getProduct = () => {
         let filter = '';
@@ -109,9 +115,39 @@ const ProductPage = (props) => {
                         {
                             val.product_name.length <= 21
                                 ? <button type="button" className="mb-3 mt-7 md:mt-9 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => {
+                                        if (status !== 'Unverified') {
+                                            onAddToCart(val.idproduct)
+                                        } else if (status === 'Unverified') {
+                                            toast.info('Verified your account first!', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        }
+                                    }}>Keranjang</button>
                                 : <button type="button" className="my-3 md:my-5 w-full text-btn-500 hover:text-white border
-                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
+                            border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => {
+                                        if (status !== 'Unverified') {
+                                            onAddToCart(val.idproduct)
+                                        } else if (status === 'Unverified') {
+                                            toast.info('Verified your account first!', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        }
+                                    }}>Keranjang</button>
                         }
 
                     </div>
@@ -444,8 +480,7 @@ const ProductPage = (props) => {
                             </div>
                         </div>
                     </div>
-
-                    {
+                   {
                         sort || filterName ?
                             <>
                                 <div className="flex my-7">

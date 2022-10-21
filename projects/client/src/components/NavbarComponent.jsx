@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import logo from '../assets/medical-logo-removebg-preview.png'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import { Spinner } from 'flowbite-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutAction } from '../action/useraction';
 import Avatar from './Avatar';
 import { RiShoppingCartLine } from "react-icons/ri";
 import LoadingComponent from './Loading';
 import { API_URL } from '../helper';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
 
 const NavbarComponent = (props) => {
   const navigate = useNavigate()
@@ -17,11 +18,19 @@ const NavbarComponent = (props) => {
 
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
+  const [disable, setDisable] = useState(false)
+
+  const { status, email } = useSelector((state) => {
+    return {
+      status: state.userReducer.status_name,
+      email: state.userReducer.email
+    }
+  })
+
 
   let { username, role, profile_pic } = useSelector((state) => {
     return {
       username: state.userReducer.username,
-      status: state.userReducer.status,
       role: state.userReducer.role,
       profile_pic: state.userReducer.profile_pic,
     }
@@ -40,10 +49,48 @@ const NavbarComponent = (props) => {
     }
   })
 
+  // Update Verification
+
+  const resendVerif = async () => {
+    try {
+      await axios.get(`${API_URL}/api/user/resend-verif?email=${email}`)
+        .then((res) => {
+          setDisable(true)
+          toast.success('Please check your email', {
+            theme: "colored",
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+          })
+        })
+    } catch (error) {
+      toast.error(`${error.response.data.message}`, {
+        theme: "colored",
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+      })
+    }
+  }
+
 
   return (
     <div>
-      <div className='shadow-md'>
+      {
+        status === 'Unverified' &&
+        <button className='w-full bg-red-700 hover:bg-red-800 disabled:cursor-not-allowed disabled:bg-red-700' onClick={resendVerif} disabled={disable}>
+          <p className='text-center font-Public'>Click here to verified your account</p>
+        </button>
+      }
+      <div className='shadow-md shadow-teal-50 mb-8'>
         <div className='container md:px-14 md:mx-auto'>
           <div className='flex py-3 justify-between'>
             <div className='flex-none'>
@@ -74,11 +121,24 @@ const NavbarComponent = (props) => {
                     <div className='relative flex items-center w-24 justify-between'>
                       {/* kemal tambah button cart */}
                       <button type='button' onClick={() => {
-                        setLoading(true);
-                        setTimeout(() => {
-                          setLoading(false);
-                          navigate('/cart');
-                        }, 1500)
+                        if (status !== 'Unverified') {
+                          setLoading(true);
+                          setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                          }, 1500)
+                        } else if (status === 'Unverified') {
+                          toast.info('Verified your account first!', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                          });
+                        }
                       }}>
                         <RiShoppingCartLine className='w-7 h-7 mr-3 text-main-500' />
                         <div className='border-0 bg-red-600 font-bold text-white text-xs rounded-full w-fit p-1 px-2 z-10 absolute left-5 bottom-5'>{cart.length}</div>
@@ -115,7 +175,27 @@ const NavbarComponent = (props) => {
                                       navigate('/product');
                                     }, 1500)
                                   }}>Product</button>
-                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm">Transaction</button>
+                                  <button href="#" className="text-gray-700 block px-4 py-2 text-sm" onClick={() => {
+                                    if (status !== 'Unverified') {
+                                      setLoading(true);
+                                      setTimeout(() => {
+                                        setDropdown(false);
+                                        setLoading(false);
+                                        navigate(`/transaction/${username}`);
+                                      }, 1500)
+                                    } else if (status === 'Unverified') {
+                                      toast.info('Verified your account first!', {
+                                        theme: "colored",
+                                        position: "top-center",
+                                        autoClose: 2000,
+                                        hideProgressBar: false,
+                                        closeOnClick: true,
+                                        pauseOnHover: true,
+                                        draggable: false,
+                                        progress: undefined,
+                                      });
+                                    }
+                                  }}>Transaction</button>
                                   <form method="POST" action="#" role="none">
                                     <button type="submit" className="text-gray-700 block w-full px-4 py-2 text-left text-sm" onClick={onLogout}>Sign out</button>
                                   </form>
@@ -138,9 +218,10 @@ const NavbarComponent = (props) => {
                       }
                     </div>
                   ) : (
+                    // Update Button
                     <div className='flex '>
-                      <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100' onClick={() => navigate('/login')}>Sign In</button>
-                      <button className='transition mr-4 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 ' onClick={() => navigate('/register')} >Sign Up</button>
+                      <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 font-bold text-sm rounded-lg w-20 md:w-28 h-11 hover:-translate-y-1 ' onClick={() => navigate('/login')}>Sign In</button>
+                      <button className='transition mr-4 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded-lg font-bold text-sm w-20 md:w-28 h-11 hover:-translate-y-1 ' onClick={() => navigate('/register')} >Sign Up</button>
                     </div>
                   )
               }
@@ -148,6 +229,7 @@ const NavbarComponent = (props) => {
           </div>
         </div>
       </div>
+      <ToastContainer />
       <LoadingComponent loading={loading} className='z-50' />
     </div>
   )

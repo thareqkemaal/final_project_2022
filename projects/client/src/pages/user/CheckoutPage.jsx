@@ -12,6 +12,7 @@ import EditAddressComponent from '../../components/EditAddressModalComp';
 import LoadingComponent from '../../components/Loading';
 import success from '../../assets/success.png';
 import Currency from '../../components/CurrencyComp';
+import { useSelector } from 'react-redux';
 
 const Checkout = (props) => {
 
@@ -20,7 +21,7 @@ const Checkout = (props) => {
 
     const [checkoutData, setCheckoutData] = React.useState([]);
     const [allAddress, setAllAddress] = React.useState([]);
-    const [selectedAddress, setSelectedAddress] = React.useState({});
+    const [selectedAddress, setSelectedAddress] = React.useState(null);
     const [showAddressModal, setShowAddressModal] = React.useState('');
     const [showNewAddressModal, setShowNewAddressModal] = React.useState('');
     const [showEditAddressModal, setShowEditAddressModal] = React.useState('');
@@ -40,10 +41,14 @@ const Checkout = (props) => {
     // INPUT EDIT ADDRESS
     const [selectedEdit, setSelectedEdit] = React.useState({});
 
-    const [totalPrice, setTotalPrice] = React.useState(0);
-
     const { state } = useLocation();
     const navigate = useNavigate();
+
+    const { username } = useSelector((state) => {
+        return {
+            username: state.userReducer.username
+        }
+    })
 
     React.useEffect(() => {
         console.log('selected', state.selected)
@@ -53,6 +58,7 @@ const Checkout = (props) => {
 
     const getAddress = async () => {
         try {
+            setLoading(true)
             let userToken = localStorage.getItem('medcarelog');
             let getAddress = await axios.get(API_URL + '/api/address/get', {
                 headers: {
@@ -60,20 +66,26 @@ const Checkout = (props) => {
                 }
             });
             //console.log('user address', getAddress.data);
-            setAllAddress(getAddress.data);
+            if (getAddress.data.length > 0) {
+                setAllAddress(getAddress.data);
 
-            let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
-            let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
+                let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
+                let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
 
 
-            if (selectedAddress === {}) {
-                setSelectedAddress(getPrimaryAddress);
-            } else {
-                if (getSelectedAddress === getPrimaryAddress) {
+                if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
-                    setSelectedAddress(getSelectedAddress);
+                    if (getSelectedAddress === getPrimaryAddress) {
+                        setSelectedAddress(getPrimaryAddress);
+                    } else {
+                        setSelectedAddress(getSelectedAddress);
+                    }
                 }
+                setLoading(false);
+            } else {
+                setSelectedAddress(null);
+                setLoading(false);
             }
 
         } catch (error) {
@@ -138,7 +150,7 @@ const Checkout = (props) => {
     };
 
     const printSelectedAddress = () => {
-        if (selectedAddress !== {}) {
+        if (selectedAddress !== null) {
             return (
                 <div>
                     <p className='text-transform: uppercase'>{selectedAddress.full_address}</p>
@@ -148,7 +160,7 @@ const Checkout = (props) => {
         } else {
             return (
                 <div>
-                    You don't have any address. Please click select address and click add new address.
+                    You don't have any address. Please click select change address and click add new address.
                 </div>
             )
         }
@@ -235,6 +247,10 @@ const Checkout = (props) => {
             let presCode = 1; // kode invoice untuk cart
             let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
 
+            // DATE_ORDER
+            let get = new Date().getTime();
+            let date_order = new Date(get);
+
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
             let setAddress = full_address + ', ' + 'Kecamatan' + ' ' + district + ', ' + city + ', ' + province + ', ' + postal_code;
@@ -251,17 +267,26 @@ const Checkout = (props) => {
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
-                courier,
-                total: state.totalPrice
+                courier: courier + '/' + selectedDelivery.split(',')[1],
+                total: state.totalPrice,
+                date_order: date_order.toLocaleString('sv-SE')
             }
 
-            // console.log(checkoutData);
+            console.log(checkoutData);
+            console.log('form submit', formSubmit);
 
             // Data untuk ke transaction_detail
             // product_name, product_qty, product_qty, product_price, product_image
             let temp = [];
             checkoutData.forEach((val, idx) => {
-                temp.push({ product_name: val.product_name, product_qty: val.quantity, product_price: val.price, product_unit: val.default_unit, product_image: val.picture })
+                temp.push({
+                    product_name: val.product_name,
+                    product_qty: val.quantity,
+                    product_price: val.price,
+                    product_unit: val.default_unit,
+                    product_image: val.picture,
+                    product_id: val.idproduct,
+                })
             });
             // console.log(temp)
 
@@ -274,10 +299,16 @@ const Checkout = (props) => {
             })
 
             if (res.data.success) {
+                state.selected.forEach(async (val, idx) => {
+                    if (val.idcart) {
+                        await axios.delete(API_URL + `/api/product/deletecart/${val.idcart}`)
+                    }
+                });
+
                 setTimeout(() => {
                     setLoading(false);
                     setShowSuccessPayModal('show');
-                }, 5000)
+                }, 2500)
             }
         } catch (error) {
             console.log(error)
@@ -369,9 +400,14 @@ const Checkout = (props) => {
                                         <select type='text' onChange={(e) => { getDelivery(e.target.value); setCourier(e.target.value) }}
                                             className='w-full border border-main-600 rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'>
                                             <option value=''>Select Courier</option>
-                                            <option value='jne'>JNE</option>
-                                            <option value='tiki'>TIKI</option>
-                                            <option value='pos'>POS Indonesia</option>
+                                            {
+                                                allAddress.length > 0 &&
+                                                <>
+                                                    <option value='jne'>JNE</option>
+                                                    <option value='tiki'>TIKI</option>
+                                                    <option value='pos'>POS Indonesia</option>
+                                                </>
+                                            }
                                         </select>
                                 }
                             </div>
@@ -416,30 +452,8 @@ const Checkout = (props) => {
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                     onClick={() => {
-                                        if (selectedAddress === {}) {
-                                            toast.error('Please select an Address', {
-                                                theme: "colored",
-                                                position: "top-center",
-                                                autoClose: 2000,
-                                                hideProgressBar: false,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: false,
-                                                progress: undefined,
-                                            });
-                                        } else if (courier === '') {
-                                            toast.error('Please Choose Courier', {
-                                                theme: "colored",
-                                                position: "top-center",
-                                                autoClose: 2000,
-                                                hideProgressBar: false,
-                                                closeOnClick: true,
-                                                pauseOnHover: true,
-                                                draggable: false,
-                                                progress: undefined,
-                                            });
-                                        } else if (selectedDelivery === '') {
-                                            toast.error('Please Choose Delivery', {
+                                        if (allAddress.length === 0) {
+                                            toast.error('Please choose address', {
                                                 theme: "colored",
                                                 position: "top-center",
                                                 autoClose: 2000,
@@ -450,7 +464,42 @@ const Checkout = (props) => {
                                                 progress: undefined,
                                             });
                                         } else {
-                                            setShowPaymentModal('show')
+                                            if (selectedAddress === {}) {
+                                                toast.error('Please select an Address', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else if (courier === '') {
+                                                toast.error('Please Choose Courier', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else if (selectedDelivery === '') {
+                                                toast.error('Please Choose Delivery', {
+                                                    theme: "colored",
+                                                    position: "top-center",
+                                                    autoClose: 2000,
+                                                    hideProgressBar: false,
+                                                    closeOnClick: true,
+                                                    pauseOnHover: true,
+                                                    draggable: false,
+                                                    progress: undefined,
+                                                });
+                                            } else {
+                                                setShowPaymentModal('show')
+                                            }
                                         }
                                     }}>Select Payment</button>
                                 {/* MODAL SELECT PAYMENT */}
@@ -484,7 +533,7 @@ const Checkout = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                                S  </div>
                                         </div>
                                         :
                                         ""
@@ -509,7 +558,14 @@ const Checkout = (props) => {
                                                                         navigate('/', { replace: true });
                                                                     }, 3500)
                                                                 }}>Back to Homepage</button>
-                                                            <button className='border-2 rounded-lg py-3 px-10 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'>Go To Order Progress</button>
+                                                            <button className='border-2 rounded-lg py-3 px-10 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'
+                                                                onClick={() => {
+                                                                    setLoading(true);
+                                                                    setTimeout(() => {
+                                                                        setLoading(false);
+                                                                        navigate(`/transaction/${username}`, { replace: true })
+                                                                    }, 2000)
+                                                                }}>Go To Order Progress</button>
                                                         </div>
                                                     </div>
                                                 </div>

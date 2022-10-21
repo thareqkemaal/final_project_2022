@@ -15,6 +15,8 @@ import { loginAction } from './action/useraction';
 import EditProfile from './pages/EditProfile.jsx'
 import DashboardPage from './pages/admin/DashboardPage.jsx';
 import TransactionPage from './pages/admin/TransactionPage';
+import ReportPage from './pages/admin/ReportPage';
+import HistoryPage from './pages/admin/HistoryPage';
 import ProductPage from "./pages/user/ProductPage";
 import UserCart from './pages/user/CartPage';
 import Checkout from './pages/user/CheckoutPage';
@@ -28,6 +30,10 @@ import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 import ProductAdminPage from './pages/admin/ProductAdminPage';
 import EditProductPage from './pages/admin/EditProductPage';
 import AddProductPage from './pages/admin/AddProductPage';
+import EmailVerification from './pages/user/EmailVerification';
+import UserOrderList from './pages/user/OrderList';
+import ChangePassword from './components/ChangePassword';
+import AddressComponent from './components/AdressComponent';
 
 function App() {
   const dispatch = useDispatch()
@@ -41,8 +47,6 @@ function App() {
           'Authorization': `Bearer ${medcarelog}`
         }
       }).then((res) => {
-        console.log(res.data)
-        console.log('====================================kepp')
         if (res.data.iduser) {
           localStorage.getItem('medcarelog', res.data.token)
           delete res.data.token
@@ -71,23 +75,27 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-
-        {/* Protect Route Ketika User Blm Login */}
-        <Route element={<ProtectRoute />}>
-          <Route path='/profile' element={<EditProfile />} />
-          <Route path='/prescription' element={<Prescription />} />
-          <Route path='/prescription/success' element={<UploadSuccess />} />
-          <Route path='/cart' element={<UserCart />} />
-          <Route path='/checkout' element={<Checkout />} />
-        </Route>
-
-        {/* Protect Route Page Admin */}
-        <Route element={<ProtectRouteAdmin />}>
-          <Route path='/admin/dashboard' element={<DashboardPage />} />
-        <Route path='/admin/product' element={<ProductAdminPage />} />
-        <Route path='/admin/product/add' element={<AddProductPage/>} />
-        <Route path='/admin/product/edit' element={<EditProductPage/>} />
-        </Route>
+          {/* Protect Route Ketika User Blm Login */}
+          <Route element={<ProtectRoute />}>
+            <Route path='/profile' element={<EditProfile />} />
+            <Route path='/prescription' element={<Prescription />} />
+            <Route path='/success' element={<UploadSuccess />} />
+            <Route path='/cart' element={<UserCart />} />
+            <Route path='/checkout' element={<Checkout />} />
+            <Route path='/change-pass' element={<ChangePassword/>} />
+            <Route path='/address' element={<AddressComponent/>} />
+          </Route>
+          
+          {/* Protect Route Page Admin */}
+          <Route element={<ProtectRouteAdmin />}>
+              <Route path='/admin/dashboard' element={<DashboardPage />} />
+              <Route path='/admin/product' element={<ProductAdminPage />} />
+              <Route path='/admin/product/add' element={<AddProductPage/>} />
+              <Route path='/admin/product/edit' element={<EditProductPage/>} />
+              <Route path='/admin/transaction' element={<TransactionPage />} />
+              <Route path='/admin/report' element={<ReportPage />} />
+              <Route path='/admin/stock_log' element={<HistoryPage />} />
+          </Route>
 
         {/* Protect Route Ketika User Sudah Login */}
         <Route element={<ProtectRouteLogin />}>
@@ -97,11 +105,13 @@ function App() {
         </Route>
 
         <Route path='/verification/:token' element={<Verified />} />
+        <Route path='/email-verification/:token' element={<EmailVerification />} />
         <Route path='/product' element={<ProductPage />} />
         <Route path='/product/detail' element={<ProductDetail />} />
+        <Route path='/transaction/:user' element={<UserOrderList />} />
       </Routes>
       <Footer />
-    </div>
+    </div >
   );
 }
 

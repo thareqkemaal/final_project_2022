@@ -523,7 +523,6 @@ const ProductAdminPage = (props) => {
                         {modalDeleteOn && <ModalDeleteProduct setModalDeleteOn={setModalDeleteOn} idproduct={idproduct} nameDeleted={nameDeleted} setLoading={setLoading} />}
                     </div>
                 </div>
-
             </div>
         </div>
     )

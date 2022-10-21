@@ -23,7 +23,7 @@ const ProductCategory = (props) => {
         }
     })
 
-    console.log(props)
+    // console.log(props)
 
     const getCategoryProduct = () => {
         // Tika Change #1 : mengganti mw api
@@ -37,16 +37,6 @@ const ProductCategory = (props) => {
         })
             .then((res) => {
                 // Tika Change #2 : mengganti setProductByCategory
-                // Before : setProductByCategory(res.data)
-                // After : setProductByCategory(res.data.results)
-
-                setProductByCategory(res.data.results)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-            .then((res) => {
-                // Tika Change #3 : mengganti setProductByCategory
                 // Before : setProductByCategory(res.data)
                 // After : setProductByCategory(res.data.results)
 
@@ -181,26 +171,31 @@ const ProductCategory = (props) => {
     const printData = () => {
         return productByCategory.map((val, idx) => {
             return (
-                <div className='w-48 h-80 shadow-lg mx-4 my-4 bg-white grid-cols-3' key={val.idproduct} >
+                <div className='w-48 h-[350px] rounded-lg shadow-[16px] mx-4 my-4 bg-white grid-cols-8 hover:-translate-y-1 hover:scale-110 duration-500 delay-300 hover:shadow-2xl hover:shadow-main-500'  key={val.idproduct} >
                     <Link to={`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`}>
-                        <div >
-                            <div className='flex justify-center'>
-                                <img src={val.picture} alt='medcare.com' className='w-64 h-36 px-10' />
+                        <div className=''>
+                            <div className='flex justify-center min-w-full h-[147px] object-none mt-2'>
+                                <img src={val.picture} alt='medcare.com' className='object-cover h-[147px]' />
                             </div>
-                            <div className='py-5 h-28'>
-                                <p className=' px-5 text-blue-900 font-bold text-sm font-Public'>{val.product_name}</p>
-                                <div className='w-20 py-1 px-5 flex '>
+                            <div className='py-2 h-28'>
+                                <div className='w-full h-10'>
+                                    <p className=' px-5 text-txt-500 font-bold leading-5 text-sm font-Public'>{val.product_name}</p>
+                                </div>
+                                <div className='w-20 my-3 px-5 flex '>
                                     <p className='border border-red-400 text-xs text-red-300 font-bold text-center font-Public'>17%</p>
                                     <p className='pl-1 text-gray-400 text-xs line-through font-Public'>Rp.6.000</p>
                                 </div>
-                                <div className='px-5'>
-                                    <p className='text-blue-900 font-bold text-sm'>Rp.{val.price.toLocaleString('id')}<span className='text-sm text-gray-400 font-normal font-Public'>/{val.netto_unit}</span></p>
+                                <div className='px-5 flex justify-between'>
+                                    <div className='w-24 h-5'>
+                                        <p className='text-txt-500 font-bold text-base leading-[18.8px]'>Rp.{val.price.toLocaleString('id')}</p>
+                                    </div>
+                                    <p className='text-sm text-gray-400 font-normal font-Public'>/{val.netto_unit}</p>
                                 </div>
                             </div>
                         </div>
                     </Link >
                     <div className='px-5 py-5'>
-                        <button type='button' className='border-2 border-teal-500 text-teal-500 px-10 rounded-lg py-1 hover:bg-teal-200 font-Public'
+                        <button type='button' className='border-2 border-main-500 text-main-500 px-10 text-base leading-[14px] rounded-lg py-2 font-bold hover:bg-main-500 hover:text-white font-Public'
                             onClick={() => onAddToCart(val.idproduct)}>Keranjang</button>
                     </div>
                 </div >
@@ -211,7 +206,7 @@ const ProductCategory = (props) => {
 
     return (
         <div className=''>
-            <div className='overflow-x-auto w-full'>
+            <div className='overflow-x-auto w-full h-[400px]'>
                 <div className=' flex'>
                     {printData()}
                 </div>

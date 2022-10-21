@@ -17,7 +17,6 @@ const Verified = () => {
           status:state.userReducer.status_name
       }
   })
-  console.log(status)
 
         
     useEffect(()=>{

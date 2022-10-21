@@ -10,9 +10,28 @@ import { BsFillTelephoneFill, BsFacebook, BsTwitter, BsInstagram } from 'react-i
 import logo from '../assets/medical-logo-removebg-preview.png'
 
 const FooterComponent = () => {
-  return (
+
+    let contact = [
+        {
+            icon:IoLogoWhatsapp,
+            head:'Chat Whatsapp',
+            text:'+62 823-2323-0990'
+        },
+        {
+            icon:MdEmail,
+            head:'Email',
+            text:'contact@medcare.com'
+        },
+        {
+            icon:BsFillTelephoneFill,
+            head:'Call Center',
+            text:'+62 2323-0990'
+        },
+    ]
+
+return (
     <div>
-        <div className='bg-gray-300 py-5 sm:hidden'>
+        <div className='bg-gray-300 py-5 lg:hidden'>
             <div className='container mx-auto px-5'>
                 <div className='grid grid-cols-5 '>
                     <div>
@@ -38,74 +57,68 @@ const FooterComponent = () => {
                 </div>
             </div>
         </div>
-        <div className='hidden sm:block'>
+        <div className='hidden lg:block' >
             <div className='shadow-lg'>
-                <div className='container mx-auto px-10 bg-white'>
+                <div className='container mx-auto px-[150px] mt-8 bg-white'>
                     <div className='grid grid-cols-4 gap-10 py-10'>
-                        <div className='grid grid-rows-4 gap-2'>
+                        <div className=''>
                             <div className='flex'>
                                 <img src={logo} className='h-12' alt='medcare.com'/>
-                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-lg pt-2'>Medcare</p>
+                                <p className='bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-bold bg-clip-text text-3xl pt-1'>Medcare</p>
                             </div>
-                            <div className=''>
-                                <div className='flex pl-2 '>
-                                    <IoLogoWhatsapp size={25}/>
-                                    <div >
-                                        <p style={{fontSize:'10px'}} className='text-xs text-blue-900'>Chat Whatsapp</p>
-                                        <p style={{fontSize:'10px'}} className='text-xs text-blue-900'>+62 81 4567</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='' >
-                                <div className='flex pl-2 '>
-                                    <MdEmail size={25}/>
-                                    <div >
-                                        <p style={{fontSize:'10px'}} className='text-xs text-blue-900'>Email</p>
-                                        <p style={{fontSize:'10px'}} className='text-xs text-blue-900'>contact@medcare.com</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className=''>
-                                <div className='flex pl-2 '>
-                                    <BsFillTelephoneFill size={25}/>
-                                    <div>
-                                        <p className='text-xs text-blue-900' style={{fontSize:'10px'}}>Call Center</p>
-                                        <p className='text-xs text-blue-900' style={{fontSize:'10px'}}>+62 134598</p>
-                                    </div>
-                                </div>
+                            <div className='mt-5'>
+                                {
+                                    contact.map(data=>(
+                                        <div className='flex pl-2 mt-1' key={data.head} >
+                                            <div className='w-10 h-10 pt-1'>
+                                                <data.icon className='w-10 h-10 mt-1'/>
+                                            </div>
+                                            <div className='ml-2'>
+                                                <p className='w-60 h-6 pt-2 text-sm leading-5 font-bold  text-txt-500'>{data.head}</p>
+                                                <p className='w-60 h-6 pb-1 text-sm leading-5 text-txt-500'>{data.text}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </div>
-                        <div className='grid grid-rows-5 mx-auto text-blue-900' style={{fontSize:'10px'}}>
-                            <p>Tentang Kami</p>
+                        <div className='grid grid-rows-5 mx-auto font-normal text-sm leading-5 items-center text-txt-500'>
+                            <p className=''>Tentang Kami</p>
                             <p>Kebijakan Privasi</p>
                             <p>FAQ</p>
                             <p>Syarat dan Ketentuan</p>
                             <p>Karir</p>
                         </div>
-                        <div className='grid grid-rows-4 mx-auto text-blue-900' style={{fontSize:'10px'}}>
+                        <div className='grid grid-rows-5 mx-auto pt-3 font-normal text-sm leading-5 text-txt-500'>
                             <p>Blog</p>
                             <p>Cara Belanja</p>
                             <p>Promo</p>
                             <p>Diagnosis</p>
                         </div>
-                        <div className='grid grid-rows-4 mx-auto text-blue-900'>
-                            <p className='text-lg font-bold'>Ikuti Kami</p>
+                        <div className='grid grid-rows-4 mx-auto pt-1 '>
+                            <p className='text-2xl font-bold leading-7 text-txt-500'>Ikuti Kami</p>
                             <div className='flex pl-2 '>
-                                <BsFacebook size={25}/>
-                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Facebook</p>
+                                <div className='w-6 h-6'>
+                                    <BsFacebook className='w-6 h-6'/>
+                                </div>
+                                <p className='text-base leading-6 text-txt-500 font-normal ml-4'>Facebook</p>
                             </div>
                             <div className='flex pl-2 '>
-                                <BsTwitter size={25}/>
-                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Twitter</p>
+                                <div className='w-6 h-6'>
+                                    <BsTwitter className='w-6 h-6'/>
+                                </div>
+                                <p className='text-base leading-6 text-txt-500 font-normal ml-4'>Twitter</p>
                             </div>
                             <div className='flex pl-2 '>
-                                <BsInstagram size={25}/>
-                                <p className='text-xs text-blue-900 pt-1' style={{fontSize:'10px'}}>Instagram</p>
+                                <div className='w-6 h-6' >
+                                    <BsInstagram className='w-6 h-6' />
+                                </div>
+                                <p className='text-base leading-6 text-txt-500 font-normal ml-4'>Instagram</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className='bg-blue-900'>
+                <div className='bg-[#4F618E] mt-5'>
                     <p className='text-white text-xs text-center py-5'>@MedCare2022</p>
                 </div>
             </div>

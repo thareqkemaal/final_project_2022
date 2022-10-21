@@ -4,13 +4,11 @@ import { useNavigate } from 'react-router';
 import { API_URL } from '../../helper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import bni from '../../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
-import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
-import bri from '../../assets/bri.png';
 import LoadingComponent from "../../components/Loading";
 import NewAddressComponent from "../../components/NewAddressModalComp";
 import EditAddressComponent from "../../components/EditAddressModalComp";
 import Currency from "../../components/CurrencyComp";
+import placeholder from '../../assets/placeholder.png';
 
 const Prescription = (props) => {
 
@@ -21,7 +19,7 @@ const Prescription = (props) => {
     const [loading, setLoading] = React.useState(false);
 
     const [allAddress, setAllAddress] = React.useState([]);
-    const [selectedAddress, setSelectedAddress] = React.useState({});
+    const [selectedAddress, setSelectedAddress] = React.useState(null);
     const [showAddressModal, setShowAddressModal] = React.useState('');
     const [showNewAddressModal, setShowNewAddressModal] = React.useState('');
     const [showEditAddressModal, setShowEditAddressModal] = React.useState('');
@@ -55,21 +53,26 @@ const Prescription = (props) => {
                     'Authorization': `Bearer ${userToken}`
                 }
             });
-            //console.log('user address', getAddress.data);
-            setAllAddress(getAddress.data);
 
-            let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
-            let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
+            if (getAddress.data.length > 0) {
+                console.log('user address', getAddress.data);
+                setAllAddress(getAddress.data);
+
+                let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
+                let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
 
 
-            if (selectedAddress === {}) {
-                setSelectedAddress(getPrimaryAddress);
-            } else {
-                if (getSelectedAddress === getPrimaryAddress) {
+                if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
-                    setSelectedAddress(getSelectedAddress);
+                    if (getSelectedAddress === getPrimaryAddress) {
+                        setSelectedAddress(getPrimaryAddress);
+                    } else {
+                        setSelectedAddress(getSelectedAddress);
+                    }
                 }
+            } else {
+                setSelectedAddress(null);
             }
 
         } catch (error) {
@@ -134,7 +137,7 @@ const Prescription = (props) => {
     };
 
     const printSelectedAddress = () => {
-        if (selectedAddress !== {}) {
+        if (selectedAddress !== null) {
             return (
                 <div>
                     <p className='text-transform: uppercase'>{selectedAddress.full_address}</p>
@@ -144,7 +147,7 @@ const Prescription = (props) => {
         } else {
             return (
                 <div>
-                    You don't have any address. Please click select address and click add new address.
+                    You don't have any address. Please click select change address and click add new address.
                 </div>
             )
         }
@@ -178,11 +181,11 @@ const Prescription = (props) => {
             if (courier !== 'none') {
                 if (courier === 'pos') {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value}/></option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd.split(' ')[0]} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 } else {
                     return (
-                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value}/></option>
+                        <option key={idx} value={`${val.cost[0].value},${val.service}`}>{val.service} [Estimate {val.cost[0].etd} Day(s)] - <Currency price={val.cost[0].value} /></option>
                     )
                 }
             }
@@ -200,6 +203,10 @@ const Prescription = (props) => {
             let randomNumber = new Date().getTime();
             let presCode = 2; // kode invoice untuk resep
             let setInvoice = 'INV' + '/' + presCode + '/' + randomNumber;
+
+            // DATE_ORDER
+            let get = new Date().getTime();
+            let date_order = new Date(get);
 
             // ADDRESS
             const { full_address, district, city, province, postal_code } = selectedAddress;
@@ -220,7 +227,8 @@ const Prescription = (props) => {
                 address: setAddress,
                 weight,
                 delivery: parseInt(selectedDelivery.split(',')[0]),
-                courier,
+                courier: courier + '/' + selectedDelivery.split(',')[1],
+                date_order: date_order.toLocaleString('sv-SE')
             }));
             formSubmit.append('prescription_pic', prescriptionPic);
 
@@ -363,7 +371,7 @@ const Prescription = (props) => {
                                     :
                                     ''
                             }
-                            <img src={showPic} className={showPic === '' ? 'hidden' : 'block max-w-lg'} alt='user_prescription' />
+                            <img src={showPic ? showPic : placeholder} className={loadPic ? 'hidden' : 'block max-w-lg'} alt='user_prescription' />
                         </div>
                     </div>
                 </div>
@@ -385,9 +393,14 @@ const Prescription = (props) => {
                                     <select type='text' onChange={(e) => { getDelivery(e.target.value); setCourier(e.target.value) }}
                                         className='w-full border border-main-600 rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'>
                                         <option value=''>Select Courier</option>
-                                        <option value='jne'>JNE</option>
-                                        <option value='tiki'>TIKI</option>
-                                        <option value='pos'>POS Indonesia</option>
+                                        {
+                                            allAddress.length > 0 &&
+                                            <>
+                                                <option value='jne'>JNE</option>
+                                                <option value='tiki'>TIKI</option>
+                                                <option value='pos'>POS Indonesia</option>
+                                            </>
+                                        }
                                     </select>
                             }
                         </div>
@@ -418,55 +431,22 @@ const Prescription = (props) => {
                             <p>Delivery</p>
                             {
                                 selectedDelivery ?
-                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])}/></p>
+                                    <p><Currency price={parseInt(selectedDelivery.split(',')[0])} /></p>
                                     :
-                                    <p><Currency price={0}/></p>
+                                    <p><Currency price={0} /></p>
                             }
                         </div>
                         <div className='flex justify-between my-4'>
                             <p className='font-bold text-2xl text-main-500'>Total Delivery</p>
-                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery}/></p>
+                            <p className='font-bold text-2xl text-main-500'><Currency price={totalDelivery} /></p>
                         </div>
                         <div>
                             <button type='button'
                                 className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
                                 hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                 onClick={() => {
-                                    if (selectedAddress === {}) {
-                                        toast.error('Please select an Address', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (prescriptionPic === '') {
-                                        toast.error('You have not upload an image', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (courier === '') {
-                                        toast.error('Please Choose Courier', {
-                                            theme: "colored",
-                                            position: "top-center",
-                                            autoClose: 2000,
-                                            hideProgressBar: false,
-                                            closeOnClick: true,
-                                            pauseOnHover: true,
-                                            draggable: false,
-                                            progress: undefined,
-                                        });
-                                    } else if (selectedDelivery === '') {
-                                        toast.error('Please Choose Delivery', {
+                                    if (allAddress.length === 0) {
+                                        toast.error('Please choose address', {
                                             theme: "colored",
                                             position: "top-center",
                                             autoClose: 2000,
@@ -477,7 +457,53 @@ const Prescription = (props) => {
                                             progress: undefined,
                                         });
                                     } else {
-                                        setShowConfirmModal('show');
+                                        if (selectedAddress === {}) {
+                                            toast.error('Please select an Address', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (prescriptionPic === '') {
+                                            toast.error('You have not upload an image', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (courier === '') {
+                                            toast.error('Please Choose Courier', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else if (selectedDelivery === '') {
+                                            toast.error('Please Choose Delivery', {
+                                                theme: "colored",
+                                                position: "top-center",
+                                                autoClose: 2000,
+                                                hideProgressBar: false,
+                                                closeOnClick: true,
+                                                pauseOnHover: true,
+                                                draggable: false,
+                                                progress: undefined,
+                                            });
+                                        } else {
+                                            setShowConfirmModal('show');
+                                        }
                                     }
                                 }
                                 }
