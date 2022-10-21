@@ -329,9 +329,9 @@ const ProductAdminPage = (props) => {
         // <div className={`${loading ? 'overflow-hide scroll ' : ""}`}  >
         <div>
             <div className='flex'>
-                <DashboardPage page={window.location.pathname} />
+                {/* <DashboardPage page={window.location.pathname} /> */}
 
-                {/* <AdminComponent page={window.location.pathname} /> */}
+                <AdminComponent page={window.location.pathname} />
                 <div style={{ background: "linear-gradient(155.7deg, #D6F5F3 -46%, #F7FCFC 100%, #F1F5FC 118%)", width: "85vw" }}>
                     <div className="ml-5">
                         {/* <div> */}
