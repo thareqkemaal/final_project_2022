@@ -4,6 +4,8 @@ import { API_URL } from '../../helper'
 import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { UpdateProfile } from '../../action/useraction'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EmailVerification = () => {
     const params = useParams()
@@ -20,9 +22,29 @@ const EmailVerification = () => {
             console.log(res.data)
             dispatch(UpdateProfile(res.data))
             navigate('/profile')
+            toast.success('Your Email has Changes', {
+              theme: "colored",
+              position: "top-center",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+          })
 
         } catch (error) {
             console.log(error)
+            toast.error(error, {
+              theme: "colored",
+              position: "top-center",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+          })
         }
     }
 

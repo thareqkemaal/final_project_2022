@@ -29,6 +29,8 @@ import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
 import EmailVerification from './pages/user/EmailVerification';
 import UserOrderList from './pages/user/OrderList';
+import ChangePassword from './components/ChangePassword';
+import AddressComponent from './components/AdressComponent';
 
 function App() {
   const dispatch = useDispatch()
@@ -70,22 +72,24 @@ function App() {
       </div>
       <Routes>
         <Route path='/' element={<LandingPages />} />
-        {/* Protect Route Ketika User Blm Login */}
-        <Route element={<ProtectRoute />}>
-          <Route path='/profile' element={<EditProfile />} />
-          <Route path='/prescription' element={<Prescription />} />
-          <Route path='/success' element={<UploadSuccess />} />
-          <Route path='/cart' element={<UserCart />} />
-          <Route path='/checkout' element={<Checkout />} />
-        </Route>
-
-        {/* Protect Route Page Admin */}
-        <Route element={<ProtectRouteAdmin />}>
-          <Route path='/admin/dashboard' element={<DashboardPage />} />
-          <Route path='/admin/transaction' element={<TransactionPage />} />
-          <Route path='/admin/report' element={<ReportPage />} />
-          <Route path='/admin/stock_log' element={<HistoryPage />} />
-        </Route>
+          {/* Protect Route Ketika User Blm Login */}
+          <Route element={<ProtectRoute />}>
+            <Route path='/profile' element={<EditProfile />} />
+            <Route path='/prescription' element={<Prescription />} />
+            <Route path='/success' element={<UploadSuccess />} />
+            <Route path='/cart' element={<UserCart />} />
+            <Route path='/checkout' element={<Checkout />} />
+            <Route path='/change-pass' element={<ChangePassword/>} />
+            <Route path='/address' element={<AddressComponent/>} />
+          </Route>
+          
+          {/* Protect Route Page Admin */}
+          <Route element={<ProtectRouteAdmin />}>
+              <Route path='/admin/dashboard' element={<DashboardPage />} />
+              <Route path='/admin/transaction' element={<TransactionPage />} />
+              <Route path='/admin/report' element={<ReportPage />} />
+              <Route path='/admin/stock_log' element={<HistoryPage />} />
+          </Route>
 
         {/* Protect Route Ketika User Sudah Login */}
         <Route element={<ProtectRouteLogin />}>

@@ -19,7 +19,7 @@ const AdminComponent = (page) => {
         </div>
         <ul className='pt-16 mx-1'>
           <li className={`${page.page == '/admin/dashboard' ? 'underline' : 'no-underline'} font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`}
-            onClick={() => navigate('/admin/dasboard')}
+            onClick={() => navigate('/admin/dashboard')}
           >
             <FcTemplate size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Dashboard</span>

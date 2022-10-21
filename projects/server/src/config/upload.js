@@ -1,13 +1,14 @@
 const multer = require('multer')
 const fs = require('fs')
+const { join } = require("path");
 
 module.exports = {
     // argumen 1 directory : penyimpanan
     // argumen 2 filePrefix : namaFile 
     uploader: (directory, filePrefix) => {
         // argumen directory
-        let defaultDir = './src/public';
-
+        // let defaultDir = './src/public';
+        let defaultDir = join(__dirname, "../public");
         // config multer
         const storageUploader = multer.diskStorage({
             destination: (req, file, cb) => {
