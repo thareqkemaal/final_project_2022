@@ -196,7 +196,7 @@ module.exports = {
             values ${detail.join(', ')}; `)
 
             for (i = 0; i < req.body.recipe.length; i++) {
-              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
+              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct} AND unit='${req.body.recipe[i].unit}';`)
             }
             let history = [];
             req.body.recipe.forEach((val, idx) => {
