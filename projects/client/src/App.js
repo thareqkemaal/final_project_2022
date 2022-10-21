@@ -27,6 +27,9 @@ import ResetPass from './pages/user/ResetPass';
 import ProtectRoute from './components/ProtectRoute/ProtectRoute';
 import ProtectRouteAdmin from './components/ProtectRoute/ProtectRouteAdmin';
 import ProtectRouteLogin from './components/ProtectRoute/ProtectRouteLogin';
+import ProductAdminPage from './pages/admin/ProductAdminPage';
+import EditProductPage from './pages/admin/EditProductPage';
+import AddProductPage from './pages/admin/AddProductPage';
 import EmailVerification from './pages/user/EmailVerification';
 import UserOrderList from './pages/user/OrderList';
 import ChangePassword from './components/ChangePassword';
@@ -86,6 +89,9 @@ function App() {
           {/* Protect Route Page Admin */}
           <Route element={<ProtectRouteAdmin />}>
               <Route path='/admin/dashboard' element={<DashboardPage />} />
+              <Route path='/admin/product' element={<ProductAdminPage />} />
+              <Route path='/admin/product/add' element={<AddProductPage/>} />
+              <Route path='/admin/product/edit' element={<EditProductPage/>} />
               <Route path='/admin/transaction' element={<TransactionPage />} />
               <Route path='/admin/report' element={<ReportPage />} />
               <Route path='/admin/stock_log' element={<HistoryPage />} />
