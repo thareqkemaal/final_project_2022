@@ -26,13 +26,21 @@ const ProductCategory = (props) => {
     // console.log(props)
 
     const getCategoryProduct = () => {
-        axios.post(API_URL + `/api/product/getproductadmin?${props.id}`, {
-            limit: 10,
+        // Tika Change #1 : mengganti mw api
+        // Before : getproductadmin
+        // After : getproduct
+
+        axios.post(API_URL + `/api/product/getproduct?${props.id}`, {
+            limit: 5,
             sort: '',
             offset: ''
         })
             .then((res) => {
-                setProductByCategory(res.data)
+                // Tika Change #2 : mengganti setProductByCategory
+                // Before : setProductByCategory(res.data)
+                // After : setProductByCategory(res.data.results)
+
+                setProductByCategory(res.data.results)
             })
             .catch((err) => {
                 console.log(err)

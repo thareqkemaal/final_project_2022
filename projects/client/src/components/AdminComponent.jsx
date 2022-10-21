@@ -48,7 +48,7 @@ const AdminComponent = (page) => {
             <FcClock size={30} className={`duration-300 ${open && "rotate-[360deg]"}`} />
             <span className={`${!open && 'hidden'}`}>Product History</span>
           </li>
-        </ul>
+        </ul> */}
       </div>
     </div>
     <div className='sm:hidden w-20'>

@@ -36,7 +36,7 @@ const UploadSuccess = (props) => {
                         setLoading(true);
                         setTimeout(() => {
                             setLoading(false);
-                            navigate(`/transaction/${username}`, {replace: true})
+                            navigate(`/${username}/transaction`, {replace: true})
                         }, 2000)
                     }}>Go To Order Progress</button>
                 </div>
