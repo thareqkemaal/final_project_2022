@@ -7,7 +7,7 @@ module.exports = {
     try {
       if (req.dataToken.role.toLowerCase() === 'user') {
         console.log(req.query)
-        
+
         let data = req.query;
         let filter = [];
         let sort = [];
@@ -169,7 +169,7 @@ module.exports = {
       // console.log(JSON.parse(req.body.datatransaction));
       // console.log(req.files[0].filename);
       // console.log(req.files);
-      // console.log(req.body.detail);
+      console.log(req.body.detail);
 
       if (req.files) {
         // status_id = 3 karena harus menunggu konfirmasi admin
@@ -194,6 +194,7 @@ module.exports = {
         // console.log(get[0].idtransaction);
 
         if (get[0].idtransaction > 0) {
+          console.log('detail', req.body.detail)
           let temp = [];
           req.body.detail.forEach((val, idx) => {
             temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)}, ${dbConf.escape(val.product_id)})`);
@@ -202,6 +203,11 @@ module.exports = {
 
           await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id, product_id) VALUES
           ${temp.join(', ')};`)
+
+          req.body.detail.forEach(async (val, idx) => {
+            console.log(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+            await dbQuery(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+          });
 
           let history = [];
           req.body.detail.forEach((val, idx) => {
@@ -244,7 +250,7 @@ module.exports = {
             values ${detail.join(', ')}; `)
 
             for (i = 0; i < req.body.recipe.length; i++) {
-              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
+              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct} and unit = ${dbConf.escape(req.body.recipe[i].unit)};`)
             }
             let history = [];
             req.body.recipe.forEach((val, idx) => {
@@ -270,8 +276,8 @@ module.exports = {
             // pengembalian stock (stock awal + quantity)
             let updateStock = req.body.stock;
             updateStock.forEach(async (val, idx) => {
-              console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-              await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+              console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)} AND unit = ${dbConf.escape(val.product_unit)};`);
+              await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)} AND unit = ${dbConf.escape(val.product_unit)};`);
             });
 
             let history = [];
@@ -282,7 +288,7 @@ module.exports = {
             // console.log('history', history)
 
             await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-            ${history.join(', ')};`)
+              ${history.join(', ')};`)
           }
         } else if (req.body.acceptDeliv) {
           console.log(req.body)
