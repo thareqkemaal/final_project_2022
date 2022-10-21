@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
+import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
 
 const ProductPage = (props) => {
@@ -13,15 +14,15 @@ const ProductPage = (props) => {
     const [category, setCategory] = React.useState([]);
     const [drop, setDrop] = React.useState(true);
     const [sort, setSort] = React.useState('');
-    const [filterName, setFilterName] = React.useState('');
 
     const navigate = useNavigate();
 
     const { state, search } = useLocation();    //perlu idcategory dari daniel
-    let id = search.split('');
-    const [idPage, setIdPage] = React.useState(id[id.length - 1]);
-
-    const [defaultSort, setDefaultSort] = React.useState('Terpopuler');
+    let id = search.split('=');
+    const [filterName, setFilterName] = React.useState(typeof id[id.length - 1] == typeof 'string' ? id[id.length - 1] : '');
+    const [idPage, setIdPage] = React.useState(typeof id[id.length - 1] == typeof 3 ? id[id.length - 1] : undefined);
+    const [defaultSort, setDefaultSort] = React.useState('Paling Sesuai');
+    const [filterNameOn, setFilterNameOn] = React.useState(false);
 
     const [loading, setLoading] = React.useState(false);
 
@@ -35,35 +36,37 @@ const ProductPage = (props) => {
         }
     })
 
-
     const getProduct = () => {
-        if (idPage == undefined) {
-            console.log('Ini all')
-            axios.post(API_URL + `/api/product/getproduct`, {
-                query,
-                sort,
-                filterName
-            })
-                .then((res) => {
-                    setData(res.data);
-                })
-                .catch((error) => {
-                    console.log('Print product error', error);
-                })
-        } else {
-            console.log('Ini filter')
-            axios.post(API_URL + `/api/product/filterproduct/category?category_id=${idPage}`, {
-                query,
-                sort,
-                filterName
-            })
-                .then((res) => {
-                    setData(res.data);
-                })
-                .catch((error) => {
-                    console.log('Print product error', error);
-                })
+        let filter = '';
+        let newID = '';
+
+        if (search.includes('&')) {
+            let a = search.split('&');
+            let b = a[0].split('=');
+            newID = b[b.length - 1];
+            setIdPage(newID);
         }
+
+        if ((idPage || newID) && filterName) {
+            filter = `category_id=${idPage || newID}&product_name=${filterName}`
+        } else if (idPage || newID) {
+            filter = `category_id=${idPage || newID}`
+        } else {
+            filter = `product_name=${filterName}`
+        }
+
+        axios.post(API_URL + `/api/product/getproduct?${filter}`, {
+            limit: query,
+            offset: "",
+            sort
+        })
+            .then((res) => {
+                // setData(res.data)
+                setData(res.data.results)
+            })
+            .catch((error) => {
+                console.log('getProduct error :', error)
+            })
     }
 
     React.useEffect(() => {
@@ -80,9 +83,14 @@ const ProductPage = (props) => {
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
-                return <div key={val.idproduct} className="row-span-3">
-                    <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-auto" >
-                        <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} onClick={() => navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)} />
+                return <div key={val.idproduct} className="row-span-3" onClick={() => navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)}>
+                    <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-72" >
+                        {
+                            val.picture.includes('http') ?
+                                <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} />
+                                :
+                                <img className="w-full pt-1 mb-2" src={API_URL + val.picture} alt={val.idproduct} />
+                        }
                         <div className="" >
                             {val.product_name.length <= 21
                                 ?
@@ -183,25 +191,38 @@ const ProductPage = (props) => {
         }
     }, [])
 
-    const onResetFilter = () => {
+    const onResetFilterCategory = () => {
         setLoading(false);
         setSort('');
-        setDefaultSort('Terpopuler');
+        setDefaultSort('Paling Sesuai');
         setFilterName('');
         setQuery(10)
     }
 
+    const onResetAllFilter = () => {
+        setLoading(false);
+        setSort('');
+        setDefaultSort('Paling Sesuai');
+        setFilterName('');
+        setQuery(10)
+        navigate('/product');
+        document.getElementById("searchsm").value = null;
+        document.getElementById("search").value = null;
+        setIdPage(undefined);
+        setFilterNameOn(false);
+    }
+
     const printCategory = () => {
         return category.map((val, idx) => {
-            if (val.idcategory != idPage) {
+            if (val.idcategory != (idPage)) {
                 return <div key={val.idcategory}>
                     {/* Desktop */}
-                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="hidden md:flex text-md mb-2 text-txt-500">
+                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilterCategory() }} className="hidden md:flex text-md mb-2 text-txt-500">
                         {val.category_name}
                     </button>
                     {/* Mobile */}
                     <li className="mr-2 md:hidden">
-                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilterCategory() }} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
                             {val.category_name}
                         </button>
                     </li>
@@ -209,12 +230,12 @@ const ProductPage = (props) => {
             } else {
                 return <div key={val.idcategory}>
                     {/* Desktop */}
-                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="hidden md:flex font-bold text-md mb-2 text-btn-500">
+                    <button onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilterCategory() }} className="hidden md:flex font-bold text-md mb-2 text-btn-500">
                         {val.category_name}
                     </button>
                     {/* Mobile */}
                     <li className="mr-2 md:hidden">
-                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilter() }} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                        <button type="button" onClick={() => { navigate(`/product?id=${val.idcategory}`); setIdPage(val.idcategory); onResetFilterCategory() }} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
                             {val.category_name}
                         </button>
                     </li>
@@ -329,7 +350,7 @@ const ProductPage = (props) => {
 
         <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
             <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
-            <button className="flex-none" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }}>Obat</button>
+            <button className="flex-none" onClick={() => onResetAllFilter()}>Obat</button>
         </div>
 
         <div className="grid grid-flow-col gap-4">
@@ -341,7 +362,9 @@ const ProductPage = (props) => {
                             <div className="flex">
                                 <div className="relative w-full">
                                     <input id="searchsm" onChange={(e) => setFilterName(e.target.value)} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                    <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                    <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                        {/* <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+                                        {/* <button onClick={() => setLoading(false)} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
                                         <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         <span className="sr-only">Search</span>
                                     </button>
@@ -354,11 +377,11 @@ const ProductPage = (props) => {
                     <div className="px-4 py-4">
                         <div className="font-bold text-md mb-4 text-txt-500">KATEGORI</div>
                         {idPage == undefined ?
-                            <button onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="font-bold text-md mb-2 text-btn-500">
+                            <button onClick={() => onResetAllFilter()} className="font-bold text-md mb-2 text-btn-500">
                                 Semua Produk
                             </button>
                             :
-                            <button onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="text-md mb-2">
+                            <button onClick={() => onResetAllFilter()} className="text-md mb-2">
                                 Semua Produk
                             </button>
                         }
@@ -375,13 +398,13 @@ const ProductPage = (props) => {
                         <ul className="flex flex-wrap -mb-px">
                             {idPage == undefined ?
                                 <li className="mr-2">
-                                    <button type="button" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                                    <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
                                         Semua Produk
                                     </button>
                                 </li>
                                 :
                                 <li className="mr-2">
-                                    <button type="button" onClick={() => { setIdPage(undefined); navigate('/product'); onResetFilter() }} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                                    <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
                                         Semua Produk
                                     </button>
                                 </li>
@@ -396,7 +419,9 @@ const ProductPage = (props) => {
                             <div className="flex">
                                 <div className="relative w-full">
                                     <input id="search" onChange={(e) => setFilterName(e.target.value)} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                    <button onClick={() => { setLoading(false); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                    {/* <button onClick={() => {setLoading(false); navigate(`/product?search=${filterName}`); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+
+                                    <button onClick={() => { setLoading(false); document.getElementById("search").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                         <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         <span className="sr-only">Search</span>
                                     </button>
@@ -416,7 +441,10 @@ const ProductPage = (props) => {
                         <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "103px auto auto 164px" }}>
                             <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
                                 <li>
-                                    <button onClick={() => { setLoading(false); setDefaultSort('Nama Produk'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama Produk</button>
+                                    <button onClick={() => { setLoading(false); setDefaultSort('Paling Sesuai'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paling Sesuai</button>
+                                </li>
+                                <li>
+                                    <button onClick={() => { setLoading(false); setDefaultSort('Nama : A - Z'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama : A - Z</button>
                                 </li>
                                 <li>
                                     <button onClick={() => { setLoading(false); setDefaultSort('Harga Terendah'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Harga Terendah</button>
@@ -440,7 +468,10 @@ const ProductPage = (props) => {
                             <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "115px auto auto 1180px" }}>
                                 <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
                                     <li>
-                                        <button onClick={() => { setLoading(false); setDefaultSort('Nama Produk'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama Produk</button>
+                                        <button onClick={() => { setLoading(false); setDefaultSort('Paling Sesuai'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paling Sesuai</button>
+                                    </li>
+                                    <li>
+                                        <button onClick={() => { setLoading(false); setDefaultSort('Nama : A - Z'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama : A - Z</button>
                                     </li>
                                     <li>
                                         <button onClick={() => { setLoading(false); setDefaultSort('Harga Terendah'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Harga Terendah</button>
@@ -449,12 +480,61 @@ const ProductPage = (props) => {
                             </div>
                         </div>
                     </div>
+                   {
+                        sort || filterName ?
+                            <>
+                                <div className="flex my-7">
+                                    <button className="text-btn-500 font-bold text-sm mx-2" onClick={() => { onResetAllFilter(); setFilterNameOn(false) }}>Reset Semua Filter</button>
+                                    {/* <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
+                                    {defaultFilterCategory}
+                                    <AiFillCloseCircle size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
+                                </button> */}
+                                    {
+                                        sort ?
+                                            <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
+                                                {defaultSort}
+                                                <AiFillCloseCircle onClick={() => { setSort(''); setDefaultSort('Paling Sesuai'); setLoading(false) }} size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
+                                            </button>
+                                            :
+                                            <>
+                                            </>
+                                    }
+                                    {
+                                        filterName ?
+                                            <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
+                                                {filterName}
+                                                <AiFillCloseCircle onClick={() => { setFilterName(''); setLoading(false); navigate('/product'); setFilterNameOn(false) }} size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
+                                            </button>
+                                            :
+                                            <>
+                                            </>
+                                    }
+                                </div>
+                                <hr className="hidden md:flex bg-gray-200 border-0" />
+                            </>
+                            :
+                            <>
+                                <hr className="hidden md:flex bg-gray-200 border-0" />
+                            </>
+                    }
 
                     <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
-                    <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
+                    {
+                        data.length > 0 ?
+                            <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
+                                {printProduct()}
+                            </div>
+                            :
+                            <div className="text-center text-txt-500 font-bold text-lg">
+                                Data Not Found
+                                <img src={require('../admin/NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
+                            </div>
+                    }
+
+                    {/* <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
                         {printProduct()}
-                    </div>
+                    </div> */}
                     <div className="mx-auto">
                         {
                             data.length == 0 || data.length < query

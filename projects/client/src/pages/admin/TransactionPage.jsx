@@ -436,7 +436,8 @@ const TransactionPages = () => {
         qty: qty,
         unit: buyUnit.unit,
         price: buyUnit.price,
-        idproduct: buyUnit.idproduct
+        idproduct: buyUnit.idproduct,
+        isDefault: 'true'
       }]
     } else {
       modalRecipe.total_price = modalRecipe.total_price + (qty * buyUnit.price / buyUnit.netto_stock)
@@ -445,7 +446,8 @@ const TransactionPages = () => {
         qty: qty,
         unit: buyUnit.unit,
         price: buyUnit.price / buyUnit.netto_stock,
-        idproduct: buyUnit.idproduct
+        idproduct: buyUnit.idproduct,
+        isDefault: 'false'
       }]
     }
     if (recipe.length == 0) {
@@ -615,6 +617,7 @@ const TransactionPages = () => {
                   key: 'selection',
                   color: 'teal'
                 }])
+                setPage(1)
                 navigate('/admin/transaction')
                 getTrans('')
               }}>Reset</button>

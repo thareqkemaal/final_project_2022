@@ -30,22 +30,31 @@ const ProductDetail = () => {
         }
     })
 
-
     const getDetailProduct = () => {
-        axios.post(API_URL + `/api/product/getproductadmin${search.split('&')[0]}`, {
+        // Tika Change #1 : mengganti mw api
+        // Before : getproductadmin
+        // After : getproduct
+        axios.post(API_URL + `/api/product/getproduct${search.split('&')[0]}`, {
             limit: 1,
             sort: "",
             offset: ""
         })
             .then((res) => {
-                setProductDetail(res.data)
+                // Tika Change #2 : mengganti setProductDetail
+                // Before : setProductDetail(res.data)
+                // After : setProductDetail(res.data.results)
+
+                setProductDetail(res.data.results)
             })
             .catch((err) => {
                 console.log(err)
             })
             .then((res) => {
-                console.log('get data', res.data);
-                setProductDetail(res.data)
+                // Tika Change #3 : mengganti setProductDetail
+                // Before : setProductDetail(res.data)
+                // After : setProductDetail(res.data.results)
+                
+                setProductDetail(res.data.results)
             })
             .catch((err) => {
                 console.log(err)

@@ -9,6 +9,10 @@ import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import LoadingComponent from "./Loading";
 import placeholder from '../assets/placeholder.png';
+import bni from '../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
+import bca from '../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
+import bri from '../assets/bri.png';
+import BankInfo from "./BankInfoAccordion";
 
 const OrderDetail = ({ selected, showModal }) => {
 
@@ -26,6 +30,7 @@ const OrderDetail = ({ selected, showModal }) => {
     const [showPic, setShowPic] = React.useState('');
     const [paymentProofPic, setPaymentProofPic] = React.useState('');
     const [loadPic, setLoadPic] = React.useState(false);
+    const [phone, setPhone] = React.useState('');
 
     const navigate = useNavigate();
     const fileRef = React.useRef();
@@ -44,6 +49,13 @@ const OrderDetail = ({ selected, showModal }) => {
         setDate(parseInt(selected.invoice_number.split('/')[2]));
         setCourier(selected.shipping_courier.split('/')[0]);
         setDelivery(selected.shipping_courier.split('/')[1]);
+        let ph = selected.user_phone_number;
+        let setPh = '';
+        if (ph.length > 3) {
+            let temp = ph.split('');
+            setPh = '0' + temp.splice(3, ph.length - 3).join('');
+        };
+        setPhone(setPh);
     }, []);
 
     const printDetail = () => {
@@ -123,7 +135,7 @@ const OrderDetail = ({ selected, showModal }) => {
                         });
                         setShowCancelModal('');
                         showModal(false);
-                        navigate(`/transaction/${username}`, { replace: true })
+                        navigate(`/${username}/transaction`, { replace: true })
                     }, 1500)
                 }
             } else {
@@ -151,7 +163,7 @@ const OrderDetail = ({ selected, showModal }) => {
                         });
                         setShowCancelModal('');
                         showModal(false);
-                        navigate(`/transaction/${username}`, { replace: true })
+                        navigate(`/${username}/transaction`, { replace: true })
                     }, 1500)
                 }
 
@@ -184,7 +196,7 @@ const OrderDetail = ({ selected, showModal }) => {
                     });
                     setShowAccept('');
                     showModal(false);
-                    navigate(`/transaction/${username}`, { replace: true })
+                    navigate(`/${username}/transaction`, { replace: true })
                 }, 1500)
             }
 
@@ -274,6 +286,24 @@ const OrderDetail = ({ selected, showModal }) => {
                                         <p><Datetime value={date} /></p>
                                     </div>
                                 </div>
+                                {
+                                    data.status_id === 4 ?
+                                        <div className="border shadow-md flex flex-col p-2 my-1">
+                                            <p className="text-start underline font-semibold text-main-500">How to Pay</p>
+                                            <div className="flex justify-between w-full items-center">
+                                                <p className="font-semibold">Bank Virtual Account</p>
+                                                <div className='flex my-4'>
+                                                    <img src={bni} className='w-12' alt="bnilogo" />
+                                                    <img src={bca} className='w-14 mx-4' alt="bcalogo" />
+                                                    <img src={bri} className='w-20' alt="brilogo" />
+                                                </div>
+                                            </div>
+                                            <p className="text-start font-bold text-2xl">10011{phone}</p>
+                                            <BankInfo />
+                                        </div>
+                                        :
+                                        ""
+                                }
                                 {
                                     data.prescription_pic ?
                                         <div className="border shadow-md flex flex-col p-2 my-1">
