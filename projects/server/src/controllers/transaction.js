@@ -6,13 +6,14 @@ module.exports = {
   getTransaction: async (req, res) => {
     try {
       if (req.dataToken.role.toLowerCase() === 'user') {
-        // console.log(req.query)
-
+        console.log(req.query)
+        
         let data = req.query;
         let filter = [];
         let sort = [];
         let pagination = [];
-        let search = [];
+        let keyword = [];
+        let date = [];
         for (let key in data) {
           if (key === 'status_id') {
             if (data[key].length > 1) {
@@ -21,61 +22,108 @@ module.exports = {
               filter.push(`t.${key}=${data[key]}`)
             }
           } else if (key === 'prescription_pic') {
-            filter.push(`t.${key} ${data[key].split('_').join(' ').toUpperCase()}`)
+            if (data[key] === 'is_not_null') {
+              filter.push(`t.invoice_number LIKE '%/2/%'`);
+            } else if (data[key] === 'is_null') {
+              filter.push(`t.invoice_number LIKE '%/1/%'`);
+            }
           } else if (key === 'date_order') {
             sort.push(`t.${key} ${data[key].toUpperCase()}`)
           } else if (key === 'start') {
-            filter.push(`t.date_order >= ${dbConf.escape(data[key])}`)
+            date.push(`t.date_order >= ${dbConf.escape(data[key])}`)
           } else if (key === 'end') {
-            filter.push(`t.date_order <= ${dbConf.escape(data[key])}`)
-          } else if (key === 'date_filter') {
-            filter.push(`t.date_order LIKE ${dbConf.escape(data[key] + '%')}`)
+            date.push(`t.date_order <= ${dbConf.escape(data[key])}`)
           } else if (key === 'limit') {
             pagination.push(`LIMIT ${data[key]}`)
           } else if (key === 'offset') {
             pagination.push(`OFFSET ${data[key]}`)
-          } else if (key === 'search') {
-            search.push(`invoice_number LIKE '${'%' + data[key]}'`);
-            search.push(`invoice_number LIKE '${data[key] + '%'}'`);
-            search.push(`invoice_number LIKE '${'%' + data[key] + '%'}'`);
+          } else if (key === 'keyword') {
+            keyword.push(`t.invoice_number LIKE '${'%' + data[key]}'`);
+            keyword.push(`t.invoice_number LIKE '${data[key] + '%'}'`);
+            keyword.push(`t.invoice_number LIKE '${'%' + data[key] + '%'}'`);
           }
         }
-        // console.log(filter)
-        // console.log(sort)
 
-        console.log(`SELECT * FROM transaction t 
-          JOIN status s ON t.status_id = s.idstatus 
-          WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+        if (keyword.length > 0 && date.length > 0) {
+          console.log(`SELECT * FROM transaction t 
+            JOIN status s ON t.status_id = s.idstatus 
+            WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[0]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[1]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[2]} AND
+            t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
 
-        let getSql = await dbQuery(`SELECT * FROM transaction t 
-        JOIN status s ON t.status_id = s.idstatus 
-        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+          let getSql = await dbQuery(`SELECT * FROM transaction t 
+            JOIN status s ON t.status_id = s.idstatus 
+            WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[0]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[1]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[2]} AND
+            t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
 
-        let countSql = await dbQuery(`SELECT COUNT(*) AS count FROM transaction t 
-        JOIN status s ON t.status_id = s.idstatus 
-        WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${search.length > 0 ? search.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
+          let countSql = await dbQuery(`SELECT COUNT(*) AS count FROM transaction t 
+            JOIN status s ON t.status_id = s.idstatus 
+            WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[0]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[1]} OR
+            ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword[2]} AND
+            t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
 
-        // console.log(getSql)
-        if (getSql.length > 0) {
-          let comb = getSql.map(async (val, idx) => {
-            // console.log(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
-            let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
-            return { ...val, transaction_detail: detailSql };
-          });
+          // console.log(getSql)
+          if (getSql.length > 0) {
+            let comb = getSql.map(async (val, idx) => {
+              // console.log(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
+              let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
+              return { ...val, transaction_detail: detailSql };
+            });
 
-          const resultComb = await Promise.all(comb);
+            const resultComb = await Promise.all(comb);
 
-          // console.log(resultComb);
-          res.status(200).send({
-            results: resultComb,
-            count: countSql[0].count
-          });
+            // console.log(resultComb);
+            res.status(200).send({
+              results: resultComb,
+              count: countSql[0].count
+            });
+          } else {
+            res.status(200).send({
+              results: getSql,
+              count: countSql[0].count
+            });
+          }
+
         } else {
-          res.status(200).send({
-            results: getSql,
-            count: countSql[0].count
-          });
+          console.log(`SELECT * FROM transaction t 
+              JOIN status s ON t.status_id = s.idstatus 
+              WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword.length > 0 ? keyword.join(' OR ') + ' AND' : ''} t.user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+
+          let getSql = await dbQuery(`SELECT * FROM transaction t 
+            JOIN status s ON t.status_id = s.idstatus 
+            WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword.length > 0 ? keyword.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''} ${pagination.length > 0 ? pagination.join(' ') : ''};`);
+
+          let countSql = await dbQuery(`SELECT COUNT(*) AS count FROM transaction t 
+          JOIN status s ON t.status_id = s.idstatus 
+          WHERE ${filter.length > 0 ? filter.join(' AND ') + ' AND' : ''} ${date.length > 0 ? date.join(' AND ') + ' AND' : ''} ${keyword.length > 0 ? keyword.join(' OR ') + ' AND' : ''} user_id =${dbConf.escape(req.dataToken.iduser)} ${sort.length > 0 ? 'ORDER BY' + ' ' + sort[0] : ''};`);
+
+          // console.log(getSql)
+          if (getSql.length > 0) {
+            let comb = getSql.map(async (val, idx) => {
+              // console.log(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
+              let detailSql = await dbQuery(`SELECT * FROM transaction_detail WHERE transaction_id = ${dbConf.escape(val.idtransaction)};`)
+              return { ...val, transaction_detail: detailSql };
+            });
+
+            const resultComb = await Promise.all(comb);
+
+            // console.log(resultComb);
+            res.status(200).send({
+              results: resultComb,
+              count: countSql[0].count
+            });
+          } else {
+            res.status(200).send({
+              results: getSql,
+              count: countSql[0].count
+            });
+          }
         }
+
       } else {
         let filter = [];
         for (const key in req.query) {

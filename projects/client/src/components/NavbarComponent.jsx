@@ -181,7 +181,7 @@ const NavbarComponent = (props) => {
                                       setTimeout(() => {
                                         setDropdown(false);
                                         setLoading(false);
-                                        navigate(`/transaction/${username}`);
+                                        navigate(`/${username}/transaction`);
                                       }, 1500)
                                     } else if (status === 'Unverified') {
                                       toast.info('Verified your account first!', {
