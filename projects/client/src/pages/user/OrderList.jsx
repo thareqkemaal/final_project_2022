@@ -5,7 +5,7 @@ import { API_URL } from "../../helper";
 import axios from "axios";
 import Datetime from "../../components/DatetimeConverter";
 import Currency from "../../components/CurrencyComp";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { DateRangePicker } from 'react-date-range';
@@ -14,6 +14,10 @@ import nodata from '../../assets/nodata.png';
 import OrderDetail from "../../components/OrderDetailComp";
 import LoadingComponent from "../../components/Loading";
 import { useSelector } from "react-redux";
+import BankInfo from "../../components/BankInfoAccordion";
+import bni from '../../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
+import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
+import bri from '../../assets/bri.png';
 
 const UserOrderList = (props) => {
 
@@ -21,10 +25,17 @@ const UserOrderList = (props) => {
 
     const [userTransactionData, setUserTransactionData] = React.useState([]);
     const [selected, setSelected] = React.useState({
-        tab: 'all',
-        type: 'all',
+        tab: '',
+        type: '',
         sort: 'new'
     });
+
+    const [tab, setTab] = React.useState('');
+    const [type, setType] = React.useState('');
+    const [sort, setSort] = React.useState('');
+    const [start, setStart] = React.useState('');
+    const [end, setEnd] = React.useState('');
+
     const [totalPage, setTotalPage] = React.useState(0);
     const [showPageList, setShowPageList] = React.useState([]);
     const [activePage, setActivePage] = React.useState(1);
@@ -41,6 +52,7 @@ const UserOrderList = (props) => {
     ]);
 
     const navigate = useNavigate();
+    const { search } = useLocation();
 
     const { username } = useSelector((state) => {
         return {
@@ -50,103 +62,221 @@ const UserOrderList = (props) => {
 
     const [showDetail, setShowDetail] = React.useState(false);
     const [selectedDetail, setSelectedDetail] = React.useState({});
-    const [inputSearch, setInputSearch] = React.useState('');
-    const [totalData, setTotalData] = React. useState(0);
+    const [inputKeyword, setInputKeyword] = React.useState('');
+    const [totalData, setTotalData] = React.useState(0);
+    const [showPayment, setShowPayment] = React.useState(false);
 
     React.useEffect(() => {
-        if (inputSearch === '') {
-            getUserTransactionData();
-        } else {
-            handleSearch();
+        if (search) {
+            let temp = search.split('?')[1];
+            let temp2 = temp.split('&');
+            temp2.map((val) => {
+                if (val.includes('tab')) {
+                    return setTab(val.split('=')[1]);
+                } else if (val.includes('type')) {
+                    return setType(val.split('=')[1]);
+                } else if (val.includes('sort')) {
+                    return setSort(val.split('=')[1]);
+                } else if (val.includes('start')) {
+                    let st = val.split('=')[1];
+                    setStart(st.split('%20').join(' '));
+                } else if (val.includes('end')) {
+                    let en = val.split('=')[1];
+                    setEnd(en.split('%20').join(' '));
+                }
+            });
         }
-    }, [selected, range, activePage, showDetail, showAccept]);
+        getUserTransactionData(search);
+    }, [selected, activePage, showDetail, showAccept]);
 
-    const getUserTransactionData = async () => {
+    const getUserTransactionData = async (search) => {
         try {
-            setLoading(true);
-            let temp = [];
-            if (selected.tab === 'waiting') {
-                temp.push('status_id=3', 'status_id=4', 'status_id=5')
-            } else if (selected.tab === 'process') {
-                temp.push('status_id=6')
-            } else if (selected.tab === 'delivery') {
-                temp.push('status_id=8')
-            } else if (selected.tab === 'finished') {
-                temp.push('status_id=9')
-            } else if (selected.tab === 'cancel') {
-                temp.push('status_id=7')
-            }
+            if (search) {
+                setLoading(true);
+                console.log('search', search);
+                let temp = [];
 
-            if (selected.type === 'prescription') {
-                temp.push('prescription_pic=is_not_null')
-            } else if (selected.type === 'free') {
-                temp.push('prescription_pic=is_null')
-            }
+                if (search.includes('tab=waiting')) {
+                    temp.push('status_id=3', 'status_id=4', 'status_id=5');
+                } else if (search.includes('tab=process')) {
+                    temp.push('status_id=6');
+                } else if (search.includes('tab=delivery')) {
+                    temp.push('status_id=8');
+                } else if (search.includes('tab=finished')) {
+                    temp.push('status_id=9');
+                } else if (search.includes('tab=cancel')) {
+                    temp.push('status_id=7');
+                };
 
-            if (selected.sort === 'new') {
-                temp.push('date_order=desc')
-            } else if (selected.sort === 'old') {
-                temp.push('date_order=asc')
-            }
+                if (search.includes('type=prescription')) {
+                    temp.push('prescription_pic=is_not_null');
+                } else if (search.includes('type=free')) {
+                    temp.push('prescription_pic=is_null');
+                };
 
-            if (activePage >= 1) {
-                temp.push(`limit=5`);
-                temp.push(`offset=${(activePage - 1) * 5}`)
-            }
+                if (search.includes('sort=new')) {
+                    temp.push('date_order=desc');
+                } else if (search.includes('sort=old')) {
+                    temp.push('date_order=asc');
+                };
 
-            console.log(temp.join('&'));
+                if (activePage >= 1) {
+                    temp.push(`limit=5`);
+                    temp.push(`offset=${(activePage - 1) * 5}`);
+                };
 
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
+                if (search.includes('start') && search.includes('end')) {
+                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                };
+
+                if (search.includes('keyword')){
+                    temp.push(`keyword=${inputKeyword}`);
                 }
-            })
 
-            console.log('data transaksi user', get.data.results);
-            console.log('jumlah data', get.data.count);
-            console.log('jumlah page', Math.ceil(get.data.count / 5));
+                // console.log(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                // console.log(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                // console.log('start', start);
+                // console.log('end', end);
+                console.log('join search', temp.join('&'));
 
-            if (get.data.results !== undefined) {
-                setLoading(false);
-                let arr = [];
-                if (get.data.count > 10) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                        arr[2] = activePage + 1;
-                    } else if (activePage === 1) {
-                        arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                        arr[2] = activePage + 2;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 2;
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
+                let userToken = localStorage.getItem('medcarelog');
+                let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
                     }
-                } else if (get.data.count > 5) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                    } else if (activePage === 1) {
+                });
+
+                console.log('data transaksi user', get.data.results);
+                console.log('jumlah data', get.data.count);
+                console.log('jumlah page', Math.ceil(get.data.count / 5));
+
+                if (get.data.results !== undefined) {
+                    setLoading(false);
+                    let arr = [];
+                    if (get.data.count > 10) {
+                        if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 1;
+                            arr[1] = activePage;
+                            arr[2] = activePage + 1;
+                        } else if (activePage === 1) {
+                            arr[0] = activePage;
+                            arr[1] = activePage + 1;
+                            arr[2] = activePage + 2;
+                        } else if (activePage === Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 2;
+                            arr[1] = activePage - 1;
+                            arr[2] = activePage;
+                        }
+                    } else if (get.data.count > 5) {
+                        if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 1;
+                            arr[1] = activePage;
+                        } else if (activePage === 1) {
+                            arr[0] = activePage;
+                            arr[1] = activePage + 1;
+                        } else if (activePage === Math.ceil(get.data.count / 5)) {
+                            arr[1] = activePage - 1;
+                            arr[2] = activePage;
+                        }
+                    } else {
                         arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
                     }
+                    console.log(arr);
+                    setShowPageList(arr);
+
+                    setTotalPage(Math.ceil(get.data.count / 5));
+                    setTotalData(get.data.count);
+                    setUserTransactionData(get.data.results);
                 } else {
-                    arr[0] = activePage;
+                    setLoading(false);
+                    toast.error("Data not found!", {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
                 }
-                console.log(arr);
-                setShowPageList(arr);
-
-                setTotalPage(Math.ceil(get.data.count / 5));
-                setTotalData(get.data.count);
-                setUserTransactionData(get.data.results);
             } else {
-                setLoading(false);
-            }
+                //basic page
+                console.log('no query');
+                let temp = [];
+                temp.push('date_order=desc')
+
+                if (activePage >= 1) {
+                    temp.push(`limit=5`);
+                    temp.push(`offset=${(activePage - 1) * 5}`)
+                }
+
+                console.log(temp.join('&'));
+
+                let userToken = localStorage.getItem('medcarelog');
+                let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`
+                    }
+                })
+
+                console.log('data transaksi user', get.data.results);
+                console.log('jumlah data', get.data.count);
+                console.log('jumlah page', Math.ceil(get.data.count / 5));
+
+                if (get.data.results !== undefined) {
+                    setLoading(false);
+                    let arr = [];
+                    if (get.data.count > 10) {
+                        if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 1;
+                            arr[1] = activePage;
+                            arr[2] = activePage + 1;
+                        } else if (activePage === 1) {
+                            arr[0] = activePage;
+                            arr[1] = activePage + 1;
+                            arr[2] = activePage + 2;
+                        } else if (activePage === Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 2;
+                            arr[1] = activePage - 1;
+                            arr[2] = activePage;
+                        }
+                    } else if (get.data.count > 5) {
+                        if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
+                            arr[0] = activePage - 1;
+                            arr[1] = activePage;
+                        } else if (activePage === 1) {
+                            arr[0] = activePage;
+                            arr[1] = activePage + 1;
+                        } else if (activePage === Math.ceil(get.data.count / 5)) {
+                            arr[1] = activePage - 1;
+                            arr[2] = activePage;
+                        }
+                    } else {
+                        arr[0] = activePage;
+                    }
+                    console.log(arr);
+                    setShowPageList(arr);
+
+                    setTotalPage(Math.ceil(get.data.count / 5));
+                    setTotalData(get.data.count);
+                    setUserTransactionData(get.data.results);
+                } else {
+                    setLoading(false);
+                    toast.error("Data not found!", {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                }
+            };
+
         } catch (error) {
             console.log(error)
         }
@@ -155,34 +285,31 @@ const UserOrderList = (props) => {
     const handleFilter = async () => {
         try {
             setLoading(true);
-            // console.log('range', range)
+            setSort('new');
             let temp = [];
-            if (selected.tab === 'waiting') {
-                temp.push('status_id=3', 'status_id=4', 'status_id=5')
-            } else if (selected.tab === 'process') {
-                temp.push('status_id=6')
-            } else if (selected.tab === 'delivery') {
-                temp.push('status_id=8')
-            } else if (selected.tab === 'finished') {
-                temp.push('status_id=9')
-            } else if (selected.tab === 'cancel') {
-                temp.push('status_id=7')
+            if (tab === 'waiting') {
+                temp.push('tab=waiting')
+            } else if (tab === 'process') {
+                temp.push('tab=process')
+            } else if (tab === 'delivery') {
+                temp.push('tab=delivery')
+            } else if (tab === 'finished') {
+                temp.push('tab=finished')
+            } else if (tab === 'cancel') {
+                temp.push('tab=cancel')
             }
 
-            if (selected.type === 'prescription') {
-                temp.push('prescription_pic=is_not_null')
-            } else if (selected.type === 'free') {
-                temp.push('prescription_pic=is_null')
+            if (type === 'prescription') {
+                temp.push('type=prescription')
+            } else if (type === 'free') {
+                temp.push('type=free')
             }
 
-            if (selected.sort === 'new') {
-                temp.push('date_order=desc')
-            } else if (selected.sort === 'old') {
-                temp.push('date_order=asc')
-            }
+            temp.push('sort=new')
 
             if (range[0].startDate === range[0].endDate) {
-                temp.push(`date_filter=${range[0].startDate.toLocaleDateString("sv-SE")}`)
+                temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
             } else {
                 if (range[0].startDate !== '') {
                     temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
@@ -198,69 +325,73 @@ const UserOrderList = (props) => {
                 temp.push(`offset=${(activePage - 1) * 5}`)
             }
 
-            console.log(temp.join('&'));
+            console.log(temp);
 
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            })
-            console.log('data filter', get.data.results);
-            console.log('jumlah data', get.data.count);
-            console.log('jumlah page', Math.ceil(get.data.count / 5));
+            navigate(`/${username}/transaction?${temp.join('&')}`);
+            getUserTransactionData(`?${temp.join('&')}`);
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
+    const handleKeyword = async () => {
+        try {
+            console.log(inputKeyword);
+            console.log(selected);
+            console.log('range', range)
 
-            if (get.data.results.length > 0) {
-                let arr = [];
-                if (get.data.count > 10) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                        arr[2] = activePage + 1;
-                    } else if (activePage === 1) {
-                        arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                        arr[2] = activePage + 2;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 2;
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
-                    }
-                } else if (get.data.count > 5) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                    } else if (activePage === 1) {
-                        arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
-                    }
-                } else {
-                    arr[0] = activePage;
-                }
-                console.log(arr);
-                setShowPageList(arr);
+            // setLoading(true);
+            let temp = [];
 
-                setTotalPage(Math.ceil(get.data.count / 5));
-                setUserTransactionData(get.data.results);
-                setTotalData(get.data.count);
-                setLoading(false);
-            } else {
-                setLoading(false);
-                toast.error("Data not found!", {
-                    theme: "colored",
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: false,
-                    progress: undefined,
-                });
+            if (tab === 'waiting') {
+                temp.push('tab=waiting')
+            } else if (tab === 'process') {
+                temp.push('tab=process')
+            } else if (tab === 'delivery') {
+                temp.push('tab=delivery')
+            } else if (tab === 'finished') {
+                temp.push('tab=finished')
+            } else if (tab === 'cancel') {
+                temp.push('tab=cancel')
             }
+
+            if (type === 'prescription') {
+                temp.push('type=prescription')
+            } else if (type === 'free') {
+                temp.push('type=free')
+            }
+
+            temp.push('sort=new')
+
+            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                if (range[0].startDate === range[0].endDate) {
+                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                } else {
+                    if (range[0].startDate !== '') {
+                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                    }
+
+                    if (range[0].endDate !== '') {
+                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                    }
+                }
+            }
+
+
+            if (inputKeyword !== '') {
+                temp.push(`keyword=${inputKeyword}`);
+            }
+
+            if (activePage >= 1) {
+                temp.push(`limit=5`);
+                temp.push(`offset=${(activePage - 1) * 5}`)
+            }
+
+
+            console.log(temp.join('&'));
+            navigate(`/${username}/transaction?${temp.join('&')}`);
+            getUserTransactionData(`?${temp.join('&')}`);
         } catch (error) {
             console.log(error)
         }
@@ -353,7 +484,8 @@ const UserOrderList = (props) => {
                         <div className="flex justify-end">
                             {
                                 val.status_id === 4 ?
-                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Pay Now</button>
+                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                        onClick={() => setShowPayment(true)}>Pay Now</button>
                                     :
                                     ""
                             }
@@ -471,7 +603,8 @@ const UserOrderList = (props) => {
                         <div className="flex justify-end">
                             {
                                 val.status_id === 4 ?
-                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Pay Now</button>
+                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                        onClick={() => setShowPayment(true)}>Pay Now</button>
                                     :
                                     ""
                             }
@@ -557,7 +690,7 @@ const UserOrderList = (props) => {
                         progress: undefined,
                     });
                     getUserTransactionData();
-                    navigate(`/transaction/${username}`, { replace: true })
+                    navigate(`/${username}/transaction`, { replace: true })
                 }, 1500)
             }
 
@@ -566,118 +699,6 @@ const UserOrderList = (props) => {
         }
     };
 
-    const handleSearch = async () => {
-        try {
-            console.log(inputSearch);
-            console.log(selected);
-            console.log('range', range)
-
-            setLoading(true);
-            let temp = [];
-
-            if (selected.type === 'prescription') {
-                temp.push('prescription_pic=is_not_null')
-            } else if (selected.type === 'free') {
-                temp.push('prescription_pic=is_null')
-            }
-
-            if (selected.sort === 'new') {
-                temp.push('date_order=desc')
-            } else if (selected.sort === 'old') {
-                temp.push('date_order=asc')
-            }
-
-            if (range[0].startDate !== '' && range[0].endDate !== '') {
-                if (range[0].startDate === range[0].endDate) {
-                    temp.push(`date_filter=${range[0].startDate.toLocaleDateString("sv-SE")}`)
-                } else {
-                    if (range[0].startDate !== '') {
-                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
-                    }
-
-                    if (range[0].endDate !== '') {
-                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
-                    }
-                }
-            }
-
-            if (inputSearch !== '') {
-                temp.push(`search=${inputSearch}`);
-            }
-
-            if (activePage >= 1) {
-                temp.push(`limit=5`);
-                temp.push(`offset=${(activePage - 1) * 5}`)
-            }
-
-
-            console.log(temp.join('&'));
-
-            let userToken = localStorage.getItem('medcarelog');
-            let get = await axios.get(API_URL + `/api/transaction/all?${temp.join('&')}`, {
-                headers: {
-                    'Authorization': `Bearer ${userToken}`
-                }
-            })
-            console.log('data filter', get.data.results);
-            console.log('jumlah data', get.data.count);
-            console.log('jumlah page', Math.ceil(get.data.count / 5));
-
-
-            if (get.data.results.length > 0) {
-                let arr = [];
-                if (get.data.count > 10) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                        arr[2] = activePage + 1;
-                    } else if (activePage === 1) {
-                        arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                        arr[2] = activePage + 2;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 2;
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
-                    }
-                } else if (get.data.count > 5) {
-                    if (activePage > 1 && activePage !== Math.ceil(get.data.count / 5)) {
-                        arr[0] = activePage - 1;
-                        arr[1] = activePage;
-                    } else if (activePage === 1) {
-                        arr[0] = activePage;
-                        arr[1] = activePage + 1;
-                    } else if (activePage === Math.ceil(get.data.count / 5)) {
-                        arr[1] = activePage - 1;
-                        arr[2] = activePage;
-                    }
-                } else {
-                    arr[0] = activePage;
-                }
-                console.log(arr);
-                setShowPageList(arr);
-
-                setTotalPage(Math.ceil(get.data.count / 5));
-                setUserTransactionData(get.data.results);
-                setTotalData(get.data.count);
-                setLoading(false);
-            } else {
-                setLoading(false);
-                toast.error("Data not found!", {
-                    theme: "colored",
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: false,
-                    progress: undefined,
-                });
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    };
 
 
     return (
@@ -686,144 +707,391 @@ const UserOrderList = (props) => {
                 <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
                 <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
                     <div className="border-b-2">
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'all' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: '', sort: 'new' });
+                            setTab('all');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: '', sort: 'new' }
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'all' || tab === '' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
                         >All</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'waiting' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: 'waiting', sort: 'new' });
+                            setTab('waiting');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: 'waiting', sort: 'new' };
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Waiting</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'process' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: 'process', sort: 'new' });
+                            setTab('process');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: 'process', sort: 'new' };
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'))
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >In Process</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'delivery' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: 'delivery', sort: 'new' });
+                            setTab('delivery');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: 'delivery', sort: 'new' };
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >On Delivery</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'finished' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: 'finished', sort: 'new' });
+                            setTab('finished');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: 'finished', sort: 'new' };
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Finished</button>
-                        <button type="button" onClick={() => { setSelected({ ...selected, tab: 'cancel' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                            className={selected.tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                        <button type="button" onClick={() => {
+                            setSelected({ ...selected, tab: 'cancel' });
+                            setTab('cancel');
+                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                            setActivePage(1);
+                            setInputKeyword('');
+
+                            let query = { ...selected, tab: 'cancel' };
+                            console.log('selected', selected);
+                            console.log('query', query);
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
+                            className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                         >Canceled</button>
+                    </div>
+                    <div className="my-3 p-2 flex justify-between">
+                        <div className="flex w-4/5 items-center">
+                            <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
+                            <div className="w-3/6 flex justify-between">
+                                <button type="button" onClick={() => {
+                                    setSelected({ ...selected, type: '' });
+                                    setType('all');
+                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                    setActivePage(1);
+                                    setInputKeyword('');
+
+                                    let query = { ...selected, type: '' };
+                                    console.log('selected', selected);
+                                    console.log('query', query);
+                                    let temp = [];
+                                    for (let key in query) {
+                                        if (query[key] !== '') {
+                                            temp.push(`${key}=${query[key]}`);
+                                        }
+                                    };
+                                    console.log(temp.join('&'));
+                                    navigate(`/${username}/transaction?${temp.join('&')}`);
+                                }}
+                                    className={type === "all" || type === "" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                >All Type</button>
+                                <button type="button" onClick={() => {
+                                    setSelected({ ...selected, type: 'prescription' });
+                                    setType('prescription');
+                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                    setActivePage(1);
+                                    setInputKeyword('');
+
+                                    let query = { ...selected, type: 'prescription' };
+                                    console.log('selected', selected);
+                                    console.log('query', query);
+                                    let temp = [];
+                                    for (let key in query) {
+                                        if (query[key] !== '') {
+                                            temp.push(`${key}=${query[key]}`);
+                                        }
+                                    };
+                                    console.log(temp.join('&'));
+                                    navigate(`/${username}/transaction?${temp.join('&')}`);
+                                }}
+                                    className={type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                >Prescription</button>
+                                <button type="button" onClick={() => {
+                                    setSelected({ ...selected, type: 'free' });
+                                    setType('free');
+                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                    setActivePage(1);
+                                    setInputKeyword('');
+
+                                    let query = { ...selected, type: 'free' };
+                                    console.log('selected', selected);
+                                    console.log('query', query);
+                                    let temp = [];
+                                    for (let key in query) {
+                                        if (query[key] !== '') {
+                                            temp.push(`${key}=${query[key]}`);
+                                        }
+                                    };
+                                    console.log(temp.join('&'));
+                                    navigate(`/${username}/transaction?${temp.join('&')}`);
+                                }}
+                                    className={type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                >Free Drugs</button>
+                            </div>
+                        </div>
+                        <div className="flex items-center w-1/5 justify-between">
+                            <p className="font-semibold text-main-500">Sort by:</p>
+                            <select className="border rounded-lg border-main-500 text-gray-500"
+                                onChange={(e) => {
+                                    setSelected({ ...selected, sort: e.target.value });
+                                    setSort(e.target.value);
+                                    setActivePage(1);
+                                    setInputKeyword('');
+
+                                    let query = { ...selected, sort: e.target.value };
+                                    console.log('selected', selected);
+                                    console.log('query', query);
+                                    let temp = [];
+                                    for (let key in query) {
+                                        if (query[key] !== '') {
+                                            temp.push(`${key}=${query[key]}`);
+                                        }
+                                    };
+
+                                    if (range[0].startDate !== '') {
+                                        let data = range[0];
+                                        for (let key in data) {
+                                            console.log(key, data[key]);
+                                            if (key === 'startDate') {
+                                                temp.push(`start=${data[key].toLocaleString('sv-SE')}`);
+                                            } else if (key === 'endDate') {
+                                                temp.push(`end=${data[key].toLocaleDateString('sv-SE')} 23:59:59`);
+                                            }
+                                        }
+                                    };
+
+                                    console.log(temp.join('&'))
+                                    navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    getUserTransactionData(`?${temp.join('&')}`);
+                                }}
+                                value={sort}>
+                                <option value="new">Newest</option>
+                                <option value="old">Oldest</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="p-2 flex items-center">
+                            <div className="flex w-4/5">
+                                <div className="flex w-1/6">
+                                    <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                </div>
+                                <div className="flex w-5/6">
+                                    <div className="p-1 border border-main-500 rounded flex mx-1">
+                                        <input
+                                            value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center"
+                                            placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Date Range'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
+                                    </div>
+                                    <div className="p-1 border border-main-500 rounded flex mx-1">
+                                        <input
+                                            value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center"
+                                            placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select Date Range'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
+                                    </div>
+                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                        onClick={() => {
+                                            setSort('new');
+                                            setActivePage(1); handleFilter();
+                                        }}>Filter</button>
+                                    <button type="button" className="ml-2 hover:underline"
+                                        onClick={() => {
+                                            setRange([{
+                                                startDate: '',
+                                                endDate: '',
+                                                key: 'selection',
+                                                color: 'teal'
+                                            }]);
+                                            setStart('');
+                                            setEnd('');
+                                            setSort('new');
+
+                                            setSelected({ ...selected });
+                                            setActivePage(1);
+                                            setInputKeyword('');
+
+                                            let query = { ...selected, sort: 'new' }
+                                            console.log('selected', selected)
+                                            console.log('query', query)
+                                            let temp = [];
+                                            for (let key in query) {
+                                                if (query[key] !== '') {
+                                                    temp.push(`${key}=${query[key]}`)
+                                                }
+                                            }
+                                            console.log('clear', temp.join('&'))
+                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                        }}
+                                    >Clear</button>
+                                </div>
+                                {
+                                    showFilterDate ?
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                            <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                    <div className="p-6 text-center flex flex-col items-center justify-center">
+                                                        <DateRangePicker
+                                                            onChange={item => setRange([item.selection])}
+                                                            editableDateInputs={true}
+                                                            moveRangeOnFirstSelection={false}
+                                                            ranges={range}
+                                                            months={2}
+                                                            direction="horizontal"
+                                                        />
+                                                        <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                                            onClick={() => {
+                                                                setShowFilterDate(false);
+                                                            }}>Set Date</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        :
+                                        ""
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div className="p-2 flex items-center">
+                            <div className="flex w-4/5">
+                                <div className="flex w-1/6">
+                                    <p className="font-semibold text-main-500 mr-2">Search :</p>
+                                </div>
+                                <div className="flex w-5/6">
+                                    <div className="p-1 border border-main-500 rounded flex mx-1">
+                                        <input
+                                            value={inputKeyword}
+                                            className="text-center"
+                                            placeholder='Keyword'
+                                            onChange={(e) => setInputKeyword(e.target.value)}
+                                        />
+                                    </div>
+                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                        onClick={() => {
+                                            setActivePage(1);
+                                            handleKeyword();
+                                        }}>Search</button>
+                                    <button type="button" className="ml-2 hover:underline"
+                                        onClick={() => {
+                                            setInputKeyword('');
+                                            setRange([{
+                                                startDate: '',
+                                                endDate: '',
+                                                key: 'selection',
+                                                color: 'teal'
+                                            }]);
+                                            setStart('');
+                                            setEnd('');
+                                            setSort('new');
+
+                                            setSelected({ ...selected });
+                                            setActivePage(1);
+                                            setInputKeyword('');
+
+                                            let query = { ...selected, sort: 'new' }
+                                            console.log('selected', selected)
+                                            console.log('query', query)
+                                            let temp = [];
+                                            for (let key in query) {
+                                                if (query[key] !== '') {
+                                                    temp.push(`${key}=${query[key]}`)
+                                                }
+                                            }
+                                            console.log('clear', temp.join('&'))
+                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                        }}
+                                    >Clear</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     {
                         userTransactionData.length > 0 ?
                             <>
-                                <div className="my-3 p-2 flex justify-between">
-                                    <div className="flex w-4/5 items-center">
-                                        <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
-                                        <div>
-                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'all' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                                className={selected.type === "all" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                            >All Type</button>
-                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'prescription' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                                className={selected.type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                            >Doctor Prescription</button>
-                                            <button type="button" onClick={() => { setSelected({ ...selected, type: 'free' }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }}
-                                                className={selected.type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                            >Free Drugs</button>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center w-1/5 justify-between">
-                                        <p className="font-semibold text-main-500">Sort by:</p>
-                                        <select className="border rounded-lg border-main-500 text-gray-500"
-                                            onChange={(e) => { setSelected({ ...selected, sort: e.target.value }); setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]); setActivePage(1); setInputSearch(''); }} defaultValue={'new'}>
-                                            <option value="new">Newest</option>
-                                            <option value="old">Oldest</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="p-2 flex items-center">
-                                        <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
-                                                className="text-center"
-                                                placeholder='Select Date Range'
-                                                onClick={() => setShowFilterDate(true)}
-                                            />
-                                        </div>
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
-                                                className="text-center"
-                                                placeholder='Select Date Range'
-                                                onClick={() => setShowFilterDate(true)}
-                                            />
-                                        </div>
-                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                            onClick={() => { setActivePage(1); handleFilter() }}>Filter</button>
-                                        <button type="button" className="ml-2 hover:underline"
-                                            onClick={() => {
-                                                setRange([{
-                                                    startDate: '',
-                                                    endDate: '',
-                                                    key: 'selection',
-                                                    color: 'teal'
-                                                }]);
-                                                setSelected({ ...selected });
-                                            }}
-                                        >Clear</button>
-                                    </div>
-                                    {
-                                        showFilterDate ?
-                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-1/2 h-full md:h-auto">
-                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                        <div className="p-6 text-center flex flex-col items-center justify-center">
-                                                            <DateRangePicker
-                                                                onChange={item => setRange([item.selection])}
-                                                                editableDateInputs={true}
-                                                                moveRangeOnFirstSelection={false}
-                                                                ranges={range}
-                                                                months={2}
-                                                                direction="horizontal"
-                                                            />
-                                                            <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
-                                                                onClick={() => setShowFilterDate(false)}>Set Date</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            :
-                                            ""
-                                    }
-                                </div>
-                                <div>
-                                    <div className="p-2 flex items-center">
-                                        <p className="font-semibold text-main-500 mr-2">Search :</p>
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={inputSearch}
-                                                className="text-center"
-                                                placeholder='Search'
-                                                onChange={(e) => setInputSearch(e.target.value)}
-                                            />
-                                        </div>
-                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                            onClick={() => {
-                                                setActivePage(1);
-                                                handleSearch();
-                                            }}>Search</button>
-                                        <button type="button" className="ml-2 hover:underline"
-                                            onClick={() => {
-                                                setInputSearch('');
-                                                setRange([{
-                                                    startDate: '',
-                                                    endDate: '',
-                                                    key: 'selection',
-                                                    color: 'teal'
-                                                }]);
-                                                setSelected({ ...selected });
-                                            }}
-                                        >Clear</button>
-                                    </div>
-                                </div>
                                 <div>
                                     {printTransaction()}
                                 </div>
                                 <div className="text-center my-3">
-                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
+                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage === totalPage ? totalData : activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
                                 </div>
                                 <div className="w-full flex justify-center items-center">
                                     <ul className="list-none flex">
@@ -846,6 +1114,36 @@ const UserOrderList = (props) => {
                                         }
                                     </ul>
                                 </div>
+                                {/* MODAL SELECT PAYMENT */}
+                                {
+                                    showPayment ?
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                            <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                    <div className="p-6 text-center">
+                                                        <div>
+                                                            <p className='text-2xl font-bold text-main-500'>How to Pay</p>
+                                                        </div>
+                                                        <div className='flex w-full my-4 items-center justify-center'>
+                                                            <img src={bni} className='w-20' alt="bnilogo" />
+                                                            <img src={bca} className='w-20 mx-4' alt="bcalogo" />
+                                                            <img src={bri} className='w-28' alt="brilogo" />
+                                                        </div>
+                                                        <p className='text-lg font-bold text-main-500'>See virtual account number on order detail</p>
+                                                        <BankInfo />
+                                                        <div className='w-full flex justify-center'>
+                                                            <div className='w-1/2 flex justify-evenly items-center'>
+                                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
+                                                                    onClick={() => setShowPayment(false)}>Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        :
+                                        ""
+                                }
                             </>
                             :
                             <div className="flex flex-col justify-center items-center text-center my-5">

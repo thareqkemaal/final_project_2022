@@ -13,6 +13,7 @@ import LoadingComponent from '../../components/Loading';
 import success from '../../assets/success.png';
 import Currency from '../../components/CurrencyComp';
 import { useSelector } from 'react-redux';
+import BankInfo from '../../components/BankInfoAccordion';
 
 const Checkout = (props) => {
 
@@ -522,6 +523,7 @@ const Checkout = (props) => {
                                                                 <input type='radio' value='manual' onChange={(e) => { setPaymentMethod(e.target.value); console.log(e.target.value) }} />
                                                                 <span className='ml-2'>Bank Transfer (Manual Verification)</span>
                                                             </div>
+                                                            <BankInfo />
                                                         </div>
                                                         <div className='w-full flex justify-center'>
                                                             <div className='w-1/2 flex justify-evenly items-center'>
@@ -533,7 +535,7 @@ const Checkout = (props) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                S  </div>
+                                            </div>
                                         </div>
                                         :
                                         ""
@@ -563,7 +565,7 @@ const Checkout = (props) => {
                                                                     setLoading(true);
                                                                     setTimeout(() => {
                                                                         setLoading(false);
-                                                                        navigate(`/transaction/${username}`, { replace: true })
+                                                                        navigate(`/${username}/transaction`, { replace: true })
                                                                     }, 2000)
                                                                 }}>Go To Order Progress</button>
                                                         </div>
