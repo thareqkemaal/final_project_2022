@@ -3,6 +3,7 @@ import axios from 'axios'
 import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
 import { useSelector } from 'react-redux'
+import { useNavigate, useLocation } from 'react-router'
 import { BiSearchAlt2, BiDetail } from 'react-icons/bi';
 import { BsFillChatDotsFill, BsClock, BsChevronDown } from 'react-icons/bs'
 import { MdOutlinePayments, MdOutlineHideImage, MdAdd, MdOutlineDeleteOutline, MdOutlineArrowForward } from 'react-icons/md'
@@ -25,7 +26,8 @@ const TransactionPages = () => {
     }
   })
   let check = []
-
+  const navigate = useNavigate()
+  const search = useLocation().search
   const [defaultSort, setDefaultSort] = React.useState('Date')
   const [loading, setLoading] = React.useState(true)
   const [drop, setDrop] = React.useState(true)
@@ -34,11 +36,12 @@ const TransactionPages = () => {
   const [dropRecipe, setDropRecipe] = React.useState(true)
   const [filterKey, setFilterKey] = React.useState(0)
   const [transaction, setTransaction] = React.useState([])
-  const [filterTransaction, setFilterTransaction] = React.useState([])
-  const [allTransaction, setAllTransaction] = React.useState([])
+  const [count, setCount] = React.useState(0)
   const [product, setProduct] = React.useState([])
-  const [selectedStatus, setSelectedStatus] = React.useState(3456789)
-  const [isFilter, setIsFilter] = React.useState(false)
+  const [filter, setFilter] = React.useState('')
+  const [status, setStatus] = React.useState('')
+  const [sort, setSort] = React.useState('')
+  const [page, setPage] = React.useState(1)
   const [invoice, setInvoice] = React.useState('')
   const [open, setOpen] = React.useState(false)
   const [modalDetail, setModalDetail] = React.useState('')
@@ -65,26 +68,17 @@ const TransactionPages = () => {
       color: 'teal'
     }
   ])
-  const [startPage, setStartPage] = React.useState(0)
-  const [endPage, setEndPage] = React.useState(4)
-  const [status1, setStatus1] = React.useState(true)
-  const [status2, setStatus2] = React.useState(false)
-  const [status3, setStatus3] = React.useState(false)
-  const [status4, setStatus4] = React.useState(false)
-  const [status5, setStatus5] = React.useState(false)
-  const [status6, setStatus6] = React.useState(false)
 
-
-  const getTrans = () => {
+  const getTrans = (search) => {
     let userToken = localStorage.getItem('medcarelog');
-    axios.get(API_URL + `/api/transaction/all`, {
+    axios.get(API_URL + `/api/transaction/all${search}`, {
       headers: {
         'Authorization': `Bearer ${userToken}`
       }
     })
       .then((res) => {
-        setAllTransaction(res.data)
-        handleStatus(selectedStatus, res.data)
+        setTransaction(res.data.transaction)
+        setCount(res.data.count[0].total)
         setTimeout(() => setLoading(false), 1000)
       }).catch((err) => {
         console.log(err)
@@ -92,15 +86,53 @@ const TransactionPages = () => {
   }
 
   React.useEffect(() => {
-    getTrans()
+    getTrans(search)
+    if (search) {
+      let first = search.split('?')
+      let split = first[1].split('&')
+      let firstInvoice = split.filter((val) => val.includes('invoice'))
+      let firstSort = split.filter((val) => val.includes('sort'))
+      let firstStatus = split.filter((val) => val.includes('status'))
+      let firstPage = split.filter((val) => val.includes('page'))
+      let firstStart = split.filter((val) => val.includes('start'))
+      let firstEnd = split.filter((val) => val.includes('end'))
+      if (firstInvoice.length != 0 || firstStart.length != 0) {
+        if (firstInvoice.length != 0 && firstStart.length == 0) {
+          setInvoice(firstInvoice[0].split('=')[1])
+          setFilter(firstInvoice[0])
+        } else if (firstInvoice.length == 0 && firstStart.length != 0) {
+          setRange([
+            {
+              startDate: new Date(`${firstStart[0].split('=')[1]}`),
+              endDate: new Date(`${firstEnd[0].split('=')[1]}`),
+              key: 'selection',
+              color: 'teal'
+            }
+          ])
+          setFilter(`${firstStart[0]}&${firstEnd[0]}`)
+        } else {
+          setInvoice(firstInvoice[0].split('=')[1])
+          setFilter(`${firstInvoice[0]}&${firstStart[0]}&${firstEnd[0]}`)
+        }
+      }
+      if (firstSort.length != 0) {
+        setSort(`sort=2`)
+        setDefaultSort('Invoice ID')
+      }
+      if (firstStatus.length != 0) {
+        setStatus(firstStatus[0])
+      }
+      if (firstPage.length != 0) {
+        setPage(firstPage[0].split('=')[1])
+      }
+    }
     getProduct()
   }, [])
 
   const getProduct = () => {
-    axios.post(API_URL + `/api/product/getproduct`, {})
+    axios.post(API_URL + `/api/product/getproduct`, { offset: '' })
       .then((res) => {
-        console.log(res.data)
-        setProduct(res.data)
+        setProduct(res.data.results)
       })
       .catch((error) => {
         console.log('Print product error', error);
@@ -109,133 +141,136 @@ const TransactionPages = () => {
 
   const printTrans = () => {
     return transaction.map((val, idx) => {
-      if (idx >= startPage && idx <= endPage) {
-        return <div key={val.idtransaction} className='bg-white border border-teal-300 my-5 mr-10 rounded-2xl divide-y divide-teal-100'>
-          <div className='grid ml-5 mt-3 grid-cols-12'>
-            <p className='text-xl font-bold mr-5 col-span-2'>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 ? 'New Order'
-              : `${val.status_id == 6 ? 'Ready To Ship'
-                : `${val.status_id == 7 ? 'Order Canceled'
-                  : `${val.status_id == 8 ? 'In Delivery'
-                    : 'Order Completed'}`}`}`} </p>
-            <p className='text-xl font-semibold mx-5 col-span-2'>{val.invoice_number}</p>
-            <p className='text-xl font-thin flex items-center col-span-2'><BsClock className='mr-2 opacity-50' /> {val.dateOrder} WIB</p>
-          </div>
-          <div className='ml-5 grid grid-cols-5 gap-0'>
-            <div className='flex col-span-2'>
-              <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 overflow-hidden mt-3'>
-                <img class="w-full h-auto rounded my-3" src={val.prescription_pic ? val.prescription_pic.includes('https') ? val.prescription_pic : API_URL + val.prescription_pic : val.detail[0].product_image.includes('https') ? val.detail[0].product_image : API_URL + val.detail[0].product_image} alt="image description" />
-              </div>
-              <div className='my-3 mx-5'>
-                <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
-                <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`} onClick={val.status_id == 3 ? () => setModalRecipe(val) : () => setModalDetail(val)}>{val.status_id == 3 ? `Make Recipe's Copy` : 'See Detail Order'}</button>
-                <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
-                  {val.status_id == 3 ? null
-                    :
-                    <div>
-                      <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
-                      {val.detail.length > 1 ?
-                        <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
-                          setLoading(true)
-                          setTimeout(() => setLoading(false), 1000)
-                          setTimeout(() => setModalDetail(val), 1000)
-                        }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
-                        : null
-                      }
-                    </div>
-                  }
-                </div>
+      return <div key={val.idtransaction} className='bg-white border border-teal-300 my-5 mr-10 rounded-2xl divide-y divide-teal-100'>
+        <div className='grid ml-5 mt-3 grid-cols-12'>
+          <p className='text-xl font-bold mr-5 col-span-2'>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 ? 'New Order'
+            : `${val.status_id == 6 ? 'Ready To Ship'
+              : `${val.status_id == 7 ? 'Order Canceled'
+                : `${val.status_id == 8 ? 'In Delivery'
+                  : 'Order Completed'}`}`}`} </p>
+          <p className='text-xl font-semibold mx-5 col-span-2'>{val.invoice_number}</p>
+          <p className='text-xl font-thin flex items-center col-span-2'><BsClock className='mr-2 opacity-50' /> {val.dateOrder} WIB</p>
+        </div>
+        <div className='ml-5 grid grid-cols-5 gap-0'>
+          <div className='flex col-span-2'>
+            <div className='w-36 px-4 pb-3 bg-white rounded-lg border border-gray-200 overflow-hidden mt-3'>
+              <img class="w-full h-auto rounded my-3" src={val.prescription_pic ? val.prescription_pic.includes('https') ? val.prescription_pic : API_URL + val.prescription_pic : val.detail[0].product_image.includes('https') ? val.detail[0].product_image : API_URL + val.detail[0].product_image} alt="image description" />
+            </div>
+            <div className='my-3 mx-5'>
+              <p className='font-bold text-lg'>{val.prescription_pic ? 'Resep Dokter' : val.detail[0].product_name}</p>
+              <button type='button' className={`${val.prescription_pic ? 'text-md transition mt-3 p-1 bg-main-500 hover:bg-main-700 focus:ring-main-500 text-white rounded  hover:-translate-y-1 w-44' : 'hidden'}`} onClick={val.status_id == 3 ? () => setModalRecipe(val) : () => setModalDetail(val)}>{val.status_id == 3 ? `Make Recipe's Copy` : 'See Detail Order'}</button>
+              <div className={`${val.prescription_pic ? 'hidden' : ''}`}>
+                {val.status_id == 3 ? null
+                  :
+                  <div>
+                    <p className='font-thin text-lg flex'>{val.detail[0].product_qty} {val.detail[0].product_unit}  x <p className='ml-2'><Currency price={val.detail[0].product_price} /></p></p>
+                    {val.detail.length > 1 ?
+                      <button type='button' className='my-5 text-teal-500 flex items-center text-lg' onClick={() => {
+                        setLoading(true)
+                        setTimeout(() => setLoading(false), 1000)
+                        setTimeout(() => setModalDetail(val), 1000)
+                      }}>See {val.detail.length - 1} more medicine <BsChevronDown className='ml-1  mt-1' /> </button>
+                      : null
+                    }
+                  </div>
+                }
               </div>
             </div>
-            <div className='my-3 ml-3'>
-              <p className='font-bold text-lg'>Customer</p>
-              <p className='font-thin text-lg'>{val.user_name}</p>
-            </div>
-            <div className='my-3 ml-3'>
-              <p className='font-bold text-lg'>Address</p>
-              <p className='font-thin text-lg'>{val.user_address}</p>
-            </div>
-            <div className='my-3 ml-3'>
-              <p className='font-bold text-lg'>Courier</p>
-              <p className='font-thin text-lg'>{val.shipping_courier}</p>
-            </div>
           </div>
-          <div className='bg-teal-100 flex justify-between rounded ml-5 mr-10 my-5 h-10'>
-            <p className='items-center pl-2 pt-1 font-semibold text-xl'>Total</p>
-            <p className='items-center pr-2 pt-1 font-semibold text-xl'>Rp{(val.total_price + val.delivery_price).toLocaleString('id')}</p>
+          <div className='my-3 ml-3'>
+            <p className='font-bold text-lg'>Customer</p>
+            <p className='font-thin text-lg'>{val.user_name}</p>
           </div>
-          <div className='flex m-5 justify-between'>
-            <div className='flex'>
-              <p className='mt-5 text-lg text-teal-500 font-semibold flex items-center'><BsFillChatDotsFill className='mr-2' /> Chat Customer</p>
-              <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="detailModal" onClick={() => {
+          <div className='my-3 ml-3'>
+            <p className='font-bold text-lg'>Address</p>
+            <p className='font-thin text-lg'>{val.user_address}</p>
+          </div>
+          <div className='my-3 ml-3'>
+            <p className='font-bold text-lg'>Courier</p>
+            <p className='font-thin text-lg'>{val.shipping_courier}</p>
+          </div>
+        </div>
+        <div className='bg-teal-100 flex justify-between rounded ml-5 mr-10 my-5 h-10'>
+          <p className='items-center pl-2 pt-1 font-semibold text-xl'>Total</p>
+          <p className='items-center pr-2 pt-1 font-semibold text-xl'>Rp{(val.total_price + val.delivery_price).toLocaleString('id')}</p>
+        </div>
+        <div className='flex m-5 justify-between'>
+          <div className='flex'>
+            <p className='mt-5 text-lg text-teal-500 font-semibold flex items-center'><BsFillChatDotsFill className='mr-2' /> Chat Customer</p>
+            <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="detailModal" onClick={() => {
+              setLoading(true)
+              setTimeout(() => setLoading(false), 1000)
+              setTimeout(() => setModalDetail(val), 1000)
+            }}><BiDetail className='mr-2' />Order Detail</button>
+            <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="paymentModal" onClick={() => {
+              setLoading(true)
+              setTimeout(() => setLoading(false), 1000)
+              setTimeout(() => setModalPayment(val), 1000)
+            }}><MdOutlinePayments className='mr-2' />Check Payment</button>
+          </div>
+          <div className='flex'>
+            <button className='mt-5 text-lg mr-10 font-semibold text-teal-500 flex' onClick={() => {
+              setLoading(true)
+              setTimeout(() => setLoading(false), 1000)
+              setTimeout(() => setModalCancel(val), 1000)
+            }}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 || val.status_id == 6 ? 'Reject Order' : ''}</button>
+            <button type='button'
+              className={`${val.status_id == 7 || val.status_id == 9 ? 'hidden' : ''} ${val.status_id == 3 || val.status_id == 4 ? 'bg-gray-300' : ' bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} text-lg transition mt-4 p-1 mr-5 font-semibold text-white rounded w-44`}
+              disabled={val.status_id == 3 || val.status_id == 4 ? true : false}
+              onClick={val.status_id == 8 ? () => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
                 setTimeout(() => setModalDetail(val), 1000)
-              }}><BiDetail className='mr-2' />Order Detail</button>
-              <button className={`${val.status_id == 3 ? 'hidden' : ''} mt-5 text-lg text-teal-500  font-semibold flex ml-10 items-center`} data-modal-toggle="paymentModal" onClick={() => {
+              } : () => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
-                setTimeout(() => setModalPayment(val), 1000)
-              }}><MdOutlinePayments className='mr-2' />Check Payment</button>
-            </div>
-            <div className='flex'>
-              <button className='mt-5 text-lg mr-10 font-semibold text-teal-500 flex' onClick={() => {
-                setLoading(true)
-                setTimeout(() => setLoading(false), 1000)
-                setTimeout(() => setModalCancel(val), 1000)
-              }}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 || val.status_id == 6 ? 'Reject Order' : ''}</button>
-              <button type='button'
-                className={`${val.status_id == 7 || val.status_id == 9 ? 'hidden' : ''} ${val.status_id == 3 || val.status_id == 4 ? 'bg-gray-300' : ' bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} text-lg transition mt-4 p-1 mr-5 font-semibold text-white rounded w-44`}
-                disabled={val.status_id == 3 || val.status_id == 4 ? true : false}
-                onClick={val.status_id == 8 ? () => {
-                  setLoading(true)
-                  setTimeout(() => setLoading(false), 1000)
-                  setTimeout(() => setModalDetail(val), 1000)
-                } : () => {
-                  setLoading(true)
-                  setTimeout(() => setLoading(false), 1000)
-                  setTimeout(() => setModalAccept(val), 1000)
-                }}
-              >
-                {val.status_id == 6 ? 'Ask For Pickup' : `${val.status_id == 8 ? 'See Detail' : 'Accept Order'}`}
-              </button>
-            </div>
+                setTimeout(() => setModalAccept(val), 1000)
+              }}
+            >
+              {val.status_id == 6 ? 'Ask For Pickup' : `${val.status_id == 8 ? 'See Detail' : 'Accept Order'}`}
+            </button>
           </div>
         </div>
-      }
-    })
+      </div>
+    }
+    )
   }
 
-  const handleStatus = (status, firstSubmit) => {
-    setStartPage(0)
-    setEndPage(4)
+  const handleStatus = (status) => {
+    setPage(1)
     setLoading(true)
-    let result = []
-    if (firstSubmit) {
-      result = firstSubmit.filter((val) => status.toString().includes(val.status_id.toString()))
-      console.log('ini dari firstsubmit', result)
-    } else if (isFilter) {
-      result = filterTransaction.filter((val) => status.toString().includes(val.status_id.toString()))
-      console.log('ini dari filter', result)
+    if (filter || sort) {
+      if (status == 'all') {
+        setStatus('')
+        navigate(`/admin/transaction?${filter}&${sort}`)
+        getTrans(`?${filter}&${sort}`)
+      } else {
+        setStatus(`status=${status}`)
+        navigate(`/admin/transaction?${filter}&status=${status}&${sort}`)
+        getTrans(`?${filter}&status=${status}&${sort}`)
+      }
     } else {
-      result = allTransaction.filter((val) => status.toString().includes(val.status_id.toString()))
-      console.log('ini dari all', result)
+      if (status == 'all') {
+        setStatus('')
+        navigate('/admin/transaction')
+        getTrans('')
+      } else {
+        setStatus(`status=${status}`)
+        navigate(`/admin/transaction?status=${status}`)
+        getTrans(`?status=${status}`)
+      }
     }
-    setTransaction(result)
-    setTimeout(() => setLoading(false), 1000)
   }
 
   const handleFilter = () => {
-    let userToken = localStorage.getItem('medcarelog');
-    setIsFilter(true)
-    setStartPage(0)
-    setEndPage(4)
+    setPage(1)
     setLoading(true)
     let filter = ''
     if (range[0].startDate && range[0].startDate) {
       filter = {
         invoice_number: invoice,
         start: range[0].startDate.toLocaleDateString("en-CA"),
-        end: new Date(range[0].endDate.getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString("en-CA")
+        end: range[0].endDate.toLocaleDateString("en-CA"),
       }
     } else {
       filter = {
@@ -249,18 +284,16 @@ const TransactionPages = () => {
         filterArray.push(`${key}=${filter[key]}`)
       }
     }
+
     console.log(filterArray)
-    axios.get(API_URL + `/api/transaction/all?${filterArray.join('&')}`, {
-      headers: {
-        'Authorization': `Bearer ${userToken}`
-      }
-    })
-      .then((res) => {
-        setFilterTransaction(res.data)
-        handleStatus(selectedStatus, res.data)
-      }).catch((err) => {
-        console.log(err)
-      })
+    setFilter(filterArray.join('&'))
+    if (status || sort) {
+      navigate(`/admin/transaction?${filterArray.join('&')}&${status}&${sort}`)
+      getTrans(`?${filterArray.join('&')}&${status}&${sort}`)
+    } else {
+      navigate(`/admin/transaction?${filterArray.join('&')}`)
+      getTrans(`?${filterArray.join('&')}`)
+    }
   }
 
   const handleUpdate = (val, status) => {
@@ -286,11 +319,7 @@ const TransactionPages = () => {
         recipe: recipe
       }).then((res) => {
         setRecipe('')
-        if (isFilter) {
-          handleFilter()
-        } else {
-          getTrans()
-        }
+        getTrans(search)
       }).catch((err) => {
         console.log(err)
       })
@@ -301,11 +330,7 @@ const TransactionPages = () => {
         status: val.status_id,
         order: status
       }).then((res) => {
-        if (isFilter) {
-          handleFilter()
-        } else {
-          getTrans()
-        }
+        getTrans(search)
       }).catch((err) => {
         console.log(err)
       })
@@ -321,11 +346,7 @@ const TransactionPages = () => {
       id: val.idtransaction,
       reason
     }).then((res) => {
-      if (isFilter) {
-        handleFilter()
-      } else {
-        getTrans()
-      }
+      getTrans(search)
     }).catch((err) => {
       console.log(err)
     })
@@ -451,7 +472,7 @@ const TransactionPages = () => {
     let index = recipe.findIndex((val) => val.idproduct == id)
     modalRecipe.total_price = modalRecipe.total_price - (recipe[index].price * recipe[index].qty)
     recipe.splice(index, 1)
-    getTrans()
+    getTrans(search)
   }
 
   const handleConv = (val) => {
@@ -505,7 +526,7 @@ const TransactionPages = () => {
         <div className='ml-5 '>
           <p className="sm:text-2xl font-bold mt-5 mb-3 text-txt-500">Order List</p>
           <div className='sm:flex relative mt-5 sm:mt-20'>
-            <input placeholder='Invoice Number' id='invoice' key={filterKey} className='w-60 sm:w-96 h-5sm:h-10 border border-teal-500 rounded-lg px-3 sm:px-10' onChange={(e) => setInvoice(e.target.value)} />
+            <input placeholder='Invoice Number' defaultValue={invoice ? invoice : null} id='invoice' key={filterKey} className='w-60 sm:w-96 h-5sm:h-10 border border-teal-500 rounded-lg px-3 sm:px-10' onChange={(e) => setInvoice(e.target.value)} />
             <BiSearchAlt2 className='absolute left-2 top-2 fill-slate-500 hidden sm:block' size={25} />
             <div className="sm:ml-10 mt-2 sm:mt-0 sm:flex items-center">
               <span className="sm:text-xl mr-5">Sort</span>
@@ -519,18 +540,32 @@ const TransactionPages = () => {
                 <div id="dropdown" className={`${drop == true ? 'hidden' : 'z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow absolute'}`} >
                   <ul className="py-1 text-sm text-gray-700" aria-labelledby="dropdownDefault">
                     <li className='hover:bg-gray-100'>
-                      <button className="block py-2 pl-4" onClick={() => {
+                      <button className="block py-2 pl-4" disabled={defaultSort == 'Date' ? true : false} onClick={() => {
+                        setSort('')
+                        setLoading(true)
                         setDefaultSort('Date')
-                        setTransaction(transaction.reverse())
+                        navigate(`/admin/transaction?${filter}&${status}`)
+                        getTrans(`?${filter}&${status}`)
                         setDrop(true)
                       }}>Date</button>
                     </li>
                     <li className='hover:bg-gray-100'>
-                      <button className="block py-2 pl-4" onClick={() => {
+                      <button className="block py-2 pl-4" disabled={defaultSort == 'Invoice ID' ? true : false} onClick={search && search != '?&' ? () => {
+                        setSort(`sort=2`)
+                        setLoading(true)
                         setDefaultSort('Invoice ID')
-                        setTransaction(transaction.reverse())
+                        navigate(`/admin/transaction${search}&sort=2`)
+                        getTrans(`${search}&sort=2`)
                         setDrop(true)
-                      }}>Invoice ID</button>
+                      }
+                        : () => {
+                          setSort(`sort=2`)
+                          setLoading(true)
+                          setDefaultSort('Invoice ID')
+                          navigate(`/admin/transaction?sort=2`)
+                          getTrans(`?sort=2`)
+                          setDrop(true)
+                        }}>Invoice ID</button>
                     </li>
                   </ul>
                 </div>
@@ -563,10 +598,11 @@ const TransactionPages = () => {
                 handleFilter()
               }}>Filter</button>
               <button type='button' className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 rounded-lg py-1 px-2 hover:-translate-y-1 hover:bg-main-500 w-20 sm:w-30  text-black' onClick={() => {
-                setIsFilter(false)
-                setStartPage(0)
-                setEndPage(4)
+                setDefaultSort('Date')
                 setFilterKey(filterKey + 1)
+                setFilter('')
+                setStatus('')
+                setSort('')
                 setInvoice('')
                 setLoading(true)
                 setRange([{
@@ -575,7 +611,8 @@ const TransactionPages = () => {
                   key: 'selection',
                   color: 'teal'
                 }])
-                getTrans()
+                navigate('/admin/transaction')
+                getTrans('')
               }}>Reset</button>
             </div>
           </div>
@@ -583,80 +620,38 @@ const TransactionPages = () => {
             <p className="sm:text-xl font-bold mb-3 mr-5 mt-1">Status</p>
             <div className='w-20 sm:w-full flex'>
               <button
-                className={`${status1 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white text-sm sm:text-base font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(true)
-                  setStatus2(false)
-                  setStatus3(false)
-                  setStatus4(false)
-                  setStatus5(false)
-                  setStatus6(false)
-                  setSelectedStatus(3456789)
-                  handleStatus(3456789)
+                className={`${status == '' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white text-sm sm:text-base font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('all')
                 }} type="button">
                 All Orders
               </button>
               <button
-                className={`${status2 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(false)
-                  setStatus2(true)
-                  setStatus3(false)
-                  setStatus4(false)
-                  setStatus5(false)
-                  setStatus6(false)
-                  setSelectedStatus(345)
-                  handleStatus(345)
+                className={`${status == 'status=waiting' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('waiting')
                 }} type="button">
                 New Order
               </button>
               <button
-                className={`${status3 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(false)
-                  setStatus2(false)
-                  setStatus3(true)
-                  setStatus4(false)
-                  setStatus5(false)
-                  setStatus6(false)
-                  setSelectedStatus(6)
-                  handleStatus(6)
+                className={`${status == 'status=process' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('process')
                 }} type="button">
                 Ready To Ship
               </button>
               <button
-                className={`${status4 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(false)
-                  setStatus2(false)
-                  setStatus3(false)
-                  setStatus4(true)
-                  setStatus5(false)
-                  setStatus6(false)
-                  setSelectedStatus(8)
-                  handleStatus(8)
+                className={`${status == 'status=on' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('on')
                 }} type="button">
                 In Delivery
               </button>
               <button
-                className={`${status5 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(false)
-                  setStatus2(false)
-                  setStatus3(false)
-                  setStatus4(false)
-                  setStatus5(true)
-                  setStatus6(false)
-                  setSelectedStatus(9)
-                  handleStatus(9)
+                className={`${status == 'status=completed' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('finished')
                 }} type="button">
                 Order Completed
               </button>
               <button
-                className={`${status6 ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
-                  setStatus1(false)
-                  setStatus2(false)
-                  setStatus3(false)
-                  setStatus4(false)
-                  setStatus5(false)
-                  setStatus6(true)
-                  setSelectedStatus(7)
-                  handleStatus(7)
+                className={`${status == 'status=canceled' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                  handleStatus('canceled')
                 }} type="button">
                 Order Canceled
               </button>
@@ -665,25 +660,55 @@ const TransactionPages = () => {
           <div className={`${transaction.length == 0 ? 'hidden' : "flex flex-col items-end mb-5 mr-12"}`}>
             {/* <!-- Help text --> */}
             <span className="text-large text-gray-700 dark:text-gray-400">
-              Showing <span className="font-semibold text-gray-900 dark:text-white">{startPage + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{endPage < transaction.length ? endPage + 1 : transaction.length}</span> of <span className="font-semibold text-gray-900 dark:text-white">{transaction.length}</span> Entries
+              Showing <span className="font-semibold text-gray-900 dark:text-white">{page == 1 ? page : (page * 5) - 4}</span> to <span className="font-semibold text-gray-900 dark:text-white">{(page * 5) < count ? page * 5 : count}</span> of <span className="font-semibold text-gray-900 dark:text-white">{count}</span> Entries
             </span>
             {/* <!-- Buttons --> */}
             <div className="inline-flex mt-2 xs:mt-0 divide-x">
-              <button className={`${startPage < 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+              <button className={`${page == 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
-                setStartPage(startPage - 5)
-                setEndPage(endPage - 5)
-              }}
-                disabled={startPage < 1 ? true : false}>
+                if (search.includes('page')) {
+                  let add = search.replace(`page=${page}`, `page=${page - 1}`)
+                  navigate(`/admin/transaction${add}`)
+                  getTrans(add)
+                } else {
+                  navigate(`/admin/transaction${search}&page=${page - 1}`)
+                  getTrans(`${search}&page=${page - 1}`)
+                }
+                setPage(page - 1)
+              }
+                :
+                () => {
+                  setLoading(true)
+                  setTimeout(() => setLoading(false), 1000)
+                  navigate(`/admin/transaction?page=${page - 1}`)
+                  getTrans(`?page=${page - 1}`)
+                  setPage(page - 1)
+                }}
+                disabled={page == 1 ? true : false}>
                 Prev
               </button>
-              <button className={`${endPage >= transaction.length ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+              <button className={`${page * 5 >= count ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                 setLoading(true)
                 setTimeout(() => setLoading(false), 1000)
-                setStartPage(startPage + 5)
-                setEndPage(endPage + 5)
-              }} disabled={endPage >= transaction.length ? true : false}>
+                if (search.includes('page')) {
+                  let add = search.replace(`page=${page}`, `page=${page + 1}`)
+                  navigate(`/admin/transaction${add}`)
+                  getTrans(add)
+                } else {
+                  navigate(`/admin/transaction${search}&page=${page + 1}`)
+                  getTrans(`${search}&page=${page + 1}`)
+                }
+                setPage(page + 1)
+              }
+                :
+                () => {
+                  setLoading(true)
+                  setTimeout(() => setLoading(false), 1000)
+                  navigate(`/admin/transaction?page=${page + 1}`)
+                  getTrans(`?page=${page + 1}`)
+                  setPage(page + 1)
+                }} disabled={page * 5 >= count ? true : false}>
                 Next
               </button>
             </div>
@@ -699,25 +724,55 @@ const TransactionPages = () => {
         <div className={`${transaction.length == 0 ? 'hidden' : "flex flex-col items-end mb-5 mr-12"}`}>
           {/* <!-- Help text --> */}
           <span className="text-large text-gray-700 dark:text-gray-400">
-            Showing <span className="font-semibold text-gray-900 dark:text-white">{startPage + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{endPage < transaction.length ? endPage + 1 : transaction.length}</span> of <span className="font-semibold text-gray-900 dark:text-white">{transaction.length}</span> Entries
+            Showing <span className="font-semibold text-gray-900 dark:text-white">{page == 1 ? page : (page * 5) - 4}</span> to <span className="font-semibold text-gray-900 dark:text-white">{(page * 5) < count ? page * 5 : count}</span> of <span className="font-semibold text-gray-900 dark:text-white">{count}</span> Entries
           </span>
           {/* <!-- Buttons --> */}
           <div className="inline-flex mt-2 xs:mt-0 divide-x">
-            <button className={`${startPage < 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+            <button className={`${page == 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
               setLoading(true)
               setTimeout(() => setLoading(false), 1000)
-              setStartPage(startPage - 5)
-              setEndPage(endPage - 5)
-            }}
-              disabled={startPage < 1 ? true : false}>
+              if (search.includes('page')) {
+                let add = search.replace(`page=${page}`, `page=${page - 1}`)
+                navigate(`/admin/transaction${add}`)
+                getTrans(add)
+              } else {
+                navigate(`/admin/transaction${search}&page=${page - 1}`)
+                getTrans(`${search}&page=${page - 1}`)
+              }
+              setPage(page - 1)
+            }
+              :
+              () => {
+                setLoading(true)
+                setTimeout(() => setLoading(false), 1000)
+                navigate(`/admin/transaction?page=${page - 1}`)
+                getTrans(`?page=${page - 1}`)
+                setPage(page - 1)
+              }}
+              disabled={page == 1 ? true : false}>
               Prev
             </button>
-            <button className={`${endPage >= transaction.length ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+            <button className={`${page * 5 >= count ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
               setLoading(true)
               setTimeout(() => setLoading(false), 1000)
-              setStartPage(startPage + 5)
-              setEndPage(endPage + 5)
-            }} disabled={endPage >= transaction.length ? true : false}>
+              if (search.includes('page')) {
+                let add = search.replace(`page=${page}`, `page=${page + 1}`)
+                navigate(`/admin/transaction${add}`)
+                getTrans(add)
+              } else {
+                navigate(`/admin/transaction${search}&page=${page + 1}`)
+                getTrans(`${search}&page=${page + 1}`)
+              }
+              setPage(page + 1)
+            }
+              :
+              () => {
+                setLoading(true)
+                setTimeout(() => setLoading(false), 1000)
+                navigate(`/admin/transaction?page=${page + 1}`)
+                getTrans(`?page=${page + 1}`)
+                setPage(page + 1)
+              }} disabled={page * 5 >= count ? true : false}>
               Next
             </button>
           </div>
@@ -1086,6 +1141,9 @@ const TransactionPages = () => {
               <button type="button" onClick={() => {
                 setRecipe('')
                 setModalRecipe('')
+                setShowInput(false)
+                setShowBtn(true)
+                setPickMed('Search Medicine')
               }} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="RecipeModal">
                 <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                 <span className="sr-only">Close modal</span>
@@ -1155,11 +1213,14 @@ const TransactionPages = () => {
                 <button className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20' onClick={() => {
                   setRecipe('')
                   setModalRecipe('')
+                  setShowInput(false)
+                  setShowBtn(true)
+                  setPickMed('Search Medicine')
                 }}>Cancel</button>
-                <button type='button' className='bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1 text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44' onClick={() => {
+                <button type='button' className={`${recipe.length < 1 ? 'bg-gray-300' : 'bg-main-500  hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} text-lg transition my-4 p-1 mr-5 font-semibold text-white rounded w-44`} onClick={() => {
                   setModalAccept(modalRecipe)
                   setModalRecipe('')
-                }}>Make Order</button>
+                }} disabled={recipe.length > 0 ? false : true}>Make Order</button>
               </div>
             </div>
           </div>

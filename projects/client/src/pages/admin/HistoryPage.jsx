@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import { API_URL } from '../../helper';
 import AdminComponent from '../../components/AdminComponent'
+import { useNavigate, useLocation } from 'react-router'
 import { BiSearchAlt2 } from 'react-icons/bi';
 import Loading from '../../components/Loading'
 import { DateRangePicker } from 'react-date-range'
@@ -10,10 +11,15 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 
 const HistoryPage = () => {
+    const navigate = useNavigate()
+    const search = useLocation().search
     const [loading, setLoading] = React.useState(true)
     const [history, setHistory] = React.useState([])
     const [product, setProduct] = React.useState('')
     const [filterKey, setFilterKey] = React.useState(0)
+    const [filter, setFilter] = React.useState('')
+    const [count, setCount] = React.useState(0)
+    const [page, setPage] = React.useState(1)
     const [range, setRange] = React.useState([
         {
             startDate: '',
@@ -22,16 +28,16 @@ const HistoryPage = () => {
             color: 'teal'
         }
     ])
-    const [startPage, setStartPage] = React.useState(0)
-    const [endPage, setEndPage] = React.useState(19)
     const [open, setOpen] = React.useState(false)
 
 
 
-    const getHistory = () => {
-        axios.get(API_URL + `/api/transaction/history`)
+    const getHistory = (search) => {
+        axios.get(API_URL + `/api/transaction/history${search}`)
             .then((res) => {
-                setHistory(res.data)
+                console.log(res.data.count[0].total)
+                setHistory(res.data.history)
+                setCount(res.data.count[0].total)
                 setTimeout(() => setLoading(false), 1000)
             }).catch((err) => {
                 console.log(err)
@@ -39,49 +45,76 @@ const HistoryPage = () => {
     }
 
     React.useEffect(() => {
-        getHistory()
+        getHistory(search)
+        if (search) {
+            let first = search.split('?')
+            let split = first[1].split('&')
+            let firstProduct = split.filter((val) => val.includes('product'))
+            let firstPage = split.filter((val) => val.includes('page'))
+            let firstStart = split.filter((val) => val.includes('start'))
+            let firstEnd = split.filter((val) => val.includes('end'))
+            if (firstProduct.length != 0 || firstStart.length != 0) {
+                if (firstProduct.length != 0 && firstStart.length == 0) {
+                    setProduct(firstProduct[0].split('=')[1])
+                    setFilter(firstProduct[0])
+                } else if (firstProduct.length == 0 && firstStart.length != 0) {
+                    setRange([
+                        {
+                            startDate: new Date(`${firstStart[0].split('=')[1]}`),
+                            endDate: new Date(`${firstEnd[0].split('=')[1]}`),
+                            key: 'selection',
+                            color: 'teal'
+                        }
+                    ])
+                    setFilter(`${firstStart[0]}&${firstEnd[0]}`)
+                } else {
+                    setProduct(firstProduct[0].split('=')[1])
+                    setFilter(`${firstProduct[0]}&${firstStart[0]}&${firstEnd[0]}`)
+                }
+            }
+            if (firstPage.length != 0) {
+                setPage(firstPage[0].split('=')[1])
+            }
+        }
     }, [])
 
     const printHistory = () => {
         return history.map((val, idx) => {
-            if (idx >= startPage && idx <= endPage) {
-                return <tr className='border border-black divide-black divide-x'>
-                    <th scope="col" className="py-3 px-3 text-center">
-                        {val.date_change}
-                    </th>
-                    <th scope="col" className="py-3 pl-6 w-96 text-center">
-                        {val.product_name}
-                    </th>
-                    <th scope="col" className="py-3 px-3 w-32 text-center">
-                        {val.user_id}
-                    </th>
-                    <th scope="col" className="py-3 px-3 text-center">
-                        {val.unit}
-                    </th>
-                    <th scope="col" className="py-3 px-3 w-20 text-center">
-                        {val.qty}
-                    </th>
-                    <th scope="col" className="py-3 px-3 text-center">
-                        {val.type}
-                    </th>
-                    <th scope="col" className="py-3 px-3 text-center">
-                        {val.information}
-                    </th>
-                </tr>
-            }
+            return <tr className='border border-black divide-black divide-x'>
+                <th scope="col" className="py-3 px-3 text-center">
+                    {val.date_change}
+                </th>
+                <th scope="col" className="py-3 pl-6 w-96 text-center">
+                    {val.product_name}
+                </th>
+                <th scope="col" className="py-3 px-3 w-32 text-center">
+                    {val.username}
+                </th>
+                <th scope="col" className="py-3 px-3 text-center">
+                    {val.unit}
+                </th>
+                <th scope="col" className="py-3 px-3 w-20 text-center">
+                    {val.quantity}
+                </th>
+                <th scope="col" className="py-3 px-3 text-center">
+                    {val.type}
+                </th>
+                <th scope="col" className="py-3 px-3 text-center">
+                    {val.information}
+                </th>
+            </tr>
         })
     }
 
     const handleFilter = () => {
-        setStartPage(0)
-        setEndPage(19)
+        setPage(1)
         setLoading(true)
         let filter = ''
         if (range[0].startDate && range[0].startDate) {
             filter = {
                 product_name: product,
                 start: range[0].startDate.toLocaleDateString("en-CA"),
-                end: new Date(range[0].endDate.getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString("en-CA")
+                end: range[0].endDate.toLocaleDateString("en-CA")
             }
         } else {
             filter = {
@@ -95,14 +128,9 @@ const HistoryPage = () => {
                 filterArray.push(`${key}=${filter[key]}`)
             }
         }
-        console.log(filterArray)
-        axios.get(API_URL + `/api/transaction/history?${filterArray.join('&')}`)
-            .then((res) => {
-                setHistory(res.data)
-                setTimeout(() => setLoading(false), 1000)
-            }).catch((err) => {
-                console.log(err)
-            })
+        setFilter(filterArray.join('&'))
+        navigate(`/admin/stock_log?${filterArray.join('&')}`)
+        getHistory(`?${filterArray.join('&')}`)
     }
 
     return (<div>
@@ -113,7 +141,7 @@ const HistoryPage = () => {
                     <p className="sm:text-2xl font-bold mt-5 mb-3 text-txt-500">Stock History</p>
                     <p className="sm:text-xl font-semibold mt-5 mb-3 text-txt-500">Last Update {new Date().toLocaleString('en-CA')}</p>
                     <div className='sm:flex relative mt-5 sm:mt-10'>
-                        <input placeholder='Product Name' id='product' key={filterKey} className='w-60 sm:w-96 h-5sm:h-10 border border-teal-500 rounded-lg px-3 sm:px-10' onChange={(e) => setProduct(e.target.value)} />
+                        <input placeholder='Product Name' defaultValue={product ? product : null} id='product' key={filterKey} className='w-60 sm:w-96 h-5sm:h-10 border border-teal-500 rounded-lg px-3 sm:px-10' onChange={(e) => setProduct(e.target.value)} />
                         <BiSearchAlt2 className='absolute left-2 top-2 fill-slate-500 hidden sm:block' size={25} />
                         <div className='sm:ml-5 mt-3 sm:mt-0 flex items-center'>
                             <input
@@ -143,36 +171,71 @@ const HistoryPage = () => {
                             handleFilter()
                         }}>Filter</button>
                         <button type='button' className='transition mr-4 bg-white border border-main-500 focus:ring-main-500 rounded-lg py-1 px-2 hover:-translate-y-1 hover:bg-main-500 w-20 sm:w-30  text-black' onClick={() => {
-                            setLoading(true)
                             setFilterKey(filterKey + 1)
+                            setLoading(true)
+                            setRange([{
+                                startDate: '',
+                                endDate: '',
+                                key: 'selection',
+                                color: 'teal'
+                            }])
+                            navigate('/admin/stock_log')
                             setProduct('')
-                            getHistory()
-                            setStartPage(0)
-                            setEndPage(19)
+                            getHistory('')
                         }}>Reset</button>
                     </div>
                     <div className={`${history.length == 0 ? 'hidden' : "flex flex-col items-end mr-12"}`}>
                         {/* <!-- Help text --> */}
                         <span className="text-large text-gray-700 dark:text-gray-400">
-                            Showing <span className="font-semibold text-gray-900 dark:text-white">{startPage + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{endPage < history.length ? endPage + 1 : history.length}</span> of <span className="font-semibold text-gray-900 dark:text-white">{history.length}</span> Entries
+                            Showing <span className="font-semibold text-gray-900 dark:text-white">{page == 1 ? page : (page * 20) - 19}</span> to <span className="font-semibold text-gray-900 dark:text-white">{page * 20 <= count ? page * 20 : count}</span> of <span className="font-semibold text-gray-900 dark:text-white">{count}</span> Entries
                         </span>
                         {/* <!-- Buttons --> */}
                         <div className="inline-flex mt-2 xs:mt-0 divide-x">
-                            <button className={`${startPage < 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+                            <button className={`${page == 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                                 setLoading(true)
                                 setTimeout(() => setLoading(false), 1000)
-                                setStartPage(startPage - 20)
-                                setEndPage(endPage - 20)
-                            }}
-                                disabled={startPage < 1 ? true : false}>
+                                if (search.includes('page')) {
+                                    let add = search.replace(`page=${page}`, `page=${page - 1}`)
+                                    navigate(`/admin/stock_log${add}`)
+                                    getHistory(add)
+                                } else {
+                                    navigate(`/admin/stock_log${search}&page=${page - 1}`)
+                                    getHistory(`${search}&page=${page - 1}`)
+                                }
+                                setPage(page - 1)
+                            }
+                                :
+                                () => {
+                                    setLoading(true)
+                                    setTimeout(() => setLoading(false), 1000)
+                                    navigate(`/admin/stock_log?page=${page - 1}`)
+                                    getHistory(`?page=${page - 1}`)
+                                    setPage(page - 1)
+                                }}
+                                disabled={page == 1 ? true : false}>
                                 Prev
                             </button>
-                            <button className={`${endPage >= history.length ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+                            <button className={`${page * 20 >= count ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                                 setLoading(true)
                                 setTimeout(() => setLoading(false), 1000)
-                                setStartPage(startPage + 20)
-                                setEndPage(endPage + 20)
-                            }} disabled={endPage >= history.length ? true : false}>
+                                if (search.includes('page')) {
+                                    let add = search.replace(`page=${page}`, `page=${page + 1}`)
+                                    navigate(`/admin/stock_log${add}`)
+                                    getHistory(add)
+                                } else {
+                                    navigate(`/admin/stock_log${search}&page=${page + 1}`)
+                                    getHistory(`${search}&page=${page + 1}`)
+                                }
+                                setPage(page + 1)
+                            }
+                                :
+                                () => {
+                                    setLoading(true)
+                                    setTimeout(() => setLoading(false), 1000)
+                                    navigate(`/admin/stock_log?page=${page + 1}`)
+                                    getHistory(`?page=${page + 1}`)
+                                    setPage(page + 1)
+                                }} disabled={page * 20 >= count ? true : false}>
                                 Next
                             </button>
                         </div>
@@ -188,7 +251,7 @@ const HistoryPage = () => {
                                         Product Name
                                     </th>
                                     <th scope="col" className="py-3 px-3 w-32 text-center">
-                                        By Who (ID)
+                                        By Who
                                     </th>
                                     <th scope="col" className="py-3 px-3 text-center">
                                         Unit
@@ -209,28 +272,58 @@ const HistoryPage = () => {
                             </tbody>
                         </table>
                     </div>
-                    <div className={`${history.length == 0 ? 'hidden' : "flex flex-col items-end mb-5 mt-5 mr-12"}`}>
+                    <div className={`${history.length == 0 ? 'hidden' : "flex flex-col items-end mr-12"}`}>
                         {/* <!-- Help text --> */}
                         <span className="text-large text-gray-700 dark:text-gray-400">
-                            Showing <span className="font-semibold text-gray-900 dark:text-white">{startPage + 1}</span> to <span className="font-semibold text-gray-900 dark:text-white">{endPage < history.length ? endPage + 1 : history.length}</span> of <span className="font-semibold text-gray-900 dark:text-white">{history.length}</span> Entries
+                            Showing <span className="font-semibold text-gray-900 dark:text-white">{page == 1 ? page : (page * 20) - 19}</span> to <span className="font-semibold text-gray-900 dark:text-white">{page * 20 <= count ? page * 20 : count}</span> of <span className="font-semibold text-gray-900 dark:text-white">{count}</span> Entries
                         </span>
                         {/* <!-- Buttons --> */}
                         <div className="inline-flex mt-2 xs:mt-0 divide-x">
-                            <button className={`${startPage < 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+                            <button className={`${page == 1 ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                                 setLoading(true)
                                 setTimeout(() => setLoading(false), 1000)
-                                setStartPage(startPage - 20)
-                                setEndPage(endPage - 20)
-                            }}
-                                disabled={startPage < 1 ? true : false}>
+                                if (search.includes('page')) {
+                                    let add = search.replace(`page=${page}`, `page=${page - 1}`)
+                                    navigate(`/admin/stock_log${add}`)
+                                    getHistory(add)
+                                } else {
+                                    navigate(`/admin/stock_log${search}&page=${page - 1}`)
+                                    getHistory(`${search}&page=${page - 1}`)
+                                }
+                                setPage(page - 1)
+                            }
+                                :
+                                () => {
+                                    setLoading(true)
+                                    setTimeout(() => setLoading(false), 1000)
+                                    navigate(`/admin/stock_log?page=${page - 1}`)
+                                    getHistory(`?page=${page - 1}`)
+                                    setPage(page - 1)
+                                }}
+                                disabled={page == 1 ? true : false}>
                                 Prev
                             </button>
-                            <button className={`${endPage >= history.length ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={() => {
+                            <button className={`${page * 20 >= count ? "bg-gray-300" : ' bg-main-500 hover:bg-main-700 focus:ring-main-500'} w-20 py-2 px-4 mx-1 text-sm font-medium rounded text-white`} onClick={search && search != '?&' ? () => {
                                 setLoading(true)
                                 setTimeout(() => setLoading(false), 1000)
-                                setStartPage(startPage + 20)
-                                setEndPage(endPage + 20)
-                            }} disabled={endPage >= history.length ? true : false}>
+                                if (search.includes('page')) {
+                                    let add = search.replace(`page=${page}`, `page=${page + 1}`)
+                                    navigate(`/admin/stock_log${add}`)
+                                    getHistory(add)
+                                } else {
+                                    navigate(`/admin/stock_log${search}&page=${page + 1}`)
+                                    getHistory(`${search}&page=${page + 1}`)
+                                }
+                                setPage(page + 1)
+                            }
+                                :
+                                () => {
+                                    setLoading(true)
+                                    setTimeout(() => setLoading(false), 1000)
+                                    navigate(`/admin/stock_log?page=${page + 1}`)
+                                    getHistory(`?page=${page + 1}`)
+                                    setPage(page + 1)
+                                }} disabled={page * 20 >= count ? true : false}>
                                 Next
                             </button>
                         </div>
