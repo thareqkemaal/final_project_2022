@@ -52,16 +52,11 @@ const DashboardPage = (props) => {
     const getProduct = () => {
         axios.post(API_URL + `/api/product/getproduct`, { offset: '' })
             .then((res) => {
-                res.data.results.map((val) => {
-                    if (val.isDefault == 'false') {
-                        let index = res.data.results.findIndex((value) => value == val)
-                        res.data.results.splice(index, 1)
-                    }
-                })
-                setProduct(res.data.results)
+                console.log(res.data.totalProduct)
+                setProduct(res.data.totalProduct)
                 let array = []
                 res.data.results.map((val) => {
-                    if (val.stock_unit < 5) {
+                    if (val.stock_unit < 5 && val.isDefault == 'true') {
                         array.push(val)
                     }
                 })
@@ -168,7 +163,7 @@ const DashboardPage = (props) => {
                             </div>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg mx-5'>
                                 <p className="sm:text-xl font-semibold mt-5 mb-3 px-5">Total Product Registered</p>
-                                <p className="sm:text-4xl font-bold mt-3 mb-3 pl-5">{product.length}</p>
+                                <p className="sm:text-4xl font-bold mt-3 mb-3 pl-5">{product}</p>
                             </div>
                         </div>
                         <div className='ml-5 grid grid-cols-2'>

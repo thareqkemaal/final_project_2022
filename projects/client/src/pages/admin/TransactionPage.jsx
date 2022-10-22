@@ -132,6 +132,7 @@ const TransactionPages = () => {
   const getProduct = () => {
     axios.post(API_URL + `/api/product/getproduct`, { offset: '' })
       .then((res) => {
+        console.log(res.data)
         setProduct(res.data.results)
       })
       .catch((error) => {
@@ -213,7 +214,7 @@ const TransactionPages = () => {
               setLoading(true)
               setTimeout(() => setLoading(false), 1000)
               setTimeout(() => setModalCancel(val), 1000)
-            }}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 || val.status_id == 6 ? 'Reject Order' : ''}</button>
+            }}>{val.status_id == 3 || val.status_id == 4 || val.status_id == 5 ? 'Reject Order' : ''}</button>
             <button type='button'
               className={`${val.status_id == 7 || val.status_id == 9 ? 'hidden' : ''} ${val.status_id == 3 || val.status_id == 4 ? 'bg-gray-300' : ' bg-main-500 hover:bg-main-700 focus:ring-main-500 hover:-translate-y-1'} text-lg transition mt-4 p-1 mr-5 font-semibold text-white rounded w-44`}
               disabled={val.status_id == 3 || val.status_id == 4 ? true : false}
@@ -300,13 +301,6 @@ const TransactionPages = () => {
     setSee(false)
     setLoading(true)
     setTimeout(() => setLoading(false), 1000)
-    if (val.status_id == 5) {
-      setTimeout(() => setModalNote('success'), 1000)
-    } else if (val.status_id == 3) {
-      setTimeout(() => setModalNote('gopayment'), 1000)
-    } else {
-      setTimeout(() => setModalNote('pickup'), 1000)
-    }
     setModalAccept('')
     if (val.status_id == 3) {
       axios.patch(API_URL + `/api/transaction/update`, {
@@ -318,8 +312,11 @@ const TransactionPages = () => {
         image: val.prescription_pic,
         recipe: recipe
       }).then((res) => {
-        setRecipe('')
-        getTrans(search)
+        if (res.data.message) {
+          setRecipe('')
+          getTrans(search)
+          setTimeout(() => setModalNote('gopayment'), 1000)
+        }
       }).catch((err) => {
         console.log(err)
       })
@@ -330,7 +327,14 @@ const TransactionPages = () => {
         status: val.status_id,
         order: status
       }).then((res) => {
-        getTrans(search)
+        if (res.data.message) {
+          getTrans(search)
+          if (val.status_id == 5) {
+            setTimeout(() => setModalNote('success'), 1000)
+          } else {
+            setTimeout(() => setModalNote('pickup'), 1000)
+          }
+        }
       }).catch((err) => {
         console.log(err)
       })
@@ -432,7 +436,8 @@ const TransactionPages = () => {
         qty: qty,
         unit: buyUnit.unit,
         price: buyUnit.price,
-        idproduct: buyUnit.idproduct
+        idproduct: buyUnit.idproduct,
+        isDefault: 'true'
       }]
     } else {
       modalRecipe.total_price = modalRecipe.total_price + (qty * buyUnit.price / buyUnit.netto_stock)
@@ -441,7 +446,8 @@ const TransactionPages = () => {
         qty: qty,
         unit: buyUnit.unit,
         price: buyUnit.price / buyUnit.netto_stock,
-        idproduct: buyUnit.idproduct
+        idproduct: buyUnit.idproduct,
+        isDefault: 'false'
       }]
     }
     if (recipe.length == 0) {
@@ -611,6 +617,7 @@ const TransactionPages = () => {
                   key: 'selection',
                   color: 'teal'
                 }])
+                setPage(1)
                 navigate('/admin/transaction')
                 getTrans('')
               }}>Reset</button>
@@ -902,7 +909,7 @@ const TransactionPages = () => {
                 <img src={modalPayment.payment_proof_pic.includes('https') ? modalPayment.payment_proof_pic : API_URL + modalPayment.payment_proof_pic} className='max-w-lg max-h-lg mx-auto' alt='user_payment' />
                 <div className='mt-5 flex justify-center border-t text-2xl'>
                   <p className='font-semibold my-5'>Total to be paid</p>
-                  <p className='font-bold my-5'><Currency price={(modalPayment.delivery_price + modalPayment.total_price)} /></p>
+                  <p className='font-bold my-5 ml-2'><Currency price={(modalPayment.delivery_price + modalPayment.total_price)} /></p>
                 </div>
               </div>
               :

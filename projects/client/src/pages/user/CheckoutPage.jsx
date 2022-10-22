@@ -286,7 +286,7 @@ const Checkout = (props) => {
                     product_price: val.price,
                     product_unit: val.default_unit,
                     product_image: val.picture,
-                    product_id: val.idproduct,
+                    product_id: val.idproduct
                 })
             });
             // console.log(temp)
