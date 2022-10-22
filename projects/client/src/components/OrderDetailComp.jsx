@@ -43,7 +43,7 @@ const OrderDetail = ({ selected, showModal }) => {
     })
 
     React.useEffect(() => {
-        // console.log('selected', selected);
+        console.log('selected', selected);
         setData(selected);
         setDetail(selected.transaction_detail);
         setDate(parseInt(selected.invoice_number.split('/')[2]));
@@ -64,11 +64,11 @@ const OrderDetail = ({ selected, showModal }) => {
                 return (
                     <div className="border rounded-lg flex my-1" key={val.idtransaction_detail}>
                         <div className="w-1/6">
-                            <img src={val.product_image} alt={val.product_name} />
+                            <img src={val.product_image.includes('http') ? val.product_image : API_URL + val.product_image} alt={val.product_name} />
                         </div>
                         <div className="flex flex-col text-start h-full border-r w-3/6 p-2">
                             <p className="font-semibold">{val.product_name}</p>
-                            <p>{val.product_qty} x <Currency price={val.product_price} /></p>
+                            <p>{val.product_qty} <a className="transform: capitalize">{val.product_unit}</a> x <Currency price={val.product_price} /></p>
                         </div>
                         <div className="w-2/6 p-2 flex flex-col text-end">
                             <p>Total Item Price</p>
