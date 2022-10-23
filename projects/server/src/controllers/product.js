@@ -123,7 +123,7 @@ module.exports = {
                     let resultFilter = `category_id=${filterCategory}`;
                     dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
                     ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-                    order by ${sort ? `${sort} asc` : `idproduct asc`}`,
+                    ${sort ? `order by ${sort} asc` : ``}`,
                         (err, results) => {
                             if (err) {
                                 return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
@@ -286,7 +286,7 @@ module.exports = {
                             let resultFilter = `category_id=${filterCategory}`;
                             dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
         ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-        order by ${sort ? `${sort} asc` : `idproduct asc`}`,
+         ${sort ? `order by ${sort} asc` : ``}`,
                                 (err, results) => {
                                     if (err) {
                                         return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)

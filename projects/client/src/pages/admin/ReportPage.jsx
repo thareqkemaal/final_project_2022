@@ -61,11 +61,11 @@ const ReportPage = () => {
     const getReport = (month, reset) => {
         axios.get(API_URL + `/api/transaction/report?month=${month}`)
             .then((res) => {
-                console.log(res.data.product)
                 setAllReport(res.data)
                 let total_revenue = 0
                 let total_product = 0
                 setListMonth(res.data.revenue.map((val) => val.month))
+                let product = res.data.product.slice(0, 10)
                 if (filterRev && !reset) {
                     handleFilterRev(sort)
                 } else {
@@ -75,7 +75,6 @@ const ReportPage = () => {
                     let transactionSalesArray = res.data.transactionSales.slice(0, 12)
                     let userArray = res.data.user.slice(-12)
                     let userSalesArray = res.data.userSales.slice(0, 12)
-                    let product = res.data.product.slice(0, 10)
                     setRevenueReport({
                         labels: revenueArray.map((val) => val.month),
                         datasets: [{
@@ -96,16 +95,7 @@ const ReportPage = () => {
                             ]
                         }]
                     })
-                    setProductReport({
-                        labels: product.map((val) => val.product_name),
-                        datasets: [{
-                            label: "Best Seller",
-                            data: product.map((val) => val.best_seller),
-                            backgroundColor: [
-                                'rgba(75, 192, 192, 0.2)'
-                            ]
-                        }]
-                    })
+
                     setTransactionReport({
                         labels: transactionArray.map((val) => val.month),
                         datasets: [{
@@ -147,6 +137,16 @@ const ReportPage = () => {
                         }]
                     })
                 }
+                setProductReport({
+                    labels: product.map((val) => val.product_name),
+                    datasets: [{
+                        label: "Best Seller",
+                        data: product.map((val) => val.best_seller),
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)'
+                        ]
+                    }]
+                })
                 res.data.revenue.map((val) => {
                     total_revenue = total_revenue + val.revenue
                 })

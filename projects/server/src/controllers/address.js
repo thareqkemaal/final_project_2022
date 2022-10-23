@@ -8,7 +8,7 @@ module.exports = {
             JOIN status s ON a.status_id = s.idstatus 
             JOIN user u ON u.iduser = a.user_id 
             WHERE a.user_id = ${req.dataToken.iduser};`)
-            console.log(getSql)
+            // console.log(getSql)
 
             res.status(200).send(getSql);
         } catch (error) {
@@ -38,7 +38,7 @@ module.exports = {
 
     updateAddress: async (req, res) => {
         try {
-            console.log(req.body)
+            // console.log(req.body)
             if (req.body.selected) {
                 await dbQuery(`UPDATE address SET selected='false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                 await dbQuery(`UPDATE address SET selected=${dbConf.escape(req.body.selected)} WHERE idaddress = ${dbConf.escape(req.body.idaddress)};`);
@@ -47,7 +47,7 @@ module.exports = {
 
                 let temp = [];
                 for (let key in data) {
-                    console.log(key, data[key]);
+                    // console.log(key, data[key]);
                     if (data[key] != 0 || data[key] != '') {
                         temp.push(`${key} = ${dbConf.escape(data[key])}`)
                     }

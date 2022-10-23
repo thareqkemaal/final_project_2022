@@ -7,7 +7,7 @@ module.exports = {
     try {
       if (req.dataToken.role.toLowerCase() === 'user') {
         console.log(req.query)
-        
+
         let data = req.query;
         let filter = [];
         let sort = [];
@@ -169,7 +169,7 @@ module.exports = {
       // console.log(JSON.parse(req.body.datatransaction));
       // console.log(req.files[0].filename);
       // console.log(req.files);
-      // console.log(req.body.detail);
+      console.log(req.body.detail);
 
       if (req.files) {
         // status_id = 3 karena harus menunggu konfirmasi admin
@@ -194,14 +194,20 @@ module.exports = {
         // console.log(get[0].idtransaction);
 
         if (get[0].idtransaction > 0) {
+          console.log('detail', req.body.detail)
           let temp = [];
           req.body.detail.forEach((val, idx) => {
-            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)}, ${dbConf.escape(val.product_id)})`);
+            temp.push(`(${dbConf.escape(val.product_name)}, ${dbConf.escape(val.product_qty)}, ${dbConf.escape(val.product_price)}, ${dbConf.escape(val.product_image)}, ${dbConf.escape(val.product_unit)}, ${dbConf.escape(get[0].idtransaction)}, ${dbConf.escape(val.product_id)},'true')`);
           });
           // console.log(temp.join(', '));
 
-          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id, product_id) VALUES
+          await dbQuery(`INSERT INTO transaction_detail (product_name, product_qty, product_price, product_image, product_unit, transaction_id, product_id,isDefault) VALUES
           ${temp.join(', ')};`)
+
+          req.body.detail.forEach(async (val, idx) => {
+            console.log(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+            await dbQuery(`UPDATE stock SET stock_unit = stock_unit - ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+          });
 
           let history = [];
           req.body.detail.forEach((val, idx) => {
@@ -238,13 +244,13 @@ module.exports = {
             await dbQuery(`UPDATE transaction SET status_id=${req.body.status + 1},total_price=${req.body.price} WHERE idtransaction = ${dbConf.escape(req.body.id)};`)
             let detail = []
             req.body.recipe.map((val, idx) => {
-              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)},${dbConf.escape(val.idproduct)})`)
+              detail.push(`(${dbConf.escape(val.name)},${dbConf.escape(val.qty)},${dbConf.escape(val.unit)},${dbConf.escape(val.price)},${dbConf.escape(req.body.image)},${dbConf.escape(req.body.id)},${dbConf.escape(val.idproduct)},${dbConf.escape(val.isDefault)})`)
             })
-            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id,product_id)
+            await dbQuery(`INSERT INTO transaction_detail (product_name,product_qty,product_unit,product_price,product_image,transaction_id,product_id,isDefault)
             values ${detail.join(', ')}; `)
 
             for (i = 0; i < req.body.recipe.length; i++) {
-              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct};`)
+              await dbQuery(`UPDATE stock SET stock_unit=stock_unit-${req.body.recipe[i].qty} where product_id = ${req.body.recipe[i].idproduct} AND unit='${req.body.recipe[i].unit}';`)
             }
             let history = [];
             req.body.recipe.forEach((val, idx) => {
@@ -270,8 +276,8 @@ module.exports = {
             // pengembalian stock (stock awal + quantity)
             let updateStock = req.body.stock;
             updateStock.forEach(async (val, idx) => {
-              console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
-              await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)};`)
+              console.log(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)} AND unit = ${dbConf.escape(val.product_unit)};`);
+              await dbQuery(`UPDATE stock SET stock_unit = stock_unit + ${dbConf.escape(val.product_qty)} WHERE product_id = ${dbConf.escape(val.product_id)} AND unit = ${dbConf.escape(val.product_unit)};`);
             });
 
             let history = [];
@@ -282,7 +288,7 @@ module.exports = {
             // console.log('history', history)
 
             await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
-            ${history.join(', ')};`)
+              ${history.join(', ')};`)
           }
         } else if (req.body.acceptDeliv) {
           console.log(req.body)
@@ -306,7 +312,7 @@ module.exports = {
       let transactionSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(*) as transaction FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y ') order by transaction desc;`)
       let user = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by date_order;`)
       let userSales = await dbQuery(`SELECT date_format(date_order,'%b %Y') as month,count(distinct user_id) as user FROM transaction where status_id = 9 group by date_format(date_order,'%b %Y') order by user desc;`)
-      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id join stock on transaction_detail.product_id=stock.product_id where status_id = 9 AND stock.isDefault='true' ${req.query.month ? `AND date_format(date_order,'%b %Y') = '${req.query.month}'` : ''} group by product_name order by best_seller desc;`)
+      let product = await dbQuery(` SELECT product_name,sum(product_qty) as best_seller ,date_format(date_order,'%b %Y') as month FROM transaction_detail join transaction on transaction.idtransaction=transaction_detail.transaction_id where status_id = 9 AND transaction_detail.isDefault='true' ${req.query.month ? `AND date_format(date_order,'%b %Y') = '${req.query.month}'` : ''} group by product_name order by best_seller desc;`)
       res.status(200).send({
         revenue,
         revenueSales,
