@@ -18,6 +18,7 @@ import BankInfo from "../../components/BankInfoAccordion";
 import bni from '../../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
 import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../../assets/bri.png';
+import { Helmet } from "react-helmet";
 
 const UserOrderList = (props) => {
 
@@ -702,459 +703,465 @@ const UserOrderList = (props) => {
 
 
     return (
-        <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
-            <div className="p-5 flex flex-col justify-center items-center">
-                <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
-                <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
-                    <div className="border-b-2">
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: '', sort: 'new' });
-                            setTab('all');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+        <div>
+            <Helmet>
+                <title>List order</title>
+                <meta name="description" content='list order'/>
+            </Helmet>
+            <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
+                <div className="p-5 flex flex-col justify-center items-center">
+                    <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
+                    <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
+                        <div className="border-b-2">
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: '', sort: 'new' });
+                                setTab('all');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: '', sort: 'new' }
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'all' || tab === '' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
-                        >All</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'waiting', sort: 'new' });
-                            setTab('waiting');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: '', sort: 'new' }
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'all' || tab === '' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
+                            >All</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'waiting', sort: 'new' });
+                                setTab('waiting');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'waiting', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Waiting</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'process', sort: 'new' });
-                            setTab('process');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'waiting', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Waiting</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'process', sort: 'new' });
+                                setTab('process');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'process', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'))
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >In Process</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'delivery', sort: 'new' });
-                            setTab('delivery');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'process', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'))
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >In Process</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'delivery', sort: 'new' });
+                                setTab('delivery');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'delivery', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >On Delivery</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'finished', sort: 'new' });
-                            setTab('finished');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'delivery', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >On Delivery</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'finished', sort: 'new' });
+                                setTab('finished');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'finished', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Finished</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'cancel' });
-                            setTab('cancel');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'finished', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Finished</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'cancel' });
+                                setTab('cancel');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'cancel' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Canceled</button>
-                    </div>
-                    <div className="my-3 p-2 flex justify-between">
-                        <div className="flex w-4/5 items-center">
-                            <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
-                            <div className="w-3/6 flex justify-between">
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: '' });
-                                    setType('all');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: '' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "all" || type === "" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >All Type</button>
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: 'prescription' });
-                                    setType('prescription');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: 'prescription' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >Prescription</button>
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: 'free' });
-                                    setType('free');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: 'free' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >Free Drugs</button>
-                            </div>
+                                let query = { ...selected, tab: 'cancel' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Canceled</button>
                         </div>
-                        <div className="flex items-center w-1/5 justify-between">
-                            <p className="font-semibold text-main-500">Sort by:</p>
-                            <select className="border rounded-lg border-main-500 text-gray-500"
-                                onChange={(e) => {
-                                    setSelected({ ...selected, sort: e.target.value });
-                                    setSort(e.target.value);
-                                    setActivePage(1);
-                                    setInputKeyword('');
+                        <div className="my-3 p-2 flex justify-between">
+                            <div className="flex w-4/5 items-center">
+                                <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
+                                <div className="w-3/6 flex justify-between">
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: '' });
+                                        setType('all');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
 
-                                    let query = { ...selected, sort: e.target.value };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-
-                                    if (range[0].startDate !== '') {
-                                        let data = range[0];
-                                        for (let key in data) {
-                                            console.log(key, data[key]);
-                                            if (key === 'startDate') {
-                                                temp.push(`start=${data[key].toLocaleString('sv-SE')}`);
-                                            } else if (key === 'endDate') {
-                                                temp.push(`end=${data[key].toLocaleDateString('sv-SE')} 23:59:59`);
+                                        let query = { ...selected, type: '' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
                                             }
-                                        }
-                                    };
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "all" || type === "" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >All Type</button>
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: 'prescription' });
+                                        setType('prescription');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
 
-                                    console.log(temp.join('&'))
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                    getUserTransactionData(`?${temp.join('&')}`);
-                                }}
-                                value={sort}>
-                                <option value="new">Newest</option>
-                                <option value="old">Oldest</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="p-2 flex items-center">
-                            <div className="flex w-4/5">
-                                <div className="flex w-1/6">
-                                    <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                        let query = { ...selected, type: 'prescription' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >Prescription</button>
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: 'free' });
+                                        setType('free');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
+
+                                        let query = { ...selected, type: 'free' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >Free Drugs</button>
                                 </div>
-                                <div className="flex w-5/6">
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
-                                        <input
-                                            value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
-                                            className="text-center"
-                                            placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                            onClick={() => setShowFilterDate(true)}
-                                        />
-                                    </div>
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
-                                        <input
-                                            value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
-                                            className="text-center"
-                                            placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                            onClick={() => setShowFilterDate(true)}
-                                        />
-                                    </div>
-                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                        onClick={() => {
-                                            setSort('new');
-                                            setActivePage(1); handleFilter();
-                                        }}>Filter</button>
-                                    <button type="button" className="ml-2 hover:underline"
-                                        onClick={() => {
-                                            setRange([{
-                                                startDate: '',
-                                                endDate: '',
-                                                key: 'selection',
-                                                color: 'teal'
-                                            }]);
-                                            setStart('');
-                                            setEnd('');
-                                            setSort('new');
+                            </div>
+                            <div className="flex items-center w-1/5 justify-between">
+                                <p className="font-semibold text-main-500">Sort by:</p>
+                                <select className="border rounded-lg border-main-500 text-gray-500"
+                                    onChange={(e) => {
+                                        setSelected({ ...selected, sort: e.target.value });
+                                        setSort(e.target.value);
+                                        setActivePage(1);
+                                        setInputKeyword('');
 
-                                            setSelected({ ...selected });
-                                            setActivePage(1);
-                                            setInputKeyword('');
+                                        let query = { ...selected, sort: e.target.value };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
 
-                                            let query = { ...selected, sort: 'new' }
-                                            console.log('selected', selected)
-                                            console.log('query', query)
-                                            let temp = [];
-                                            for (let key in query) {
-                                                if (query[key] !== '') {
-                                                    temp.push(`${key}=${query[key]}`)
+                                        if (range[0].startDate !== '') {
+                                            let data = range[0];
+                                            for (let key in data) {
+                                                console.log(key, data[key]);
+                                                if (key === 'startDate') {
+                                                    temp.push(`start=${data[key].toLocaleString('sv-SE')}`);
+                                                } else if (key === 'endDate') {
+                                                    temp.push(`end=${data[key].toLocaleDateString('sv-SE')} 23:59:59`);
                                                 }
                                             }
-                                            console.log('clear', temp.join('&'))
-                                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                                        }}
-                                    >Clear</button>
-                                </div>
-                                {
-                                    showFilterDate ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                            <div className="relative p-4 w-1/2 h-full md:h-auto">
-                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                    <div className="p-6 text-center flex flex-col items-center justify-center">
-                                                        <DateRangePicker
-                                                            onChange={item => setRange([item.selection])}
-                                                            editableDateInputs={true}
-                                                            moveRangeOnFirstSelection={false}
-                                                            ranges={range}
-                                                            months={2}
-                                                            direction="horizontal"
-                                                        />
-                                                        <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
-                                                            onClick={() => {
-                                                                setShowFilterDate(false);
-                                                            }}>Set Date</button>
+                                        };
+
+                                        console.log(temp.join('&'))
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                        getUserTransactionData(`?${temp.join('&')}`);
+                                    }}
+                                    value={sort}>
+                                    <option value="new">Newest</option>
+                                    <option value="old">Oldest</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="p-2 flex items-center">
+                                <div className="flex w-4/5">
+                                    <div className="flex w-1/6">
+                                        <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                    </div>
+                                    <div className="flex w-5/6">
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
+                                                className="text-center"
+                                                placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Date Range'}
+                                                onClick={() => setShowFilterDate(true)}
+                                            />
+                                        </div>
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
+                                                className="text-center"
+                                                placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select Date Range'}
+                                                onClick={() => setShowFilterDate(true)}
+                                            />
+                                        </div>
+                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => {
+                                                setSort('new');
+                                                setActivePage(1); handleFilter();
+                                            }}>Filter</button>
+                                        <button type="button" className="ml-2 hover:underline"
+                                            onClick={() => {
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setStart('');
+                                                setEnd('');
+                                                setSort('new');
+
+                                                setSelected({ ...selected });
+                                                setActivePage(1);
+                                                setInputKeyword('');
+
+                                                let query = { ...selected, sort: 'new' }
+                                                console.log('selected', selected)
+                                                console.log('query', query)
+                                                let temp = [];
+                                                for (let key in query) {
+                                                    if (query[key] !== '') {
+                                                        temp.push(`${key}=${query[key]}`)
+                                                    }
+                                                }
+                                                console.log('clear', temp.join('&'))
+                                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                                            }}
+                                        >Clear</button>
+                                    </div>
+                                    {
+                                        showFilterDate ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                                <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center flex flex-col items-center justify-center">
+                                                            <DateRangePicker
+                                                                onChange={item => setRange([item.selection])}
+                                                                editableDateInputs={true}
+                                                                moveRangeOnFirstSelection={false}
+                                                                ranges={range}
+                                                                months={2}
+                                                                direction="horizontal"
+                                                            />
+                                                            <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                                                onClick={() => {
+                                                                    setShowFilterDate(false);
+                                                                }}>Set Date</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        :
-                                        ""
-                                }
+                                            :
+                                            ""
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="p-2 flex items-center">
-                            <div className="flex w-4/5">
-                                <div className="flex w-1/6">
-                                    <p className="font-semibold text-main-500 mr-2">Search :</p>
-                                </div>
-                                <div className="flex w-5/6">
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
-                                        <input
-                                            value={inputKeyword}
-                                            className="text-center"
-                                            placeholder='Keyword'
-                                            onChange={(e) => setInputKeyword(e.target.value)}
-                                        />
+                        <div>
+                            <div className="p-2 flex items-center">
+                                <div className="flex w-4/5">
+                                    <div className="flex w-1/6">
+                                        <p className="font-semibold text-main-500 mr-2">Search :</p>
                                     </div>
-                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                        onClick={() => {
-                                            setActivePage(1);
-                                            handleKeyword();
-                                        }}>Search</button>
-                                    <button type="button" className="ml-2 hover:underline"
-                                        onClick={() => {
-                                            setInputKeyword('');
-                                            setRange([{
-                                                startDate: '',
-                                                endDate: '',
-                                                key: 'selection',
-                                                color: 'teal'
-                                            }]);
-                                            setStart('');
-                                            setEnd('');
-                                            setSort('new');
+                                    <div className="flex w-5/6">
+                                        <div className="p-1 border border-main-500 rounded flex mx-1">
+                                            <input
+                                                value={inputKeyword}
+                                                className="text-center"
+                                                placeholder='Keyword'
+                                                onChange={(e) => setInputKeyword(e.target.value)}
+                                            />
+                                        </div>
+                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => {
+                                                setActivePage(1);
+                                                handleKeyword();
+                                            }}>Search</button>
+                                        <button type="button" className="ml-2 hover:underline"
+                                            onClick={() => {
+                                                setInputKeyword('');
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setStart('');
+                                                setEnd('');
+                                                setSort('new');
 
-                                            setSelected({ ...selected });
-                                            setActivePage(1);
-                                            setInputKeyword('');
+                                                setSelected({ ...selected });
+                                                setActivePage(1);
+                                                setInputKeyword('');
 
-                                            let query = { ...selected, sort: 'new' }
-                                            console.log('selected', selected)
-                                            console.log('query', query)
-                                            let temp = [];
-                                            for (let key in query) {
-                                                if (query[key] !== '') {
-                                                    temp.push(`${key}=${query[key]}`)
+                                                let query = { ...selected, sort: 'new' }
+                                                console.log('selected', selected)
+                                                console.log('query', query)
+                                                let temp = [];
+                                                for (let key in query) {
+                                                    if (query[key] !== '') {
+                                                        temp.push(`${key}=${query[key]}`)
+                                                    }
                                                 }
-                                            }
-                                            console.log('clear', temp.join('&'))
-                                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                                        }}
-                                    >Clear</button>
+                                                console.log('clear', temp.join('&'))
+                                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                                            }}
+                                        >Clear</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {
-                        userTransactionData.length > 0 ?
-                            <>
-                                <div>
-                                    {printTransaction()}
-                                </div>
-                                <div className="text-center my-3">
-                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage === totalPage ? totalData : activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
-                                </div>
-                                <div className="w-full flex justify-center items-center">
-                                    <ul className="list-none flex">
-                                        {
-                                            activePage === 1 ?
-                                                <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
-                                                :
-                                                <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                    type='button' onClick={() => setActivePage(activePage - 1)}
-                                                >Previous</li>
-                                        }
-                                        {printPagination()}
-                                        {
-                                            activePage === totalPage ?
-                                                <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
-                                                :
-                                                <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                    type='button' onClick={() => setActivePage(activePage + 1)}
-                                                >Next</li>
-                                        }
-                                    </ul>
-                                </div>
-                                {/* MODAL SELECT PAYMENT */}
-                                {
-                                    showPayment ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                            <div className="relative p-4 w-1/3 h-full md:h-auto">
-                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                    <div className="p-6 text-center">
-                                                        <div>
-                                                            <p className='text-2xl font-bold text-main-500'>How to Pay</p>
-                                                        </div>
-                                                        <div className='flex w-full my-4 items-center justify-center'>
-                                                            <img src={bni} className='w-20' alt="bnilogo" />
-                                                            <img src={bca} className='w-20 mx-4' alt="bcalogo" />
-                                                            <img src={bri} className='w-28' alt="brilogo" />
-                                                        </div>
-                                                        <p className='text-lg font-bold text-main-500'>See virtual account number on order detail</p>
-                                                        <BankInfo />
-                                                        <div className='w-full flex justify-center'>
-                                                            <div className='w-1/2 flex justify-evenly items-center'>
-                                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
-                                                                    onClick={() => setShowPayment(false)}>Close</button>
+                        {
+                            userTransactionData.length > 0 ?
+                                <>
+                                    <div>
+                                        {printTransaction()}
+                                    </div>
+                                    <div className="text-center my-3">
+                                        <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage === totalPage ? totalData : activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
+                                    </div>
+                                    <div className="w-full flex justify-center items-center">
+                                        <ul className="list-none flex">
+                                            {
+                                                activePage === 1 ?
+                                                    <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
+                                                    :
+                                                    <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                    >Previous</li>
+                                            }
+                                            {printPagination()}
+                                            {
+                                                activePage === totalPage ?
+                                                    <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
+                                                    :
+                                                    <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                    >Next</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    {/* MODAL SELECT PAYMENT */}
+                                    {
+                                        showPayment ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                                <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center">
+                                                            <div>
+                                                                <p className='text-2xl font-bold text-main-500'>How to Pay</p>
+                                                            </div>
+                                                            <div className='flex w-full my-4 items-center justify-center'>
+                                                                <img src={bni} className='w-20' alt="bnilogo" />
+                                                                <img src={bca} className='w-20 mx-4' alt="bcalogo" />
+                                                                <img src={bri} className='w-28' alt="brilogo" />
+                                                            </div>
+                                                            <p className='text-lg font-bold text-main-500'>See virtual account number on order detail</p>
+                                                            <BankInfo />
+                                                            <div className='w-full flex justify-center'>
+                                                                <div className='w-1/2 flex justify-evenly items-center'>
+                                                                    <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
+                                                                        onClick={() => setShowPayment(false)}>Close</button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        :
-                                        ""
-                                }
-                            </>
-                            :
-                            <div className="flex flex-col justify-center items-center text-center my-5">
-                                <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
-                                <img src={nodata} className="w-2/3" alt='placeholder' />
-                            </div>
-                    }
+                                            :
+                                            ""
+                                    }
+                                </>
+                                :
+                                <div className="flex flex-col justify-center items-center text-center my-5">
+                                    <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
+                                    <img src={nodata} className="w-2/3" alt='placeholder' />
+                                </div>
+                        }
+                    </div>
                 </div>
+                <ToastContainer />
+                <LoadingComponent loading={loading} />
             </div>
-            <ToastContainer />
-            <LoadingComponent loading={loading} />
         </div>
     )
 };

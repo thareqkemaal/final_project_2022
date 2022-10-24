@@ -72,14 +72,14 @@ const LandingPages = () => {
             <div className=''>
               <img className='h-30 lg:h-52 lg:mx-auto' src={image} alt='medcare.com' />
             </div>
-            <div className='mx-auto py-2 lg:mx-1 lg:py-4  md:flex justify-around md:mt-10 lg:mt-10'>
+            <div className='mx-auto py-2 lg:mx-1 lg:py-4 md:mt-10 lg:mt-10 lg:flex justify-around'>
               <div className=''>
                 <p className=' text-[#213360] text-sm font-bold lg:text-2xl font-Public ml-5 md:ml-0'>Punya Resep Dokter ?</p>
                 <div className='w-80 h-12'>
                   <p className='text-[#525252] hidden md:flex'>Hanya foto resep anda dan unggah max 10mb tanpa perlu antri obat akan dikirimkan ke lokasi anda</p>
                 </div>
               </div>
-              <div className=' md:pr-2 lg:mt-5'>
+              <div className=' md:mt-10 lg:mt-5'>
                 <button type='button' onClick={() => {
                   if (iduser !== null && status !== 'Unverified') {
                     navigate('/prescription')

@@ -9,6 +9,7 @@ import LoadingComponent from './Loading';
 import { useSelector } from 'react-redux';
 import placeholder from '../assets/placeholder.png';
 import Tabs from './Tabs';
+import { Helmet } from 'react-helmet';
 
 
 
@@ -171,6 +172,10 @@ const AddressComponent = (props) => {
 
     return (
         <div>
+            <Helmet>
+                <title>Profile</title>
+                <meta name="description" content="Edit your profile" />
+            </Helmet>
             <Tabs/>
             <div className='container mx-auto'>
                 <p className='flex items-center justify-center text-main-500 font-bold text-2xl my-3'>ADDRESS</p>
