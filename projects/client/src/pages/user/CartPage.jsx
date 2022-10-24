@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { updateCart } from '../../action/useraction';
 import LoadingComponent from '../../components/Loading';
 import nodata from '../../assets/nodata.png';
+import { Helmet } from 'react-helmet';
 
 const UserCart = (props) => {
 
@@ -293,57 +294,63 @@ const UserCart = (props) => {
     };
 
     return (
-        <div className='container mx-auto py-5'>
-            <div className='mx-9'>
-                <div className='text-xl font-bold px-3 text-main-600'>
-                    My Cart
-                </div>
-                <div className='flex flex-row mt-2'>
-                    <div className='basis-7/12'>
-                        <div className='border m-2 p-3 shadow-md rounded-md '>
-                            <div className='mb-2 align-items-center border-b-2 border-main-800 flex items-center'>
-                                <input type='checkbox' className='ml-2 w-4 h-4 text-main-600 bg-gray-100 rounded border-gray-300 focus:ring-main-500'
-                                    onClick={onCheckboxAll} defaultChecked={isCheckAll} checked={isCheckAll === 'true' ? true : false}
-                                />
-                                <span className='font-medium p-2'>Select All</span>
-                            </div>
-                            {
-                                cartData.length > 0 ?
-                                    <div>
-                                        {printCart()}
-                                    </div>
-                                    :
-                                    <div className="flex flex-col justify-center items-center text-center my-5">
-                                        <p className="font-bold text-2xl drop-shadow-lg text-main-500">Oops you cart is empty!</p>
-                                        <img src={nodata} className="w-2/3" alt='placeholder' />
-                                    </div>
+        <div>
+            <Helmet>
+                <title>Cart</title>
+                <meta name="description" content='Detail your cart'/>
+            </Helmet>
+            <div className='container mx-auto py-5'>
+                <div className='mx-9'>
+                    <div className='text-xl font-bold px-3 text-main-600'>
+                        My Cart
+                    </div>
+                    <div className='flex flex-row mt-2'>
+                        <div className='basis-7/12'>
+                            <div className='border m-2 p-3 shadow-md rounded-md '>
+                                <div className='mb-2 align-items-center border-b-2 border-main-800 flex items-center'>
+                                    <input type='checkbox' className='ml-2 w-4 h-4 text-main-600 bg-gray-100 rounded border-gray-300 focus:ring-main-500'
+                                        onClick={onCheckboxAll} defaultChecked={isCheckAll} checked={isCheckAll === 'true' ? true : false}
+                                    />
+                                    <span className='font-medium p-2'>Select All</span>
+                                </div>
+                                {
+                                    cartData.length > 0 ?
+                                        <div>
+                                            {printCart()}
+                                        </div>
+                                        :
+                                        <div className="flex flex-col justify-center items-center text-center my-5">
+                                            <p className="font-bold text-2xl drop-shadow-lg text-main-500">Oops you cart is empty!</p>
+                                            <img src={nodata} className="w-2/3" alt='placeholder' />
+                                        </div>
 
-                            }
+                                }
+                            </div>
                         </div>
-                    </div>
-                    <div className='basis-5/12'>
-                        <div className='border m-2 p-3 shadow-md rounded-md'>
-                            <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
-                            <div className='flex justify-between border-b-2 border-main-800 pb-4'>
-                                <p>Sub Total Price ({countItem} Item(s))</p>
-                                <Currency price={totalPrice} />
-                            </div>
-                            <div className='flex justify-between my-4'>
-                                <p className='font-bold text-2xl text-main-500'>Total Price</p>
-                                <p className='font-bold text-2xl text-main-500'><Currency price={totalPrice} /></p>
-                            </div>
-                            <div>
-                                <button type='button'
-                                    className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
-                                hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
-                                    onClick={onCheckout}>Checkout ({countItem})</button>
+                        <div className='basis-5/12'>
+                            <div className='border m-2 p-3 shadow-md rounded-md'>
+                                <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
+                                <div className='flex justify-between border-b-2 border-main-800 pb-4'>
+                                    <p>Sub Total Price ({countItem} Item(s))</p>
+                                    <Currency price={totalPrice} />
+                                </div>
+                                <div className='flex justify-between my-4'>
+                                    <p className='font-bold text-2xl text-main-500'>Total Price</p>
+                                    <p className='font-bold text-2xl text-main-500'><Currency price={totalPrice} /></p>
+                                </div>
+                                <div>
+                                    <button type='button'
+                                        className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
+                                    hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
+                                        onClick={onCheckout}>Checkout ({countItem})</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <ToastContainer />
+                <LoadingComponent loading={loading} />
             </div>
-            <ToastContainer />
-            <LoadingComponent loading={loading} />
         </div>
     )
 };

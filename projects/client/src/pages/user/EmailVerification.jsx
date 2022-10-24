@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import { UpdateProfile } from '../../action/useraction'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Helmet } from 'react-helmet'
 
 const EmailVerification = () => {
     const params = useParams()
@@ -50,8 +51,12 @@ const EmailVerification = () => {
 
   return (
     <div>
-            <div>
-         <div className="w-screen h-screen" id="fullscreen">
+        <Helmet>
+          <title>Change Email Verifcation</title>
+          <meta name="description" content='Change email verification'/>
+        </Helmet>
+      <div>
+        <div className="w-screen h-screen" id="fullscreen">
         <div className="absolute inset-0">
           <img className="object-cover w-full h-full" src="https://images.unsplash.com/photo-1614064548016-0b5c13ca2c85?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="A computer background" />
           <div className="absolute inset-0 bg-indigo-700 mix-blend-multiply" />

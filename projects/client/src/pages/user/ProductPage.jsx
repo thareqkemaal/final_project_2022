@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
+import { Helmet } from "react-helmet";
 
 const ProductPage = (props) => {
     const [data, setData] = React.useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -346,7 +347,13 @@ const ProductPage = (props) => {
         }
     };
 
-    return <div className="container mx-auto">
+    return (
+        <div>
+            <Helmet>
+                <title>Product</title>
+                <meta name="description" content="Get information on all medicine"/>
+            </Helmet>
+    <div className="container mx-auto">
 
         <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
             <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
@@ -548,6 +555,9 @@ const ProductPage = (props) => {
         </div>
         <ToastContainer />
     </div>
+        </div>
+    )
+    
 }
 
 export default ProductPage;

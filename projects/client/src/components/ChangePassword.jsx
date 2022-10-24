@@ -5,6 +5,7 @@ import { API_URL } from '../helper';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Tabs from './Tabs';
+import { Helmet } from 'react-helmet';
 
 const ChangePassword = () => {
     const [visible, setVisible]=useState('password')
@@ -108,6 +109,10 @@ const ChangePassword = () => {
 
   return (
     <div>
+        <Helmet>
+            <title>Profile</title>
+            <meta name="description" content="Edit your profile" />
+        </Helmet>
             <Tabs/>
            <div className='container mx-auto lg:px-96 pt-5 '>
                         <label className=' block mb-3 '>

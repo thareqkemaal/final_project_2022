@@ -34,6 +34,7 @@ import EmailVerification from './pages/user/EmailVerification';
 import UserOrderList from './pages/user/OrderList';
 import ChangePassword from './components/ChangePassword';
 import AddressComponent from './components/AdressComponent';
+import {Helmet} from "react-helmet";
 
 function App() {
   const dispatch = useDispatch()
@@ -70,6 +71,10 @@ function App() {
 
   return (
     <div>
+      <Helmet>
+        <title>Medcare</title>
+        <meta name="description" content="Meet your health needs" />
+      </Helmet>
       <div>
         <Navbar loading={loading} />
       </div>

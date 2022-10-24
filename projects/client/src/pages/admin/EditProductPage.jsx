@@ -11,6 +11,7 @@ import AdminComponent from "../../components/AdminComponent";
 import { useLocation, useNavigate } from "react-router";
 import { IoMdArrowDropright } from "react-icons/io";
 import { API_URL } from "../../helper";
+import { Helmet } from "react-helmet";
 
 // Sebelumnya dalam bentuk modal dengan nama file ModalEditProduct
 const EditProductPage = () => {
@@ -129,6 +130,9 @@ const EditProductPage = () => {
         <div>
             {/* <div className={`${loading ? 'overflow-hide scroll ' : ""}`}  > */}
             <div className='flex'>
+            <Helmet>
+                <title>Edit Product</title>
+            </Helmet>
                 {/* <DashboardPage page={window.location.pathname} /> */}
 
                 <AdminComponent page={window.location.pathname} />
