@@ -62,7 +62,6 @@ const Prescription = (props) => {
                 let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
                 let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
 
-
                 if (selectedAddress === {}) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
@@ -106,14 +105,40 @@ const Prescription = (props) => {
                         <p className='text-main-500 font-semibold'>{val.fullname}</p>
                         <p>{val.phone_number}</p>
                         <p className='text-transform: capitalize'>{val.full_address}</p>
-                        <p className='text-transform: capitalize'>Kecamatan {val.district}, {val.city}, {val.province}, {val.postal_code}</p>
-                        <button type='button' className='text-main-600 hover:underline' onClick={() => { setShowEditAddressModal('show'); setSelectedEdit(val); setShowAddressModal('') }}>Edit Address</button>
+                        <p className='text-transform: capitalize text-start'>Kecamatan {val.district}, {val.city}, {val.province}, {val.postal_code}</p>
+                        <div className='flex'>
+                            <button type='button' className='text-main-600 hover:underline' onClick={() => { setShowEditAddressModal('show'); setSelectedEdit(val); setShowAddressModal('') }}>Edit Address</button>
+                            {
+                                selectedAddress !== val ?
+                                    <>
+                                        <p className='font-bold text-main-500 mx-2 sm:hidden'>|</p>
+                                        <button type='button'
+                                            className='sm:hidden text-main-500 hover:underline focus:underline'
+                                            onClick={() => {
+                                                onSelectAddress(val.idaddress);
+                                                setShowAddressModal('');
+                                                setLoadDelivery(true);
+                                                setLoadCourier(true);
+                                                setCourier('');
+                                                setDelivery([]);
+                                                setSelectedDelivery('');
+                                                setTimeout(() => {
+                                                    setLoadDelivery(false);
+                                                    setLoadCourier(false);
+                                                }, 1000)
+                                                setTotalDelivery(0);
+                                            }}>Select Address</button>
+                                    </>
+                                    :
+                                    ""
+                            }
+                        </div>
                     </div>
                     {
                         selectedAddress === val ?
                             ""
                             :
-                            <div className='w-1/4 flex items-center justify-center'>
+                            <div className='hidden sm:w-1/4 sm:flex sm:items-center sm:justify-center'>
                                 <button type='button'
                                     className='border p-3 rounded-lg bg-main-500 text-white font-semibold hover:bg-main-600 focus:ring-2 focus:ring-main-500'
                                     onClick={() => {
@@ -141,6 +166,8 @@ const Prescription = (props) => {
         if (selectedAddress !== null) {
             return (
                 <div>
+                    <p className='text-transform: uppercase font-semibold'>{selectedAddress.fullname}</p>
+                    <p className='text-transform: uppercase'>{selectedAddress.phone_number}</p>
                     <p className='text-transform: uppercase'>{selectedAddress.full_address}</p>
                     <p className='text-transform: uppercase'>Kecamatan {selectedAddress.district}, {selectedAddress.city}, {selectedAddress.province}, {selectedAddress.postal_code}</p>
                 </div>
@@ -256,60 +283,14 @@ const Prescription = (props) => {
         <div>
             <Helmet>
                 <title>Upload Prescription</title>
-                <meta name="description" content='upload you prescription'/>
+                <meta name="description" content='upload you prescription' />
             </Helmet>
-            <div className='container mx-auto my-5 p-10 flex flex-col'>
+            <div className='container mx-auto my-5 px-10 flex flex-col'>
                 <div className='flex justify-center'>
                     <p className='font-bold text-2xl text-main-500 py-2'>UPLOAD PRESCRIPTION</p>
                 </div>
-                <div className='flex flex-row mt-2'>
+                <div className='flex flex-col lg:flex-row mt-2'>
                     <div className='basis-7/12'>
-                        <div className='border m-2 p-3 shadow-md rounded-md'>
-                            {/* tunggu nama address dari api */}
-                            <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Address</p>
-                            <div className='my-2'>
-                                {printSelectedAddress()}
-                            </div>
-                            <button type='button' className='text-main-600 hover:underline' onClick={() => setShowAddressModal('show')}>Change Address</button>
-                            {/* MODAL ALAMAT */}
-                            {
-                                showAddressModal === 'show' ?
-                                    <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                        <div className="relative p-4 w-1/2 h-full md:h-auto">
-                                            <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                <div className="p-6 text-center">
-                                                    <div>
-                                                        <p className='text-2xl font-bold text-main-500'>Choose Delivery Address</p>
-                                                    </div>
-                                                    <button type='button' className='mt-3 mb-2 py-3 w-full border rounded-lg font-bold text-gray-400 text-lg hover:bg-teal-50 focus:ring-2 focus:ring-teal-100'
-                                                        onClick={() => { setShowNewAddressModal('show'); setShowAddressModal('') }}>Add New Address</button>
-                                                    <div>
-                                                        {printAllAddress()}
-                                                    </div>
-                                                    <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
-                                                        onClick={() => setShowAddressModal('')}>Cancel</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    :
-                                    ""
-                            }
-                            {/* MODAL ALAMAT BARU */}
-                            {
-                                showNewAddressModal === 'show' ?
-                                    <NewAddressComponent showModal={setShowNewAddressModal} setAddress={getAddress()} />
-                                    :
-                                    ""
-                            }
-                            {/* MODAL EDIT ALAMAT */}
-                            {
-                                showEditAddressModal === 'show' ?
-                                    <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} setAddress={getAddress()} />
-                                    :
-                                    ""
-                            }
-                        </div>
                         <div className='border m-2 p-3 shadow-md rounded-md '>
                             <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Upload Prescription</p>
                             <div className='flex items-center'>
@@ -377,13 +358,60 @@ const Prescription = (props) => {
                                         :
                                         ''
                                 }
-                                <img src={showPic ? showPic : placeholder} className={loadPic ? 'hidden' : 'block max-w-lg'} alt='user_prescription' />
+                                <img src={showPic ? showPic : placeholder} className={loadPic ? 'hidden' : 'block'} alt='user_prescription' />
                             </div>
                         </div>
                     </div>
                     <div className='basis-5/12'>
                         <div className='border m-2 p-3 shadow-md rounded-md'>
-                            <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
+                            {/* tunggu nama address dari api */}
+                            <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Address</p>
+                            <div className='my-2'>
+                                {printSelectedAddress()}
+                            </div>
+                            <button type='button' className='text-main-600 hover:underline' onClick={() => setShowAddressModal('show')}>Change Address</button>
+                            {/* MODAL ALAMAT */}
+                            {
+                                showAddressModal === 'show' ?
+                                    <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                        <div className="relative p-4 w-full md:w-3/4 lg:w-2/3 xl:w-1/2 h-full sm:h-auto">
+                                            <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                <div className="p-6 text-center">
+                                                    <div>
+                                                        <p className='text-2xl font-bold text-main-500'>Choose Delivery Address</p>
+                                                    </div>
+                                                    <button type='button' className='mt-3 mb-2 py-3 w-full border rounded-lg font-bold text-gray-400 text-lg hover:bg-teal-50 focus:ring-2 focus:ring-teal-100'
+                                                        onClick={() => { setShowNewAddressModal('show'); setShowAddressModal('') }}>Add New Address</button>
+                                                    <div>
+                                                        {printAllAddress()}
+                                                    </div>
+                                                    <button type="button"
+                                                        className="text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-10 py-2.5 focus:z-10 "
+                                                        onClick={() => setShowAddressModal('')}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    :
+                                    ""
+                            }
+                            {/* MODAL ALAMAT BARU */}
+                            {
+                                showNewAddressModal === 'show' ?
+                                    <NewAddressComponent showModal={setShowNewAddressModal} />
+                                    :
+                                    ""
+                            }
+                            {/* MODAL EDIT ALAMAT */}
+                            {
+                                showEditAddressModal === 'show' ?
+                                    <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} />
+                                    :
+                                    ""
+                            }
+                        </div>
+                        <div className='border m-2 p-3 shadow-md rounded-md'>
+                            <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Method</p>
                             <div className='w-full flex flex-col my-2'>
                                 <p>Choose Courier :</p>
                                 {
@@ -429,9 +457,12 @@ const Prescription = (props) => {
                                         </select>
                                 }
                             </div>
+                        </div>
+                        <div className='border m-2 p-3 shadow-md rounded-md border-main-500'>
+                            <p className='font-bold text-xl text-main-500 mb-3'>Summary</p>
                             <div className='flex justify-between py-4'>
                                 <p>Sub Total Item(s)</p>
-                                <p>Will be confirm first by Admin</p>
+                                <p className='text-end'>Will be confirm first by Admin</p>
                             </div>
                             <div className='flex justify-between border-b-2 border-main-800 pb-4'>
                                 <p>Delivery</p>
@@ -449,7 +480,7 @@ const Prescription = (props) => {
                             <div>
                                 <button type='button'
                                     className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
-                                    hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
+                                hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                     onClick={() => {
                                         if (allAddress.length === 0) {
                                             toast.error('Please choose address', {
@@ -517,8 +548,8 @@ const Prescription = (props) => {
                                 {/* MODALCONFIRMATION */}
                                 {
                                     showConfirmModal === 'show' ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                            <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                            <div className="relative p-4 w-full md:w-2/3 xl:w-1/2 2xl:w-1/3 h-auto">
                                                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                     <div className="p-6 text-center">
                                                         <div>
@@ -528,10 +559,11 @@ const Prescription = (props) => {
                                                             <p className="font-semibold">Please make sure the prescription and selected address are correct!</p>
                                                         </div>
                                                         <div className='w-full flex justify-center'>
-                                                            <div className='w-2/3 flex justify-evenly items-center'>
+                                                            <div className='w-full sm:w-2/3 flex justify-evenly items-center'>
                                                                 <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
                                                                     onClick={() => onSubmit()}>Yes, Submit</button>
-                                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
+                                                                <button type="button"
+                                                                    className="text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg  text-sm font-medium px-8 py-2.5 focus:z-10 "
                                                                     onClick={() => setShowConfirmModal('')}>No, Cancel</button>
                                                             </div>
                                                         </div>

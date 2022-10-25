@@ -142,8 +142,8 @@ const EditAddressComponent = ({ selected, showModal }) => {
 
     return (
         <div>
-            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                <div className="relative p-4 w-1/2 h-full md:h-auto">
+            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                <div className="relative p-4 w-full md:w-2/3 lg:w-1/2 h-full sm:h-auto">
                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                         <div className="p-6 text-center">
                             <div>
@@ -221,7 +221,8 @@ const EditAddressComponent = ({ selected, showModal }) => {
                             <button type="button" className="mr-1 text-white bg-main-500 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50"
                                 onClick={() => { onSaveEditAddress() }} disabled={inputEditFullAddress === '' || inputEditDistrict === '' || inputEditPostalCode === '' || selectedEditProvinceID === 0 ? true : false}
                             >Save</button>
-                            <button type="button" className="ml-1 text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
+                            <button type="button" 
+                            className="ml-1 text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-10 py-2.5 focus:z-10 "
                                 onClick={() => {
                                     showModal('');
                                     setInputEditFullAddress('');
