@@ -32,6 +32,7 @@ const HistoryPage = () => {
 
 
 
+
     const getHistory = (search) => {
         axios.get(API_URL + `/api/transaction/history${search}`)
             .then((res) => {
