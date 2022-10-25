@@ -7,6 +7,7 @@ import { API_URL } from '../../helper';
 import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
 import Currency from '../../components/CurrencyComp';
+import { Helmet } from 'react-helmet';
 
 const DashboardPage = (props) => {
     const navigate = useNavigate()
@@ -140,7 +141,11 @@ const DashboardPage = (props) => {
         getProduct()
     }, [])
 
-    return (<div >
+    return (
+    <div >
+        <Helmet>
+            <title>Dashboard</title>
+        </Helmet>
         {loading ?
             <Loading loading={loading} />
             :

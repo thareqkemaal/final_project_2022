@@ -9,6 +9,7 @@ import { DateRangePicker } from 'react-date-range'
 import format from 'date-fns/format'
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
+import { Helmet } from 'react-helmet';
 
 const HistoryPage = () => {
     const navigate = useNavigate()
@@ -133,7 +134,11 @@ const HistoryPage = () => {
         getHistory(`?${filterArray.join('&')}`)
     }
 
-    return (<div>
+    return (
+    <div>
+        <Helmet>
+            <title>History</title>
+        </Helmet>
         <div className='flex'>
             <AdminComponent page={window.location.pathname} />
             <div className='w-screen' style={{ background: "linear-gradient(155.7deg, #D6F5F3 -46%, #F7FCFC 100%, #F1F5FC 118%)" }}>

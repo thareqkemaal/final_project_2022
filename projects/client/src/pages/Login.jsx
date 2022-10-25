@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux'
 import { loginAction } from '../action/useraction';
 import ForgotPass from '../components/ForgotPass';
 import Loading from '../components/Loading';
+import { Helmet } from 'react-helmet';
 
 const Login = () => {
   const navigate = useNavigate()
@@ -58,6 +59,10 @@ const Login = () => {
 
   return (
     <div className=''>
+      <Helmet>
+      <title>Login</title>
+      <meta name="description" content="Login to access all features" />
+      </Helmet>
         <div className='container mx-auto md:px-32 lg:grid grid-cols-2 pt-5'>
             <div className=' hidden bg-gradient-to-r from-blue-300 to-white py-10 drop-shadow-md lg:block'>
               <img src={regisImg}/>
