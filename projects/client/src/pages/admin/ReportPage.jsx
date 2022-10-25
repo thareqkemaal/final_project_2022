@@ -7,6 +7,7 @@ import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
 import Currency from '../../components/CurrencyComp';
 import { IoIosArrowDown, IoIosArrowRoundForward } from "react-icons/io";
+import { Helmet } from 'react-helmet';
 
 const ReportPage = () => {
     const monthNames = ["Jan", "Feb", "March", "Apr", "May", "Jun",
@@ -245,7 +246,11 @@ const ReportPage = () => {
         }
     }
 
-    return (<div >
+    return (
+    <div >
+        <Helmet>
+            <title>Admin Report</title>
+        </Helmet>
         {loading ?
             <Loading loading={loading} />
             :

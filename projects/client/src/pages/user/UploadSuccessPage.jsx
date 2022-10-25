@@ -1,4 +1,5 @@
 import React from "react";
+import { Helmet } from "react-helmet";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import confirm from '../../assets/confirm.png';
@@ -17,31 +18,37 @@ const UploadSuccess = (props) => {
     })
 
     return (
-        <div className='container mx-auto py-5 h-screen'>
-            <div className='flex flex-col items-center h-screen py-4'>
-                <img src={confirm} className='max-w-xl' alt='successuploadprescription'/>
-                <p className='font-bold text-4xl text-main-500 my-2'>Upload Prescription Success!</p>
-                <p className='font-bold text-2xl text-main-600 my-2'>Your order will be confirmed by Admin soon.</p>
-                <div className='w-1/2 my-2 flex justify-around'>
-                    <button className='border-2 rounded-lg py-3 px-14 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
-                    onClick={() => {
-                        setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
-                            navigate('/', {replace: true})
-                        }, 2000)
-                    }}>Back to Homepage</button>
-                    <button className='border-2 rounded-lg py-3 px-14 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'
-                    onClick={() => {
-                        setLoading(true);
-                        setTimeout(() => {
-                            setLoading(false);
-                            navigate(`/${username}/transaction`, {replace: true})
-                        }, 2000)
-                    }}>Go To Order Progress</button>
+        <div>
+            <Helmet>
+                <title>Upload Success</title>
+                <meta name="description" content="Success upload you prescription"/>
+            </Helmet>
+            <div className='container mx-auto py-5 h-screen'>
+                <div className='flex flex-col items-center h-screen py-4'>
+                    <img src={confirm} className='max-w-xl' alt='successuploadprescription'/>
+                    <p className='font-bold text-4xl text-main-500 my-2'>Upload Prescription Success!</p>
+                    <p className='font-bold text-2xl text-main-600 my-2'>Your order will be confirmed by Admin soon.</p>
+                    <div className='w-1/2 my-2 flex justify-around'>
+                        <button className='border-2 rounded-lg py-3 px-14 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
+                        onClick={() => {
+                            setLoading(true);
+                            setTimeout(() => {
+                                setLoading(false);
+                                navigate('/', {replace: true})
+                            }, 2000)
+                        }}>Back to Homepage</button>
+                        <button className='border-2 rounded-lg py-3 px-14 bg-main-500 text-white font-bold border-main-500 hover:bg-main-600 focus:ring-2 focus:ring-main-500'
+                        onClick={() => {
+                            setLoading(true);
+                            setTimeout(() => {
+                                setLoading(false);
+                                navigate(`/${username}/transaction`, {replace: true})
+                            }, 2000)
+                        }}>Go To Order Progress</button>
+                    </div>
                 </div>
+                <LoadingComponent loading={loading} />
             </div>
-            <LoadingComponent loading={loading} />
         </div>
     )
 };

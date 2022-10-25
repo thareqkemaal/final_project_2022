@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { format } from 'date-fns'
 import Loading from '../components/Loading';
+import { Helmet } from 'react-helmet';
 
 
 
@@ -46,6 +47,8 @@ const EditProfile = () => {
         phone_number: ''
     })
     const[newProfilPict, setNewProfilPict]=useState('')
+console.log(typeof input.phone_number)
+
 
     useEffect(()=>{
             setInput({
@@ -60,69 +63,84 @@ const EditProfile = () => {
 
     const updateProfile = ()=>{
         setLoading(true)
-        let medcarelog = localStorage.getItem('medcarelog')
-        let formData = new FormData()
+        if(input.fullname.length > 0 && input.username.length > 0 && input.email.length>0 && input.phone_number !== 'undefined'){
 
-        // if(input.email === email){
-            formData.append('data',JSON.stringify(input))
-            formData.append('images',newProfilPict)
-            axios.patch(API_URL+`/api/user/edit-profile`,formData,{
-                headers:{
-                    'Authorization': `Bearer ${medcarelog}`
-                }
-            })
-            .then((res)=>{
-                setLoading(false)
-                dispatch(UpdateProfile(res.data))
-                if(email!= input.email){
-                    toast.info('Success to change your email cek your inbox ', {
-                        theme: "colored",
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: false,
-                        progress: undefined,
-                    })
-                }else{
-                    toast.success('Success', {
-                        theme: "colored",
-                        position: "top-center",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: false,
-                        progress: undefined,
-                    })
-                }
-                setDisabled(true)
-                if(email != input.email){
-                    setInput({
-                        fullname: fullname,
-                        username:username,
-                        email:email,
-                        gender:gender?gender:'select gender',
-                        birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
-                        phone_number: phone_number,
-                    })
-                    setLoading(false)
-                }
-            })
-            .catch((err)=>{
-                setLoading(false)
-                toast.error(`${err.response.data.message}`, {
-                    theme: "colored",
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: false,
-                    progress: undefined,
+            let medcarelog = localStorage.getItem('medcarelog')
+            let formData = new FormData()
+    
+            // if(input.email === email){
+                formData.append('data',JSON.stringify(input))
+                formData.append('images',newProfilPict)
+                axios.patch(API_URL+`/api/user/edit-profile`,formData,{
+                    headers:{
+                        'Authorization': `Bearer ${medcarelog}`
+                    }
                 })
+                .then((res)=>{
+                    setLoading(false)
+                    dispatch(UpdateProfile(res.data))
+                    if(email!= input.email){
+                        toast.info('Success to change your email cek your inbox ', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        })
+                    }else{
+                        toast.success('Success', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        })
+                    }
+                    setDisabled(true)
+                    if(email != input.email){
+                        setInput({
+                            fullname: fullname,
+                            username:username,
+                            email:email,
+                            gender:gender?gender:'select gender',
+                            birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
+                            phone_number: phone_number,
+                        })
+                        setLoading(false)
+                    }
+                })
+                .catch((err)=>{
+                    setLoading(false)
+                    toast.error(`${err.response.data.message}`, {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    })
+                })
+        }else{
+            toast.error(`${'data cannot be empty'}`, {
+                theme: "colored",
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
             })
+            setLoading(false)
+        }
     }
 
     const onChange = (e)=>{
@@ -136,7 +154,7 @@ const EditProfile = () => {
             username:username,
             email:email,
             gender:gender,
-            birthdate:birthdate,
+            birthdate:format(new Date(birthdate), 'yyyy-MM-dd'),
             phone_number: phone_number
         })
         setNewProfilPict('')
@@ -180,6 +198,10 @@ const EditProfile = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>Profile</title>
+                <meta name="description" content="Edit your profile" />
+            </Helmet>
                 <Tabs/>
             <div className='container mx-auto px-16'>
                 <div className='container mx-auto lg:px-96'>
@@ -217,7 +239,7 @@ const EditProfile = () => {
                                 {/* fullname */}
                                 <label className=' block mb-3 '>
                                     <span className='block text-sm font-medium text-slate-700 mb-1'>Fullname</span>
-                                    <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='fullname' onChange={onChange} disabled={disabled} value={input.fullname} />
+                                    <input className='border border-gray-400 w-full rounded-md px-2 h-10 font-Public disabled:text-gray-600 disabled:cursor-not-allowed' name='fullname' onChange={onChange} disabled={disabled}  value={input.fullname} />
                                 </label>
                                 {/* Username */}
                                 <label className=' block mb-3 '>
@@ -232,7 +254,7 @@ const EditProfile = () => {
                                 {/* Phone */}
                                 <label className='block mb-3'>
                                     <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Phone Number</span>
-                                    <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a })} disabled={disabled} className='disabled:text-gray-600'  />
+                                    <PhoneInput international defaultCountry='ID' type='tel' value={input.phone_number} name='phone_number' onChange={(a) => setInput({ ...input, phone_number: a+'' })} disabled={disabled} className='disabled:text-gray-600'  />
                                 </label>
                                 {/* Birth date */}
                                 <label className='block mb-3'>
