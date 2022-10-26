@@ -148,95 +148,96 @@ const NewAddressComponent = ({ showModal }) => {
 
     return (
         <div>
-        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-            <div className="relative p-4 w-1/2 h-full md:h-auto">
-                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                    <div className="p-6 text-center">
-                        <div>
-                            <p className='text-2xl font-bold text-main-500'>Add New Address</p>
-                        </div>
-                        <div className='my-4'>
-                            <div className='flex flex-col items-start px-3 mb-2'>
-                                <p>Full Address<a className='text-red-600'>*</a> :</p>
-                                <textarea maxLength={200} type='text'
-                                    className={checkAddress === 'show' ? 'border border-red-600 w-full rounded-lg px-3 mt-2' : 'border border-main-600 w-full rounded-lg px-3 mt-2 focus:ring-2 focus:ring-main-500'}
-                                    placeholder='Full Address' onChange={(e) => { setInputFullAddress(e.target.value); setCountFullAddress(e.target.value.length); if (e.target.value.length > 0) { setCheckAddress('') } }} value={inputFullAddress} />
-                                <div className='flex justify-end w-full'>
-                                    {countFullAddress} / 200
+            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                <div className="relative p-4 w-full md:w-2/3 lg:w-1/2 h-full sm:h-auto">
+                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                        <div className="p-6 text-center">
+                            <div>
+                                <p className='text-2xl font-bold text-main-500'>Add New Address</p>
+                            </div>
+                            <div className='my-4'>
+                                <div className='flex flex-col items-start px-3 mb-2'>
+                                    <p>Full Address<a className='text-red-600'>*</a> :</p>
+                                    <textarea maxLength={200} type='text'
+                                        className={checkAddress === 'show' ? 'border border-red-600 w-full rounded-lg px-3 mt-2' : 'border border-main-600 w-full rounded-lg px-3 mt-2 focus:ring-2 focus:ring-main-500'}
+                                        placeholder='Full Address' onChange={(e) => { setInputFullAddress(e.target.value); setCountFullAddress(e.target.value.length); if (e.target.value.length > 0) { setCheckAddress('') } }} value={inputFullAddress} />
+                                    <div className='flex justify-end w-full'>
+                                        {countFullAddress} / 200
+                                    </div>
+                                </div>
+                                <div className='flex flex-col items-start px-3 mb-2'>
+                                    <p>Province (Provinsi)<a className='text-red-600'>*</a> :</p>
+                                    <select type='text' onChange={(e) => { handleFilterCity(e.target.value); setSelectedProvinceID(e.target.value); if (e.target.value > 0) { setCheckProvince('') } }}
+                                        className={checkProvince === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
+                                            'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}>
+                                        <option value='' className='w-1/2'>Select Province</option>
+                                        {
+                                            dataProvince.map((val, idx) => {
+                                                return (
+                                                    <option value={val.province_id} key={val.province_id}>{val.province}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                                <div className='flex flex-col items-start px-3 mb-2'>
+                                    <p>City (Kota)<a className='text-red-600'>*</a> :</p>
+                                    <select type='text' onChange={(e) => { setSelectedCityID(e.target.value); if (e.target.value > 0) { setCheckCity('') } }}
+                                        className={checkCity === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
+                                            'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}>
+                                        <option value='' className='w-1/2'>Select City</option>
+                                        {
+                                            filterCity.map((val, idx) => {
+                                                return (
+                                                    <option value={val.city_id} key={val.city_id}>{val.type} {val.city_name}</option>
+                                                )
+                                            })
+                                        }
+                                    </select>
+                                </div>
+                                <div className='flex flex-col items-start px-3 mb-2'>
+                                    <p>District (Kecamatan/Kabupaten)<a className='text-red-600'>*</a> :</p>
+                                    <input type='text'
+                                        className={checkDistrict === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
+                                            'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}
+                                        placeholder='District' onChange={(e) => { setInputDistrict(e.target.value); if (e.target.value.length > 0) { setCheckDistrict('') } }}
+                                        value={inputDistrict} />
+                                </div>
+                                <div className='flex flex-col items-start px-3 mb-2'>
+                                    <p>Postal Code (Kode Pos)<a className='text-red-600'>*</a> :</p>
+                                    <input type='text'
+                                        className={checkPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
+                                            'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}
+                                        placeholder='Postal Code' onChange={(e) => { setInputPostalCode(e.target.value); if (e.target.value > 0) { setCheckPostal('') } }}
+                                        value={inputPostalCode} maxLength={5} />
                                 </div>
                             </div>
-                            <div className='flex flex-col items-start px-3 mb-2'>
-                                <p>Province (Provinsi)<a className='text-red-600'>*</a> :</p>
-                                <select type='text' onChange={(e) => { handleFilterCity(e.target.value); setSelectedProvinceID(e.target.value); if (e.target.value > 0) { setCheckProvince('') } }}
-                                    className={checkProvince === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
-                                        'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}>
-                                    <option value='' className='w-1/2'>Select Province</option>
-                                    {
-                                        dataProvince.map((val, idx) => {
-                                            return (
-                                                <option value={val.province_id} key={val.province_id}>{val.province}</option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                            </div>
-                            <div className='flex flex-col items-start px-3 mb-2'>
-                                <p>City (Kota)<a className='text-red-600'>*</a> :</p>
-                                <select type='text' onChange={(e) => { setSelectedCityID(e.target.value); if (e.target.value > 0) { setCheckCity('') } }}
-                                    className={checkCity === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
-                                        'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}>
-                                    <option value='' className='w-1/2'>Select City</option>
-                                    {
-                                        filterCity.map((val, idx) => {
-                                            return (
-                                                <option value={val.city_id} key={val.city_id}>{val.type} {val.city_name}</option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                            </div>
-                            <div className='flex flex-col items-start px-3 mb-2'>
-                                <p>District (Kecamatan/Kabupaten)<a className='text-red-600'>*</a> :</p>
-                                <input type='text'
-                                    className={checkDistrict === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
-                                        'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}
-                                    placeholder='District' onChange={(e) => { setInputDistrict(e.target.value); if (e.target.value.length > 0) { setCheckDistrict('') } }}
-                                    value={inputDistrict} />
-                            </div>
-                            <div className='flex flex-col items-start px-3 mb-2'>
-                                <p>Postal Code (Kode Pos)<a className='text-red-600'>*</a> :</p>
-                                <input type='text'
-                                    className={checkPostal === 'show' ? 'border border-red-600 w-full rounded-lg px-3 h-10 mt-2' :
-                                        'border border-main-600 w-full rounded-lg px-3 h-10 mt-2 focus:ring-2 focus:ring-main-500'}
-                                    placeholder='Postal Code' onChange={(e) => { setInputPostalCode(e.target.value); if (e.target.value > 0) { setCheckPostal('') } }}
-                                    value={inputPostalCode} maxLength={5} />
-                            </div>
+                            <button type="button" className="mr-1 text-white bg-main-500 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
+                                onClick={() => {
+                                    onSaveNewAddress();
+                                }}>Save</button>
+                            <button type="button"
+                                className="ml-1 text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-10 py-2.5 focus:z-10 "
+                                onClick={() => {
+                                    setInputFullAddress('');
+                                    setInputDistrict('');
+                                    setInputPostalCode('');
+                                    setSelectedProvinceID(0);
+                                    setSelectedCityID(0);
+                                    setCountFullAddress(0);
+                                    setCheckAddress('');
+                                    setCheckCity('');
+                                    setCheckDistrict('');
+                                    setCheckPostal('');
+                                    setCheckProvince('');
+                                    showModal('');
+                                }}
+                            >Cancel</button>
                         </div>
-                        <button type="button" className="mr-1 text-white bg-main-500 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
-                            onClick={() => {
-                                onSaveNewAddress();
-                            }}>Save</button>
-                        <button type="button" className="ml-1 text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
-                            onClick={() => {
-                                setInputFullAddress('');
-                                setInputDistrict('');
-                                setInputPostalCode('');
-                                setSelectedProvinceID(0);
-                                setSelectedCityID(0);
-                                setCountFullAddress(0);
-                                setCheckAddress('');
-                                setCheckCity('');
-                                setCheckDistrict('');
-                                setCheckPostal('');
-                                setCheckProvince('');
-                                showModal('');
-                            }}
-                        >Cancel</button>
                     </div>
                 </div>
             </div>
-        </div>
-        <ToastContainer />
+            <ToastContainer />
         </div>
     )
 }
