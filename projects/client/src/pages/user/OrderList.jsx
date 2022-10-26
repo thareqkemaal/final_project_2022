@@ -131,7 +131,7 @@ const UserOrderList = (props) => {
                     temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
                 };
 
-                if (search.includes('keyword')){
+                if (search.includes('keyword')) {
                     temp.push(`keyword=${inputKeyword}`);
                 }
 
@@ -321,6 +321,10 @@ const UserOrderList = (props) => {
                 }
             }
 
+            if (inputKeyword !== '') {
+                temp.push(`keyword=${inputKeyword}`);
+            }
+
             if (activePage >= 1) {
                 temp.push(`limit=5`);
                 temp.push(`offset=${(activePage - 1) * 5}`)
@@ -402,36 +406,38 @@ const UserOrderList = (props) => {
         return userTransactionData.map((val, idx) => {
             if (val.prescription_pic) {
                 return (
-                    <div key={val.idtransaction} className='px-10 py-5 my-4 border rounded-lg shadow-md'>
-                        <div className="border-b-2 flex justify-between pb-3 items-center">
-                            <div className="w-1/2 flex">
-                                <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
-                                <p className="mx-4 font-semibold">{val.invoice_number}</p>
+                    <div key={val.idtransaction} className='px-5 md:px-10 py-5 my-4 border rounded-lg shadow-md'>
+                        <div className="border-b-2 flex flex-col sm:flex-row justify-between pb-3 items-center">
+                            <div className="w-full sm:w-3/4 2xl:w-1/2 flex flex-col 2xl:flex-row">
+                                <Datetime value={val.date_order} />
+                                <p className="2xl:mx-4 font-semibold">{val.invoice_number}</p>
                             </div>
-                            {
-                                val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
-                                    <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
-                                    <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 7 ?
-                                    <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
+                            <div className='self-start 2xl:self-center'>
+                                {
+                                    val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
+                                        <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
+                                        <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 7 ?
+                                        <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                            </div>
                         </div>
-                        <div className="flex my-2">
-                            <div className="w-1/5">
+                        <div className="flex flex-col sm:flex-row my-2">
+                            <div className="w-1/2 sm:w-1/5 self-center">
                                 <img src={API_URL + val.prescription_pic} className="w-full p-1" alt='prescription' />
                             </div>
-                            <div className="w-4/5">
+                            <div className="w-full sm:w-4/5">
                                 <div className="h-2/4 flex">
                                     <div className="w-2/3 px-3 py-1">
                                         <p className="font-semibold">Doctor's Prescription</p>
@@ -479,7 +485,6 @@ const UserOrderList = (props) => {
 
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         <div className="flex justify-end">
@@ -500,8 +505,8 @@ const UserOrderList = (props) => {
                         </div>
                         {
                             showAccept === val.idtransaction ?
-                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                    <div className="relative p-4 w-full max-w-md h-auto">
                                         <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                             <div className="p-6 text-center">
                                                 <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
@@ -526,36 +531,38 @@ const UserOrderList = (props) => {
                 )
             } else {
                 return (
-                    <div key={val.idtransaction} className='px-10 py-5 my-4 border rounded-lg shadow-md'>
-                        <div className="border-b-2 flex justify-between pb-2 items-center">
-                            <div className="w-1/2 flex">
-                                <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
-                                <p className="mx-4 font-semibold">{val.invoice_number}</p>
+                    <div key={val.idtransaction} className='px-5 md:px-10 py-5 my-4 border rounded-lg shadow-md'>
+                        <div className="border-b-2 flex flex-col sm:flex-row justify-between pb-3 items-center">
+                            <div className="w-full sm:w-3/4 2xl:w-1/2 flex flex-col 2xl:flex-row">
+                                <Datetime value={val.date_order} />
+                                <p className="2xl:mx-4 font-semibold">{val.invoice_number}</p>
                             </div>
-                            {
-                                val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
-                                    <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
-                                    <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 7 ?
-                                    <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
+                            <div className='self-start 2xl:self-center'>
+                                {
+                                    val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
+                                        <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
+                                        <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 7 ?
+                                        <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                            </div>
                         </div>
-                        <div className="flex my-2">
-                            <div className="w-1/5">
+                        <div className="flex flex-col sm:flex-row my-2">
+                            <div className="w-1/2 sm:w-1/5 self-center">
                                 <img src={val.transaction_detail[0].product_image} className="w-full p-1" alt='product_image' />
                             </div>
-                            <div className="w-4/5">
+                            <div className="w-full sm:w-4/5">
                                 <div className="h-2/4 flex">
                                     <div className="w-2/3 px-3 py-1">
                                         <p className="font-semibold">{val.transaction_detail[0].product_name}</p>
@@ -626,8 +633,8 @@ const UserOrderList = (props) => {
                         </div>
                         {
                             showAccept === val.idtransaction ?
-                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                    <div className="relative p-4 w-full max-w-md h-auto">
                                         <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                             <div className="p-6 text-center">
                                                 <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
@@ -706,13 +713,13 @@ const UserOrderList = (props) => {
         <div>
             <Helmet>
                 <title>List order</title>
-                <meta name="description" content='list order'/>
+                <meta name="description" content='list order' />
             </Helmet>
             <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
-                <div className="p-5 flex flex-col justify-center items-center">
+                <div className="py-5 px-1 lg:px-5 flex flex-col justify-center items-center">
                     <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
-                    <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
-                        <div className="border-b-2">
+                    <div className="border-2 rounded-lg my-8 w-full lg:w-3/4 px-4 sm:px-8 lg:px-16 py-5 shadow-lg">
+                        <div className="border-b-2 flex overflow-x-auto sm:overflow-x-hidden">
                             <button type="button" onClick={() => {
                                 setSelected({ ...selected, tab: '', sort: 'new' });
                                 setTab('all');
@@ -840,10 +847,10 @@ const UserOrderList = (props) => {
                                 className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
                             >Canceled</button>
                         </div>
-                        <div className="my-3 p-2 flex justify-between">
-                            <div className="flex w-4/5 items-center">
-                                <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
-                                <div className="w-3/6 flex justify-between">
+                        <div className="2xl:mt-3 p-2 flex flex-col 2xl:flex-row justify-between">
+                            <div className="flex w-full  2xl:w-3/4 items-center">
+                                <p className="w-1/3 2xl:w-1/6 font-semibold text-main-500">Type of Order</p>
+                                <div className="w-2/3 2xl:w-3/6 sm:flex sm:flex-row 2xl:justify-between">
                                     <button type="button" onClick={() => {
                                         setSelected({ ...selected, type: '' });
                                         setType('all');
@@ -884,7 +891,7 @@ const UserOrderList = (props) => {
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
                                     }}
-                                        className={type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                        className={type === "prescription" ? "border px-4 py-2 sm:mx-1 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 sm:mx-1 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
                                     >Prescription</button>
                                     <button type="button" onClick={() => {
                                         setSelected({ ...selected, type: 'free' });
@@ -909,14 +916,13 @@ const UserOrderList = (props) => {
                                     >Free Drugs</button>
                                 </div>
                             </div>
-                            <div className="flex items-center w-1/5 justify-between">
-                                <p className="font-semibold text-main-500">Sort by:</p>
+                            <div className="flex mt-3 2xl:mt-0 items-center 2xl:w-1/4 2xl:justify-between">
+                                <p className="w-1/3 font-semibold text-main-500">Sort by:</p>
                                 <select className="border rounded-lg border-main-500 text-gray-500"
                                     onChange={(e) => {
                                         setSelected({ ...selected, sort: e.target.value });
                                         setSort(e.target.value);
                                         setActivePage(1);
-                                        setInputKeyword('');
 
                                         let query = { ...selected, sort: e.target.value };
                                         console.log('selected', selected);
@@ -927,6 +933,10 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+
+                                        if (inputKeyword !== '') {
+                                            temp.push(`keyword=${inputKeyword}`);
+                                        }
 
                                         if (range[0].startDate !== '') {
                                             let data = range[0];
@@ -950,35 +960,35 @@ const UserOrderList = (props) => {
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <div className="p-2 flex items-center">
-                                <div className="flex w-4/5">
-                                    <div className="flex w-1/6">
-                                        <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                        <div className="p-2 flex items-center">
+                            <div className="flex w-full 2xl:w-4/5">
+                                <div className="flex w-1/3 2xl:w-1/6">
+                                    <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                </div>
+                                <div className="flex flex-col 2xl:flex-row w-2/3 sm:w-1/3 2xl:w-5/6">
+                                    <div className="p-1 border border-main-500 rounded 2xl:flex mx-1">
+                                        <input
+                                            value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center w-full"
+                                            placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Start Date'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
                                     </div>
-                                    <div className="flex w-5/6">
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
-                                                className="text-center"
-                                                placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                                onClick={() => setShowFilterDate(true)}
-                                            />
-                                        </div>
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
-                                                className="text-center"
-                                                placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                                onClick={() => setShowFilterDate(true)}
-                                            />
-                                        </div>
-                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                    <div className="p-1 border border-main-500 rounded 2xl:flex mx-1 mt-1 2xl:mt-0">
+                                        <input
+                                            value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center w-full"
+                                            placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select End Date'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
+                                    </div>
+                                    <div className="flex">
+                                        <button type="button" className="text-start ml-2 text-main-500 hover:underline focus:underline font-semibold"
                                             onClick={() => {
                                                 setSort('new');
                                                 setActivePage(1); handleFilter();
                                             }}>Filter</button>
-                                        <button type="button" className="ml-2 hover:underline"
+                                        <button type="button" className="text-start ml-2 hover:underline"
                                             onClick={() => {
                                                 setRange([{
                                                     startDate: '',
@@ -1008,49 +1018,49 @@ const UserOrderList = (props) => {
                                             }}
                                         >Clear</button>
                                     </div>
-                                    {
-                                        showFilterDate ?
-                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-1/2 h-full md:h-auto">
-                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                        <div className="p-6 text-center flex flex-col items-center justify-center">
-                                                            <DateRangePicker
-                                                                onChange={item => setRange([item.selection])}
-                                                                editableDateInputs={true}
-                                                                moveRangeOnFirstSelection={false}
-                                                                ranges={range}
-                                                                months={2}
-                                                                direction="horizontal"
-                                                            />
-                                                            <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
-                                                                onClick={() => {
-                                                                    setShowFilterDate(false);
-                                                                }}>Set Date</button>
-                                                        </div>
+                                </div>
+                                {
+                                    showFilterDate ?
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
+                                            <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                    <div className="p-6 text-center flex flex-col items-center justify-center">
+                                                        <DateRangePicker
+                                                            onChange={item => setRange([item.selection])}
+                                                            editableDateInputs={true}
+                                                            moveRangeOnFirstSelection={false}
+                                                            ranges={range}
+                                                            months={2}
+                                                            direction="horizontal"
+                                                        />
+                                                        <button type='button' className="border rounded-lg bg-main-500 text-white px-4 py-2 font-bold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                                            onClick={() => {
+                                                                setShowFilterDate(false);
+                                                            }}>Set Date</button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            :
-                                            ""
-                                    }
-                                </div>
+                                        </div>
+                                        :
+                                        ""
+                                }
                             </div>
                         </div>
-                        <div>
-                            <div className="p-2 flex items-center">
-                                <div className="flex w-4/5">
-                                    <div className="flex w-1/6">
-                                        <p className="font-semibold text-main-500 mr-2">Search :</p>
+                        <div className="p-2 flex items-center">
+                            <div className="flex w-full 2xl:w-4/5">
+                                <div className="flex w-1/3 2xl:w-1/6">
+                                    <p className="font-semibold text-main-500 mr-2">Search :</p>
+                                </div>
+                                <div className="flex flex-col 2xl:flex-row w-2/3 sm:w-1/3 2xl:w-5/6">
+                                    <div className="p-1 border border-main-500 rounded mx-1">
+                                        <input
+                                            value={inputKeyword}
+                                            className="text-center w-full"
+                                            placeholder='Keyword'
+                                            onChange={(e) => setInputKeyword(e.target.value)}
+                                        />
                                     </div>
-                                    <div className="flex w-5/6">
-                                        <div className="p-1 border border-main-500 rounded flex mx-1">
-                                            <input
-                                                value={inputKeyword}
-                                                className="text-center"
-                                                placeholder='Keyword'
-                                                onChange={(e) => setInputKeyword(e.target.value)}
-                                            />
-                                        </div>
+                                    <div className="flex items-center justify-start">
                                         <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
                                             onClick={() => {
                                                 setActivePage(1);
@@ -1103,18 +1113,34 @@ const UserOrderList = (props) => {
                                         <ul className="list-none flex">
                                             {
                                                 activePage === 1 ?
-                                                    <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
+                                                    <li className="hidden sm:block border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
                                                     :
-                                                    <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                    <li className="hidden sm:block border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
                                                         type='button' onClick={() => setActivePage(activePage - 1)}
                                                     >Previous</li>
+                                            }
+                                            {
+                                                activePage === 1 ?
+                                                    <li className="sm:hidden border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'<'}</li>
+                                                    :
+                                                    <li className="sm:hidden border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                    >{'<'}</li>
                                             }
                                             {printPagination()}
                                             {
                                                 activePage === totalPage ?
-                                                    <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
+                                                    <li className="sm:hidden border border-gray-300 rounded-r-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'>'}</li>
                                                     :
-                                                    <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                    <li className="sm:hidden border border-main-500 rounded-r-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                    >{'>'}</li>
+                                            }
+                                            {
+                                                activePage === totalPage ?
+                                                    <li className="hidden sm:block border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
+                                                    :
+                                                    <li className="hidden sm:block border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
                                                         type='button' onClick={() => setActivePage(activePage + 1)}
                                                     >Next</li>
                                             }
@@ -1123,8 +1149,8 @@ const UserOrderList = (props) => {
                                     {/* MODAL SELECT PAYMENT */}
                                     {
                                         showPayment ?
-                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                                <div className="relative p-4 w-full md:w-2/3 lg:w-1/2 h-full sm:h-auto">
                                                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                         <div className="p-6 text-center">
                                                             <div>
