@@ -7,7 +7,7 @@ const Tabs = () => {
     const navigate = useNavigate()
     const { pathname } = window.location
   return (
-    <div className='container mx-auto  border border-t-0 border-l-0 border-r-0 h-14 w-[1408px]'>
+    <div className='container mx-auto  border border-t-0 border-l-0 border-r-0 h-14'>
             <div className='flex'>
                 <div className={`flex w-24 h-14 pt-3 ${pathname === '/profile' && 'border border-t-0 border-l-0 border-r-0  border-blue-600'}`} onClick={()=>navigate('/profile')}>
                     <HiUserCircle size={25} className={`${pathname === '/profile'?'fill-blue-600':'fill-[#4b5563]' } ml-2`}/>
