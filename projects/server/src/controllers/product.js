@@ -49,7 +49,7 @@ module.exports = {
                                 // ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter.join(' ') : ''}
 
                                 dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
-                                where s.isDefault="true" ${filterCategory || product_name ? 'and' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+                                where s.isDefault="true" ${filterCategory || product_name ? 'and' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter.join(' ') : ''}
                                 order by ${sort ? `${sort} asc` : `idproduct desc`} 
                                     limit 10 offset ${dbConf.escape(offset)}`,
                                     (err, results) => {
@@ -107,25 +107,37 @@ module.exports = {
                 } else if ((typeof offset != typeof 'string' || limit) && !filterCategory) { // Before : else if (limit)
                     let resultFilter = `category_id=${filterCategory}`;
 
-                    // ${filterCategory || product_name ? 'where s.isDefault="true"' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+                    dbConf.query(`Select count(p.idproduct) as totalProductFilter from product p join category c on c.idcategory = p.category_id
+                        ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter.join(' ') : ''}
+                        order by ${sort ? `${sort} asc` : `idproduct desc`} 
+                        limit 10 offset 0`,
+                        (err, results) => {
+                            if (err) {
+                                return res.status(500).send(`Middlewear getTotalFilterProduct failed, error : ${err}`)
+                            }
 
-                    dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
+                            let totalProductFilter = results[0].totalProductFilter
+
+                            // ${filterCategory || product_name ? 'where s.isDefault="true"' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+
+
+                            dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
                     where s.isDefault="true" ${filterCategory || product_name ? 'and' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
                     order by ${sort ? `${sort} asc` : `idproduct desc`} 
                     ${typeof offset == typeof 'string' ? `limit ${dbConf.escape(limit)}` : `limit 10 offset ${dbConf.escape(offset)}`}`,
-                        (err, results) => {
-                            if (err) {
-                                return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
-                            }
+                                (err, results) => {
+                                    if (err) {
+                                        return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
+                                    }
 
-                            // console.log('results query 3', results)
-
-                            res.status(200).send(
-                                {
-                                    results,
-                                    totalProduct
-                                }
-                            );
+                                    res.status(200).send(
+                                        {
+                                            results,
+                                            totalProduct,
+                                            totalProductFilter
+                                        }
+                                    );
+                                })
                         })
                 } else {
                     let resultFilter = `category_id=${filterCategory}`;
@@ -467,14 +479,7 @@ module.exports = {
         }
     },
     stockHistory: (req, res, next) => {
-        // Tika Change #5
-        // Update definisi variabel image
-
-        // Before
-        // let image = `/imgProductPict/${req.files[0].filename}`;
-        // Notes : agar editProduct tidak perlu mengganti image, maka definisi variabel image perlu diganti
-
-        // After
+        console.log('ini stock history')
         let image = JSON.stringify(req.files) != '[]' ? `/imgProductPict/${req.files[0].filename}` : req.body.images;
         let { iduser, price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit, unit } = JSON.parse(req.body.data);
         let idproduct = req.params.id;
@@ -489,9 +494,9 @@ module.exports = {
 
                 if (results[0].stock_unit > stock_unit) {
                     // dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity, type, information) VALUES
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
 
-                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
+                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan')`,
                         (error, results) => {
@@ -518,8 +523,8 @@ module.exports = {
                             next()
                         })
                 } else if (results[0].stock_unit < stock_unit) {
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
-                (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
+                (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(req.body.data.stock_unit - results[0].stock_unit)},'Manual Update','Penambahan');`,
                         (error, results) => {

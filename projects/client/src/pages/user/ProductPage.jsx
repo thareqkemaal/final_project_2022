@@ -19,6 +19,8 @@ const ProductPage = (props) => {
 
     const { state, search } = useLocation();    //perlu idcategory dari daniel
     let id = search.split('=');
+    // console.log('ini id', id[id.length - 1])
+    // console.log('ini typeof id', typeof id[id.length - 1])
     const [filterName, setFilterName] = React.useState(typeof id[id.length - 1] == typeof 'string' ? id[id.length - 1] : '');
     const [idPage, setIdPage] = React.useState(typeof id[id.length - 1] == typeof 3 ? id[id.length - 1] : undefined);
     const [defaultSort, setDefaultSort] = React.useState('Paling Sesuai');

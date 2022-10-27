@@ -253,16 +253,16 @@ const EditProductPage = () => {
                                                             <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">Product Image</label>
 
                                                             <div className="flex justify-center items-center w-full">
-                                                                <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-30 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                                                <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-30 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                                                                     <div className="flex">
-                                                                        {/* <img className="w-40 pt-1 mb-2" src={state.dataproduct.picture.includes('/imgProductPict') ? API_URL + state.dataproduct.picture : state.dataproduct.picture} alt={state.dataproduct.idproduct} /> */}
-                                                                        <div className="flex flex-col justify-center items-center mx-2.5 py-6">
-                                                                            <svg aria-hidden="true" className="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                                                            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to edit product picture</span> or drag and drop</p>
-                                                                            <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                                                                        </div>
+                                                                        <img className="w-40 pt-1 mb-2" src={state.dataproduct.picture.includes('/imgProductPict') ? API_URL + state.dataproduct.picture : state.dataproduct.picture} alt={state.dataproduct.idproduct} />
+                                                                        {/* <div className="flex flex-col justify-center items-center mx-2.5 py-6">
+                                                                <svg aria-hidden="true" className="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                                                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span className="font-semibold">Click to edit product picture</span> or drag and drop</p>
+                                                                <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                                                            </div> */}
                                                                     </div>
-                                                                    <input id="dropzone-file" type="file" className="hidden" />
+                                                                    {/* <input id="dropzone-file" type="file" className="hidden" /> */}
                                                                     {/* <input id="dropzone-file" type="file" onChange={(e) => setPicture(e.target.files[0])} className="hidden" /> */}
                                                                 </label>
                                                             </div>
@@ -287,7 +287,7 @@ const EditProductPage = () => {
                                                         {/* <!-- Modal content --> */}
                                                         <div className="py-5 text-center items-center">
                                                             <h3 className="text-md font-bold text-gray-900">Anda belum memilih produk untuk diedit, silahkan kembali ke
-                                                                <button className="text-btn-500 ml-1" onClick={()=>navigate('/admin/product')}>
+                                                                <button className="text-btn-500 ml-1" onClick={() => navigate('/admin/product')}>
                                                                     menu daftar obat
                                                                 </button>
                                                             </h3>
@@ -411,7 +411,7 @@ const EditProductPage = () => {
                                                         <label htmlFor="description" className="block mt-4 mb-2 text-sm font-medium text-gray-900">Product Image</label>
 
                                                         <div className="flex justify-center items-center w-full">
-                                                            <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-30 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                                            <label htmlFor="dropzone-file" className="flex flex-col justify-center items-center w-full h-30 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                                                                 <div className="flex">
                                                                     <img className="w-40 pt-1 mb-2" src={state.dataproduct.picture.includes('/imgProductPict') ? API_URL + state.dataproduct.picture : state.dataproduct.picture} alt={state.dataproduct.idproduct} />
                                                                     {/* <div className="flex flex-col justify-center items-center mx-2.5 py-6">
@@ -420,7 +420,7 @@ const EditProductPage = () => {
                                                                 <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
                                                             </div> */}
                                                                 </div>
-                                                                <input id="dropzone-file" type="file" className="hidden" />
+                                                                {/* <input id="dropzone-file" type="file" className="hidden" /> */}
                                                                 {/* <input id="dropzone-file" type="file" onChange={(e) => setPicture(e.target.files[0])} className="hidden" /> */}
                                                             </label>
                                                         </div>
