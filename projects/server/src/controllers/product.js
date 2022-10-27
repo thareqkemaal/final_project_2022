@@ -586,7 +586,7 @@ module.exports = {
     },
     updatecart: async (req, res) => {
         try {
-            //console.log(req.body)
+            console.log(req.body)
             if (req.body.selected) {
                 if (req.body.selectAll) {
                     // checkbox all
@@ -596,7 +596,12 @@ module.exports = {
                     await dbQuery(`UPDATE cart SET selected=${dbConf.escape(req.body.selected)} WHERE idcart=${dbConf.escape(req.body.idcart)};`);
                 }
             } else {
-                await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)} WHERE idcart=${dbConf.escape(req.body.idcart)};`);
+                if (req.body.multiple){
+                    console.log(req.body);
+                } else {
+                    await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+                    await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)}, selected = 'true' WHERE idcart=${dbConf.escape(req.body.idcart)};`);
+                }
             }
 
             res.status(200).send({
@@ -610,11 +615,16 @@ module.exports = {
     },
     addCart: async (req, res) => {
         try {
-            // console.log(req.body);
+            console.log(req.body);
             // console.log(req.dataToken);
 
-            // single income data
-            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+            if (req.body.multiple){
+                console.log(req.body);
+            } else {
+                // single income data
+                await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+                await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)}, 'true');`);
+            }
 
             res.status(200).send({
                 success: true,
