@@ -9,6 +9,8 @@ import { DateRangePicker } from 'react-date-range'
 import format from 'date-fns/format'
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
+import * as XLSX from 'xlsx'
+import PrintHistoryComponent from '../../components/PrintHistory'
 import { Helmet } from 'react-helmet';
 
 const HistoryPage = () => {
@@ -16,6 +18,7 @@ const HistoryPage = () => {
     const search = useLocation().search
     const [loading, setLoading] = React.useState(true)
     const [history, setHistory] = React.useState([])
+    const [allHistory, setAllHistory] = React.useState([])
     const [product, setProduct] = React.useState('')
     const [filterKey, setFilterKey] = React.useState(0)
     const [filter, setFilter] = React.useState('')
@@ -37,10 +40,27 @@ const HistoryPage = () => {
     const getHistory = (search) => {
         axios.get(API_URL + `/api/transaction/history${search}`)
             .then((res) => {
-                console.log(res.data.count[0].total)
                 setHistory(res.data.history)
                 setCount(res.data.count[0].total)
                 setTimeout(() => setLoading(false), 1000)
+            }).catch((err) => {
+                console.log(err)
+            })
+        axios.get(API_URL + `/api/transaction/history?limit=no`)
+            .then((res) => {
+                let sheet = []
+                res.data.history.map((val, idx) => {
+                    sheet.push({
+                        date: val.date_change,
+                        product_name: val.product_name,
+                        username: val.username,
+                        unit: val.unit,
+                        quantity: val.quantity,
+                        type: val.type,
+                        information: val.information
+                    })
+                })
+                setAllHistory(sheet)
             }).catch((err) => {
                 console.log(err)
             })
@@ -135,6 +155,15 @@ const HistoryPage = () => {
         getHistory(`?${filterArray.join('&')}`)
     }
 
+    const handleExportFile = () => {
+        let wb = XLSX.utils.book_new()
+        let ws = XLSX.utils.json_to_sheet(allHistory)
+
+        XLSX.utils.book_append_sheet(wb, ws, 'Stock Log')
+
+        XLSX.writeFile(wb, "StockReport.xlsx")
+    }
+
     return (
         <div>
             <Helmet>
@@ -201,9 +230,17 @@ const HistoryPage = () => {
                                     color: 'teal'
                                 }])
                                 navigate('/admin/stock_log')
+                                setFilter('')
                                 setProduct('')
                                 getHistory('')
                             }}>Reset</button>
+                            <button
+                                className='mt-3 sm:mt-0 sm:ml-5 bg-white border py-1 px-2 h-10'
+                                onClick={handleExportFile}
+                            >
+                                Export All Data
+                            </button>
+                            <PrintHistoryComponent data={allHistory} />
                         </div>
                         <div className={`${history.length == 0 ? 'hidden' : "flex flex-col items-end mr-2 sm:mr-12"}`}>
                             {/* <!-- Help text --> */}
@@ -262,7 +299,7 @@ const HistoryPage = () => {
                             </div>
                         </div>
                         <div className='sm:mr-10'>
-                            <div className="mt-5 w-72 sm:w-full mr-3 overflow-x-auto bg-white border border-main-500 relative rounded-lg">
+                            <div className="mt-5 w-72 sm:w-full mr-3 overflow-x-auto bg-white relative">
                                 <table className="w-full text-sm sm:text-xl text-left text-gray-500">
                                     <thead className="text-sm sm:text-lg text-gray-600 uppercase border border-black">
                                         <tr className=' divide-black divide-x'>

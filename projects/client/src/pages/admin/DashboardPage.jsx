@@ -7,6 +7,8 @@ import { API_URL } from '../../helper';
 import AdminComponent from '../../components/AdminComponent'
 import Loading from '../../components/Loading'
 import Currency from '../../components/CurrencyComp';
+import * as XLSX from 'xlsx'
+import PrintDashboardComponent from '../../components/PrintDashboard'
 import { Helmet } from 'react-helmet';
 
 const DashboardPage = (props) => {
@@ -23,7 +25,6 @@ const DashboardPage = (props) => {
     const getReport = () => {
         axios.get(API_URL + `/api/transaction/report`)
             .then((res) => {
-                console.log(res.data.product)
                 let total_revenue = 0
                 let total_product = 0
                 let revenueArray = res.data.revenue.slice(-12)
@@ -53,7 +54,6 @@ const DashboardPage = (props) => {
     const getProduct = () => {
         axios.post(API_URL + `/api/product/getproduct`, { offset: '' })
             .then((res) => {
-                console.log(res.data.totalProduct)
                 setProduct(res.data.totalProduct)
                 let array = []
                 res.data.results.map((val) => {
@@ -154,6 +154,47 @@ const DashboardPage = (props) => {
         getProduct()
     }, [])
 
+    const handleExportFile = () => {
+        let report1 = [{
+            Revenue: `Rp${totalRevenue.toLocaleString('id')}`,
+            Product_sold: totalProduct,
+            Product_registered: product,
+        }]
+        let report2 = [{
+            New_Order: transaction[0],
+            Ready_To_Ship: transaction[1],
+            In_Delivery: transaction[2],
+            Completed: transaction[3],
+            Canceled: transaction[4]
+        }]
+
+        let stock = []
+        if (productOut.length > 0) {
+            productOut.map((val) => {
+                stock.push({
+                    product: val.product_name,
+                    remain_stock: `${val.stock_unit} ${val.unit}`
+                })
+            })
+        }
+
+        let wb = XLSX.utils.book_new()
+        let ws1 = XLSX.utils.json_to_sheet(report1)
+        let ws2 = XLSX.utils.json_to_sheet(report2)
+        let ws3 = ''
+        if (stock.length > 0) {
+            ws3 = XLSX.utils.json_to_sheet(stock)
+        }
+
+        XLSX.utils.book_append_sheet(wb, ws1, 'Revenue Analysis')
+        XLSX.utils.book_append_sheet(wb, ws2, 'Transaction Analysis')
+        if (stock.length > 0) {
+            XLSX.utils.book_append_sheet(wb, ws3, 'Low Stock Product')
+        }
+
+        XLSX.writeFile(wb, "Dashboard.xlsx")
+    }
+
     return (
         <div >
             <Helmet>
@@ -169,6 +210,17 @@ const DashboardPage = (props) => {
                             <div className='ml-5'>
                                 <p className="sm:text-3xl font-bold mt-5 mb-3 text-txt-500">Product and Transaction Analysis</p>
                                 <p className="sm:text-xl mt-2 mb-3 text-txt-500">Last Update {new Date().toLocaleString('en-CA')}</p>
+                                <div className='sm:flex'>
+                                    <button
+                                        className='mt-3 sm:mt-0 bg-white border py-1 px-2'
+                                        onClick={() => {
+                                            handleExportFile()
+                                        }}
+                                    >
+                                        Export All Data
+                                    </button>
+                                    <PrintDashboardComponent data={[totalRevenue, totalProduct, product, transaction, productOut, revenueReport]} />
+                                </div>
                             </div>
                             <div className='mt-5 sm:grid sm:grid-cols-3'>
                                 <div className='border shadow-lg h-16 sm:h-40 bg-gray-100 rounded-lg my-2 mx-5 mr-28 sm:mr-0'>

@@ -4,9 +4,11 @@ import { Chart as ChartJS } from 'chart.js/auto'
 import axios from 'axios'
 import { API_URL } from '../../helper';
 import AdminComponent from '../../components/AdminComponent'
+import PrintReportComponent from '../../components/PrintReport'
 import Loading from '../../components/Loading'
 import Currency from '../../components/CurrencyComp';
 import { IoIosArrowDown, IoIosArrowRoundForward } from "react-icons/io";
+import * as XLSX from 'xlsx'
 import { Helmet } from 'react-helmet';
 
 const ReportPage = () => {
@@ -288,6 +290,35 @@ const ReportPage = () => {
         }
     }
 
+    const handleExportFile = () => {
+        let wb = XLSX.utils.book_new()
+        let ws1 = ''
+        let ws2 = ''
+        let ws3 = ''
+        if (startRevenue != 'Start Month' && endRevenue != 'End Month') {
+            let indexStart = allReport.revenue.findIndex((val) => val.month == startRevenue)
+            let indexEnd = allReport.revenue.findIndex((val) => val.month == endRevenue)
+            let revenueArray = allReport.revenue.slice(indexStart, indexEnd + 1)
+            let transactionArray = allReport.transaction.slice(indexStart, indexEnd + 1)
+            let userArray = allReport.user.slice(indexStart, indexEnd + 1)
+            ws1 = XLSX.utils.json_to_sheet(revenueArray)
+            ws2 = XLSX.utils.json_to_sheet(transactionArray)
+            ws3 = XLSX.utils.json_to_sheet(userArray)
+        } else {
+            ws1 = XLSX.utils.json_to_sheet(allReport.revenue)
+            ws2 = XLSX.utils.json_to_sheet(allReport.transaction)
+            ws3 = XLSX.utils.json_to_sheet(allReport.user)
+        }
+        let ws4 = XLSX.utils.json_to_sheet(allReport.product)
+
+        XLSX.utils.book_append_sheet(wb, ws1, 'Revenue Report')
+        XLSX.utils.book_append_sheet(wb, ws2, 'Transaction Report')
+        XLSX.utils.book_append_sheet(wb, ws3, 'User Report')
+        XLSX.utils.book_append_sheet(wb, ws4, 'Product Report')
+
+        XLSX.writeFile(wb, "Report.xlsx")
+    }
+
     return (
         <div >
             <Helmet>
@@ -302,6 +333,15 @@ const ReportPage = () => {
                         <div className='w-screen' style={{ background: "linear-gradient(155.7deg, #D6F5F3 -46%, #F7FCFC 100%, #F1F5FC 118%)" }}>
                             <div className='ml-5'>
                                 <p className="sm:text-2xl font-bold mt-5 mb-3 text-txt-500">Report</p>
+                            </div>
+                            <div className='sm:flex'>
+                                <button
+                                    className='mt-3 sm:mt-0 sm:ml-5 bg-white border py-1 px-2'
+                                    onClick={handleExportFile}
+                                >
+                                    Export Data
+                                </button>
+                                <PrintReportComponent data={[revenueReport, transactionReport, userReport, productReport, listMonth, totalRevenue, month, totalProduct]} />
                             </div>
                             <div className='sm:flex sm:justify-center ml-2 sm:ml-0 mb-10'>
                                 <div className='inline'>
@@ -417,8 +457,8 @@ const ReportPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='sm:flex sm:ml-5 ml-2 mt-3 border border-teal-500 rounded-lg bg-white mr-5 sm:mr-10 mb-5 sm:mb-10'>
-                                <div>
+                            <div className='sm:ml-5 ml-2 mt-3 border sm:grid sm:grid-cols-4 border-teal-500 rounded-lg bg-white mr-5 sm:mr-10 mb-5 sm:mb-10'>
+                                <div className='sm:col-span-3'>
                                     <p className="sm:text-3xl font-bold mt-5 mb-3 pl-5 text-main-500">TOTAL REVENUE</p>
                                     <Line style={{ width: 1200, maxHeight: 400 }} data={sort == 'Date' ? revenueReport : revenueSalesReport} options={options1} />
                                 </div>
@@ -434,13 +474,13 @@ const ReportPage = () => {
                                     <div className='flex justify-between'>
                                         <p className="sm:text-3xl font-bold mt-5 mb-3 pl-5 text-main-500">TRANSACTION</p>
                                     </div>
-                                    <Line style={{ width: 750, maxHeight: 400 }} data={sort == 'Date' ? transactionReport : transactionSalesReport} options={options2} />
+                                    <Line style={{ width: 1200, maxHeight: 400 }} data={sort == 'Date' ? transactionReport : transactionSalesReport} options={options2} />
                                 </div>
                                 <div className='border border-teal-500 mt-5 sm:mt-0 rounded-lg bg-white'>
                                     <div className='flex justify-between'>
                                         <p className="sm:text-3xl font-bold mt-5 mb-3 pl-5 text-main-500">USER</p>
                                     </div>
-                                    <Line style={{ width: 750, maxHeight: 400 }} data={sort == 'Date' ? userReport : userSalesReport} options={options2} />
+                                    <Line style={{ width: 1200, maxHeight: 400 }} data={sort == 'Date' ? userReport : userSalesReport} options={options2} />
                                 </div>
                             </div>
                             <div className='sm:flex sm:ml-5 ml-2 mt-3 border border-teal-500 rounded-lg bg-white mr-5 sm:mr-10 mb-10' >
