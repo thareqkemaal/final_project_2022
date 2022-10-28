@@ -128,13 +128,7 @@ module.exports = {
                             );
                         })
                 } else {
-                    let resultFilter = `category_id=${filterCategory}`;
-
-                    console.log('query 4')
-
-                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
-                    ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-                    ${sort ? `order by ${sort} asc` : ``}`,
+                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id where p.isDeleted = 'false'`,
                         (err, results) => {
                             if (err) {
                                 return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
