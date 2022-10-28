@@ -18,8 +18,8 @@ const PrintDashboardComponent = (data) => {
         return data.data[4].map((val, idx) => {
             if (idx < 7) {
                 return <div className='grid grid-cols-5'>
-                    <p className='sm:text-xl text-sm font-bold my-1 text-main-500 pl-5 col-span-3'>{val.product_name}</p>
-                    <p className='sm:text-xl text-sm font-bold pl-5 text-main-800 col-span-2'>{val.stock_unit} {val.unit}</p>
+                    <p className='text-xl font-bold my-1 text-main-500 pl-5 col-span-3'>{val.product_name}</p>
+                    <p className='text-xl font-bold pl-5 text-main-800 col-span-2'>{val.stock_unit} {val.unit}</p>
                 </div>
             }
         })
@@ -69,7 +69,7 @@ const PrintDashboardComponent = (data) => {
         >
             Print Data
         </button>
-        <div className='absolute -z-30 overflow-hide-modal'>
+        <div className='absolute -z-30 overflow-hide-print'>
             <div ref={componentRef}>
                 <div className='mt-5 mb-3'>
                     <p className="text-3xl text-center font-bold mt-5 mb-3 text-txt-500">Summary</p>
@@ -77,16 +77,16 @@ const PrintDashboardComponent = (data) => {
                 <div className='mx-5 my-5'>
                     <div className='mt-5 grid grid-cols-3'>
                         <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-2'>
-                            <p className="font-semibold mt-5 mb-3 px-5">Total Revenue</p>
-                            <p className="text-2xl font-bold mt-3 mb-3 pl-5"><Currency price={data.data[0]} /></p>
+                            <p className="text-xl font-semibold mt-5 mb-3 px-5">Total Revenue</p>
+                            <p className="text-4xl font-bold mt-3 mb-3 pl-5"><Currency price={data.data[0]} /></p>
                         </div>
                         <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-2'>
-                            <p className="font-semibold mt-5 mb-3 px-5">Total Product Sold</p>
-                            <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[1]}</p>
+                            <p className="text-xl font-semibold mt-5 mb-3 px-5">Total Product Sold</p>
+                            <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[1]}</p>
                         </div>
                         <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-2'>
-                            <p className="font-semibold mt-5 mb-3 px-5">Total Product Registered</p>
-                            <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[2]}</p>
+                            <p className="text-xl font-semibold mt-5 mb-3 px-5">Total Product Registered</p>
+                            <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[2]}</p>
                         </div>
                     </div>
                     <div className='ml-5'>
@@ -95,36 +95,38 @@ const PrintDashboardComponent = (data) => {
                     <div className='mt-5'>
                         <div className='grid grid-cols-3'>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-5' type='button'>
-                                <p className="font-semibold mt-5 mb-3 px-5">New Order</p>
-                                <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[3][0]}</p>
+                                <p className="text-xl font-semibold mt-5 mb-3 px-5">New Order</p>
+                                <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[3][0]}</p>
                             </div>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-5' type='button'>
-                                <p className="font-semibold mt-5 mb-3 px-5">Ready To Ship</p>
-                                <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[3][1]}</p>
+                                <p className="text-xl font-semibold mt-5 mb-3 px-5">Ready To Ship</p>
+                                <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[3][1]}</p>
                             </div>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-5' type='button'>
-                                <p className="font-semibold mt-5 mb-3 px-5">In Delivery</p>
-                                <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[3][2]}</p>
+                                <p className="text-xl font-semibold mt-5 mb-3 px-5">In Delivery</p>
+                                <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[3][2]}</p>
                             </div>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-5' type='button'>
-                                <p className="font-semibold mt-5 mb-3 px-5">Order Completed</p>
-                                <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[3][3]}</p>
+                                <p className="text-xl font-semibold mt-5 mb-3 px-5">Order Completed</p>
+                                <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[3][3]}</p>
                             </div>
                             <div className='border shadow-lg h-40 bg-gray-100 rounded-lg my-2 mx-5' type='button'>
-                                <p className="font-semibold mt-5 mb-3 px-5">Order Canceled</p>
-                                <p className="text-2xl font-bold mt-3 mb-3 pl-5">{data.data[3][4]}</p>
+                                <p className="text-xl font-semibold mt-5 mb-3 px-5">Order Canceled</p>
+                                <p className="text-4xl font-bold mt-3 mb-3 pl-5">{data.data[3][4]}</p>
                             </div>
                         </div>
-                        <div className='border shadow-lg h-80 bg-gray-100 rounded-lg mx-5 ml-5 pt-5 mt-5 mb-40'>
+                        <div className='border shadow-lg h-96 bg-gray-100 rounded-lg mx-5 ml-5 pt-5 mt-5 mb-96'>
                             <p className="text-2xl font-bold mb-3 ml-5 text-txt-500 sm:hidden">Low Stock Product</p>
                             <p className={`${data.data[4].length < 1 ? 'mt-24 ml-20 text-5xl font-bold text-main-500' : 'hidden'}`}>All Stock Product Controlled </p>
                             {printMed()}
                         </div>
                     </div>
-                    <p className='mb-10 text-white'>REVENUE</p>
-                    <div type='button' className='ml-5 mt-3 border border-teal-500 rounded-lg bg-white mr-10 mb-10'>
-                        <p className="text-3xl font-bold mt-5 mb-3 pl-5 text-main-500 flex items-center">TOTAL REVENUE <p className='ml-2 text-xl'>(Only 12 Months)</p></p>
-                        <Line style={{ maxWidth: 900, height: 350 }} data={data.data[5]} options={options} />
+                    <div style={{ width: 1000, height: 350 }}>
+                        <p className='mb-10 text-white'>REVENUE</p>
+                        <div className='ml-5 mt-3 border border-teal-500 rounded-lg bg-white mr-10 mb-10'>
+                            <p className="text-3xl font-bold mt-5 mb-3 pl-5 text-main-500 flex items-center">TOTAL REVENUE <p className='ml-2 text-xl'>(Only 12 Months)</p></p>
+                            <Line style={{ maxWidth: 900, height: 350 }} data={data.data[5]} options={options} />
+                        </div>
                     </div>
                 </div>
             </div>
