@@ -120,14 +120,40 @@ const Checkout = (props) => {
                         <p className='text-main-500 font-semibold'>{val.fullname}</p>
                         <p>{val.phone_number}</p>
                         <p className='text-transform: capitalize'>{val.full_address}</p>
-                        <p className='text-transform: capitalize'>Kecamatan {val.district}, {val.city}, {val.province}, {val.postal_code}</p>
-                        <button type='button' className='text-main-600 hover:underline' onClick={() => { setShowEditAddressModal('show'); setSelectedEdit(val); setShowAddressModal('') }}>Edit Address</button>
+                        <p className='text-transform: capitalize text-start'>Kecamatan {val.district}, {val.city}, {val.province}, {val.postal_code}</p>
+                        <div className='flex'>
+                            <button type='button' className='text-main-600 hover:underline' onClick={() => { setShowEditAddressModal('show'); setSelectedEdit(val); setShowAddressModal('') }}>Edit Address</button>
+                            {
+                                selectedAddress !== val ?
+                                    <>
+                                        <p className='font-bold text-main-500 mx-2 sm:hidden'>|</p>
+                                        <button type='button'
+                                            className='sm:hidden text-main-500 hover:underline focus:underline'
+                                            onClick={() => {
+                                                onSelectAddress(val.idaddress);
+                                                setShowAddressModal('');
+                                                setLoadDelivery(true);
+                                                setLoadCourier(true);
+                                                setCourier('');
+                                                setDelivery([]);
+                                                setSelectedDelivery('');
+                                                setTimeout(() => {
+                                                    setLoadDelivery(false);
+                                                    setLoadCourier(false);
+                                                }, 1000)
+                                                setTotalDelivery(0);
+                                            }}>Select Address</button>
+                                    </>
+                                    :
+                                    ""
+                            }
+                        </div>
                     </div>
                     {
                         selectedAddress === val ?
                             ""
                             :
-                            <div className='w-1/4 flex items-center justify-center'>
+                            <div className='hidden sm:w-1/4 sm:flex sm:items-center sm:justify-center'>
                                 <button type='button'
                                     className='border p-3 rounded-lg bg-main-500 text-white font-semibold hover:bg-main-600 focus:ring-2 focus:ring-main-500'
                                     onClick={() => {
@@ -155,6 +181,8 @@ const Checkout = (props) => {
         if (selectedAddress !== null) {
             return (
                 <div>
+                    <p className='text-transform: uppercase font-semibold'>{selectedAddress.fullname}</p>
+                    <p className='text-transform: uppercase'>{selectedAddress.phone_number}</p>
                     <p className='text-transform: uppercase'>{selectedAddress.full_address}</p>
                     <p className='text-transform: uppercase'>Kecamatan {selectedAddress.district}, {selectedAddress.city}, {selectedAddress.province}, {selectedAddress.postal_code}</p>
                 </div>
@@ -176,18 +204,17 @@ const Checkout = (props) => {
                         <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name} />
                     </div>
                     <div className='flex flex-col w-full'>
-                        <div className='flex justify-between h-2/3'>
-                            <div className='w-3/5 px-3 pt-1'>
+                        <div className='flex flex-col sm:flex-row justify-between h-2/3'>
+                            <div className='w-full sm:w-1/2 px-3 pt-1 text-center sm:text-start'>
                                 <p className='font-medium'>{val.product_name}</p>
-                                <p className='text-transform: capitalize text-sm'>1 {val.default_unit}</p>
                             </div>
-                            <div className='w-2/5 text-center pt-1 font-semibold flex justify-between'>
-                                <div className='w-2/5 flex justify-around'>
+                            <div className='w-full sm:w-1/2 text-center pt-1 font-semibold flex flex-col sm:flex-row'>
+                                <div className='w-full sm:w-2/5 flex justify-center'>
                                     <p>Qty:</p>
-                                    <p>{val.quantity}</p>
+                                    <p className='mx-1'>{val.quantity}</p>
                                     <p className='transform: capitalize'>{val.default_unit}</p>
                                 </div>
-                                <div className='w-3/5'>
+                                <div className='w-full sm:w-3/5 text-center sm:text-end'>
                                     <Currency price={(val.price * val.quantity)} />
                                 </div>
                             </div>
@@ -322,14 +349,14 @@ const Checkout = (props) => {
             <Helmet>
                 <title>Checkout</title>
             </Helmet>
-            <div className='container mx-auto py-5'>
-                <div className='mx-9'>
+            <div className='sm:container sm:mx-auto py-5'>
+                <div className='sm:mx-9'>
                     <div className='text-xl font-bold px-3 text-main-600'>
                         Checkout
                     </div>
-                    <div className='flex flex-row mt-2'>
+                    <div className='flex flex-col lg:flex-row mt-2'>
                         <div className='basis-7/12'>
-                            <div className='border m-2 p-3 shadow-md rounded-md'>
+                            <div className='hidden lg:block border m-2 p-3 shadow-md rounded-md'>
                                 {/* tunggu nama address dari api */}
                                 <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Address</p>
                                 <div className='my-2'>
@@ -339,8 +366,8 @@ const Checkout = (props) => {
                                 {/* MODAL ALAMAT */}
                                 {
                                     showAddressModal === 'show' ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                            <div className="relative p-4 w-1/2 h-full md:h-auto">
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                            <div className="relative p-4 w-full md:w-3/4 lg:w-2/3 xl:w-1/2 h-full sm:h-auto">
                                                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                     <div className="p-6 text-center">
                                                         <div>
@@ -351,7 +378,8 @@ const Checkout = (props) => {
                                                         <div>
                                                             {printAllAddress()}
                                                         </div>
-                                                        <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-10 py-2.5 focus:z-10 "
+                                                        <button type="button"
+                                                            className="text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-10 py-2.5 focus:z-10 "
                                                             onClick={() => setShowAddressModal('')}>Cancel</button>
                                                     </div>
                                                 </div>
@@ -363,14 +391,14 @@ const Checkout = (props) => {
                                 {/* MODAL ALAMAT BARU */}
                                 {
                                     showNewAddressModal === 'show' ?
-                                        <NewAddressComponent showModal={setShowNewAddressModal} setAddress={getAddress()} />
+                                        <NewAddressComponent showModal={setShowNewAddressModal} />
                                         :
                                         ""
                                 }
                                 {/* MODAL EDIT ALAMAT */}
                                 {
                                     showEditAddressModal === 'show' ?
-                                        <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} setAddress={getAddress()} />
+                                        <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} />
                                         :
                                         ""
                                 }
@@ -379,17 +407,64 @@ const Checkout = (props) => {
                                 <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Summary</p>
                                 {printSummary()}
                                 <div className='w-full flex flex-row py-3 text-lg'>
-                                    <div className='w-4/5 px-3 font-semibold'>
+                                    <div className='w-2/5 px-3 font-semibold'>
                                         Sub Total
                                     </div>
-                                    <div className='w-1/5 text-center font-semibold'>
+                                    <div className='w-3/5 text-center sm:text-end font-semibold'>
                                         <Currency price={state.totalPrice} />
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className='basis-5/12'>
-                            <div className='border m-2 p-3 shadow-md rounded-md'>
+                            <div className='lg:hidden border m-2 p-3 shadow-md rounded-md'>
+                                {/* tunggu nama address dari api */}
+                                <p className='text-md font-bold mb-2 border-b-2 pb-2 text-main-600 border-main-800'>Delivery Address</p>
+                                <div className='my-2'>
+                                    {printSelectedAddress()}
+                                </div>
+                                <button type='button' className='text-main-600 hover:underline' onClick={() => setShowAddressModal('show')}>Change Address</button>
+                                {/* MODAL ALAMAT */}
+                                {
+                                    showAddressModal === 'show' ?
+                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                            <div className="relative p-4 w-full md:w-3/4 lg:w-2/3 xl:w-1/2 h-full sm:h-auto">
+                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                    <div className="p-6 text-center">
+                                                        <div>
+                                                            <p className='text-2xl font-bold text-main-500'>Choose Delivery Address</p>
+                                                        </div>
+                                                        <button type='button' className='mt-3 mb-2 py-3 w-full border rounded-lg font-bold text-gray-400 text-lg hover:bg-teal-50 focus:ring-2 focus:ring-teal-100'
+                                                            onClick={() => { setShowNewAddressModal('show'); setShowAddressModal('') }}>Add New Address</button>
+                                                        <div>
+                                                            {printAllAddress()}
+                                                        </div>
+                                                        <button type="button"
+                                                            className="text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-10 py-2.5 focus:z-10 "
+                                                            onClick={() => setShowAddressModal('')}>Cancel</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        :
+                                        ""
+                                }
+                                {/* MODAL ALAMAT BARU */}
+                                {
+                                    showNewAddressModal === 'show' ?
+                                        <NewAddressComponent showModal={setShowNewAddressModal} />
+                                        :
+                                        ""
+                                }
+                                {/* MODAL EDIT ALAMAT */}
+                                {
+                                    showEditAddressModal === 'show' ?
+                                        <EditAddressComponent selected={selectedEdit} showModal={setShowEditAddressModal} />
+                                        :
+                                        ""
+                                }
+                            </div>
+                            <div className='border m-2 p-3 shadow-md rounded-md border-main-500'>
                                 <p className='font-bold text-xl text-main-500 mb-3'>Checkout Summary</p>
                                 <div className='w-full flex flex-col my-2'>
                                     <p>Choose Courier :</p>
@@ -456,7 +531,7 @@ const Checkout = (props) => {
                                 <div>
                                     <button type='button'
                                         className='flex w-full bg-main-500 text-white justify-center py-3 font-bold text-2xl rounded-lg
-                                    hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
+                                hover:bg-main-600 focus:ring-offset-main-500 focus:ring-offset-2 focus:ring-2 focus:bg-main-600'
                                         onClick={() => {
                                             if (allAddress.length === 0) {
                                                 toast.error('Please choose address', {
@@ -511,8 +586,8 @@ const Checkout = (props) => {
                                     {/* MODAL SELECT PAYMENT */}
                                     {
                                         showPaymentModal === 'show' ?
-                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                                <div className="relative p-4 w-full md:w-2/3 lg:w-1/2 h-full sm:h-auto">
                                                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                         <div className="p-6 text-center">
                                                             <div>
@@ -534,7 +609,8 @@ const Checkout = (props) => {
                                                                 <div className='w-1/2 flex justify-evenly items-center'>
                                                                     <button type="button" className="text-white bg-main-500 focus:ring-4 focus:outline-none hover:bg-main-600 focus:ring-main-500 rounded-lg border border-main-500 text-sm font-medium px-10 py-2.5 focus:z-10 disabled:bg-opacity-50 disabled:bg-main-500 disabled:border-0"
                                                                         onClick={() => onPay()} disabled={paymentMethod === '' ? true : false}>Pay</button>
-                                                                    <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
+                                                                    <button type="button"
+                                                                        className="text-white bg-red-500 focus:ring-2 focus:ring-red-500 border border-gray-200 hover:bg-red-600 rounded-lg text-sm font-medium px-8 py-2.5 focus:z-10 "
                                                                         onClick={() => { setShowPaymentModal(''); setPaymentMethod('') }}>Cancel</button>
                                                                 </div>
                                                             </div>

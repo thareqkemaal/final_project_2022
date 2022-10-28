@@ -46,7 +46,8 @@ const OrderDetail = ({ selected, showModal }) => {
         console.log('selected', selected);
         setData(selected);
         setDetail(selected.transaction_detail);
-        setDate(parseInt(selected.invoice_number.split('/')[2]));
+        console.log(selected.date_order);
+        setDate(selected.date_order);
         setCourier(selected.shipping_courier.split('/')[0]);
         setDelivery(selected.shipping_courier.split('/')[1]);
         let ph = selected.user_phone_number;
@@ -259,16 +260,16 @@ const OrderDetail = ({ selected, showModal }) => {
     };
 
     return (
-        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 ">
-            <div className="relative p-4 w-1/2">
+        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 h-full">
+            <div className="relative p-4 w-full md:w-4/5 lg:w-2/3 xl:w-1/2 h-full sm:h-auto">
                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                     <div className="p-6 text-center">
                         <div className="mb-5 flex justify-center">
                             <p className='text-2xl font-bold text-main-500'>Transaction Detail</p>
                             <button type='button' className="absolute right-10 font-extrabold pt-1 text-lg text-main-500" onClick={() => showModal(false)}>X</button>
                         </div>
-                        <div className="flex">
-                            <div className="w-2/3 flex flex-col p-1 overflow-y-auto h-[51rem]">
+                        <div className="flex flex-col sm:flex-row">
+                            <div className="w-full sm:w-2/3 flex flex-col p-1 overflow-y-auto sm:h-[51rem]">
                                 <div className="border shadow-md flex flex-col p-2 my-1">
                                     <p className={data.status_id === 7 ? "text-start font-semibold text-red-500" : "text-start font-semibold text-main-500"}>{data.status_name}</p>
                                     {
@@ -292,13 +293,13 @@ const OrderDetail = ({ selected, showModal }) => {
                                             <p className="text-start underline font-semibold text-main-500">How to Pay</p>
                                             <div className="flex justify-between w-full items-center">
                                                 <p className="font-semibold">Bank Virtual Account</p>
-                                                <div className='flex my-4'>
+                                                <div className='flex flex-col sm:flex-row my-4'>
                                                     <img src={bni} className='w-12' alt="bnilogo" />
-                                                    <img src={bca} className='w-14 mx-4' alt="bcalogo" />
+                                                    <img src={bca} className='w-14 sm:mx-4 my-2 sm:my-0' alt="bcalogo" />
                                                     <img src={bri} className='w-20' alt="brilogo" />
                                                 </div>
                                             </div>
-                                            <p className="text-start font-bold text-2xl">10011{phone}</p>
+                                            <p className="text-start font-bold text-lg sm:text-2xl">10011{phone}</p>
                                             <BankInfo />
                                         </div>
                                         :
@@ -348,8 +349,8 @@ const OrderDetail = ({ selected, showModal }) => {
                                 <div className="border shadow-md flex flex-col p-2 my-1">
                                     <p className="text-start underline font-semibold text-main-500">Payment Detail</p>
                                     <div className="my-1 flex">
-                                        <div className="flex w-1/3 justify-between items-center">
-                                            <p>Total Price ({detail.length} Items)</p>
+                                        <div className="flex w-1/3 justify-between sm:items-center">
+                                            <p className="text-start">Total Price ({detail.length} Items)</p>
                                             <p>:</p>
                                         </div>
                                         <div className="flex pl-2 justify-end w-2/3">
@@ -391,10 +392,10 @@ const OrderDetail = ({ selected, showModal }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="w-1/3 px-7">
+                            <div className="w-full sm:w-1/3 px-7">
                                 <div className="flex flex-col my-1">
                                     {
-                                        data.status_id === 7 || data.status_id === 9 ?
+                                        data.status_id === 7 && data.prescription_pic === '' || data.status_id === 9 && data.prescription_pic === '' ?
                                             <button type='button'
                                                 className="border w-auto p-3 rounded-lg bg-main-500 text-white font-semibold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
                                             >Buy Again ({detail.length} items)</button>
@@ -412,7 +413,7 @@ const OrderDetail = ({ selected, showModal }) => {
                                     {
                                         showCancelModal === 'show' ?
                                             <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                                <div className="relative p-4 w-full sm:w-1/2 xl:w-1/4 h-auto">
                                                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                         <div className="p-6 text-center">
                                                             <p className="text-lg font-normal text-black">Are you sure to cancel this order?</p>
@@ -466,8 +467,8 @@ const OrderDetail = ({ selected, showModal }) => {
                                     }
                                     {
                                         showAccept === 'show' ?
-                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                                <div className="relative p-4 w-full sm:w-1/2 xl:w-1/4 h-auto">
                                                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                         <div className="p-6 text-center">
                                                             <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
@@ -498,12 +499,12 @@ const OrderDetail = ({ selected, showModal }) => {
                                                 >Upload Payment Proof</button>
                                                 {
                                                     showProofModal ?
-                                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                                            <div className="relative p-4 w-1/3 h-full md:h-auto">
+                                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                                            <div className="relative p-4 w-full md:w-2/3 xl:w-1/2 2xl:w-1/3 h-auto">
                                                                 <div className="relative border-2 bg-white rounded-lg shadow border-main-500 p-6">
                                                                     <div className="flex justify-center items-center my-3">
-                                                                        <p className="text-center font-bold text-2xl text-main-500">UPLOAD PAYMENT PROOF</p>
-                                                                        <button type='button' className="absolute right-10 font-extrabold pt-1 text-lg text-main-500" onClick={() => showProofModal()}>X</button>
+                                                                        <p className="text-center font-bold text-lg sm:text-2xl text-main-500">UPLOAD PAYMENT PROOF</p>
+                                                                        <button type='button' className="absolute right-10 font-extrabold pt-1 text-lg text-main-500" onClick={() => setShowProofModal(false)}>X</button>
                                                                     </div>
                                                                     <div className='flex items-center my-4'>
                                                                         <button className='border rounded-lg bg-main-500 text-white font-bold py-2 px-5 hover:bg-main-600 focus:ring-2 focus:ring-main-500'
@@ -570,7 +571,7 @@ const OrderDetail = ({ selected, showModal }) => {
                                                                                 :
                                                                                 ''
                                                                         }
-                                                                        <img src={showPic === '' ? placeholder : showPic} className={loadPic ? 'hidden' : 'block max-w-lg'} alt='user_paymentproof' />
+                                                                        <img src={showPic === '' ? placeholder : showPic} className={loadPic ? 'hidden' : 'block'} alt='user_paymentproof' />
                                                                     </div>
                                                                     <div className="py-3 flex justify-center items-center">
                                                                         <button type='button' onClick={() => onPaymentProof()}
