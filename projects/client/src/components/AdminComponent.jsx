@@ -51,23 +51,23 @@ const AdminComponent = (page) => {
         </ul>
       </div>
     </div>
-    <div className='sm:hidden w-20'>
-      <div className={`p-5 pt-8 h-screen bg-teal-200 relative`}>
+    <div className='sm:hidden w-10'>
+      <div className={`pt-8 h-screen bg-whiterelative`}>
         <img src={logo} className={`h-10 rounded-full cursor-pointer`} alt='medcare.com' />
-        <ul className='pt-16 mx-1'>
-          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`}>
+        <ul className='pt-10 mx-1'>
+          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`} onClick={() => navigate('/admin/dashboard')}>
             <FcTemplate size={30} />
           </li>
-          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}>
+          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`} onClick={() => navigate('/admin/product')}>
             <FcBriefcase size={30} />
           </li>
-          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}>
+          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`} onClick={() => navigate('/admin/transaction')}>
             <FcInTransit size={30} />
           </li>
-          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}>
+          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`} onClick={() => navigate('/admin/report')}>
             <FcSalesPerformance size={30} />
           </li>
-          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-10`}>
+          <li className={`font-semibold text-xl flex items-center gap-x-4 cursor-pointer hover:bg-slate-300 rounded-md mt-5`} onClick={() => navigate('/admin/stock_log')}>
             <FcClock size={30} />
           </li>
         </ul>
