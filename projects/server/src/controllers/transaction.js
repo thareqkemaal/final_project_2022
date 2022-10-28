@@ -282,12 +282,12 @@ module.exports = {
 
             let history = [];
             updateStock.forEach((val, idx) => {
-              history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'Pembatalan','Penjumlahan')`)
+              history.push(`(${dbConf.escape(val.product_name)},${dbConf.escape(update.iduser)},${dbConf.escape(val.product_unit)},${dbConf.escape(val.product_qty)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Pembatalan','Penjumlahan')`)
             })
 
             // console.log('history', history)
 
-            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity, type,information) VALUES
+            await dbQuery(`INSERT INTO history_stock (product_name, user_id,unit,quantity,date, type,information) VALUES
               ${history.join(', ')};`)
           }
         } else if (req.body.acceptDeliv) {
@@ -336,14 +336,14 @@ module.exports = {
           filter.push(`date < ${dbConf.escape(conv)}`)
         } else if (key == 'start') {
           filter.push(`date > ${dbConf.escape(req.query[key])}`)
-        } else if (key == 'page') {
+        } else if (key == 'page' || key == 'limit') {
 
         } else {
           filter.push(`${key} LIKE ${dbConf.escape('%' + req.query[key] + '%')}`)
         }
       }
       let history = await dbQuery(`select *,date_format(date,'%d %b %Y') as date_change from history_stock join user on history_stock.user_id=user.iduser
-      ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc limit 20 ${req.query.page && req.query.page != 1 ? `offset ${(req.query.page - 1) * 20}` : 'offset 0'} ;`)
+      ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc ${req.query.limit == 'no' ? '' : 'limit 20'} ${req.query.limit == 'no' ? '' : req.query.page && req.query.page != 1 ? `offset ${(req.query.page - 1) * 20}` : 'offset 0'} ;`)
       let count = await dbQuery(`select count(*) as total from history_stock ${filter.length == 0 ? '' : `where ${filter.join(' AND ')}`} order by date desc;`)
       res.status(200).send({
         history,
