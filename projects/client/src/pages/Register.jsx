@@ -164,15 +164,17 @@ const Register = () => {
                             </div>
                             <div className='flex justify-evenly lg:justify-around pt-4'>
                                 <div className='border border-gray-400 rounded-lg w-32 hover:bg-gray-300 h-12 lg:w-48'>
-                                    <div className='py-3 flex justify-center'>
+                                    <div className='py-3 flex justify-center'
+                                    onClick={()=>window.open(`${API_URL}/api/user/google`,'_blank').focus()}
+                                    >
                                         <FcGoogle size={20}/>
-                                        <div className='text-sm font-bold '><span className='hidden lg:inline-flex font-Public'>Daftar dengan </span> Google</div>
+                                        <div className='text-[13px] font-bold '><span className='hidden lg:inline-flex font-Public'>Sign up with </span> Google</div>
                                     </div>
                                 </div>
                                 <div className='border bg-blue-700 border-blue-700 w-32 hover:bg-blue-900 rounded-lg h-12 lg:w-48'>
                                     <div className='py-3 flex justify-center '>
                                         <BsFacebook className='mr-2 fill-white' size={20}/>
-                                        <div className='text-sm text-white'><span className='hidden lg:inline-flex font-Public '>Daftar dengan </span> Facebook</div>
+                                        <div className='text-[13px] text-white'><span className='hidden lg:inline-flex font-Public '>Sign up with </span> Facebook</div>
                                     </div>
                                 </div>
                             </div>

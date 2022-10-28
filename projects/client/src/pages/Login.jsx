@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import regisImg from '../assets/undraw_medicine_b-1-ol.svg'
 import { BsEye, BsEyeSlash } from 'react-icons/bs';
@@ -9,6 +9,8 @@ import { loginAction } from '../action/useraction';
 import ForgotPass from '../components/ForgotPass';
 import Loading from '../components/Loading';
 import { Helmet } from 'react-helmet';
+import { FcGoogle } from 'react-icons/fc';
+import { BsFacebook } from 'react-icons/bs';
 
 const Login = () => {
   const navigate = useNavigate()
@@ -20,7 +22,16 @@ const Login = () => {
   const [email,setEmail]=useState('')
   const [password, setPassword]=useState('')
 
+  console.log('ini login')
 
+  useEffect(()=>{
+    if(window.location.search.length >0){
+      setLoading(true)
+      localStorage.setItem('medcarelog',window.location.search.split('=')[1])
+    }
+
+  },[])
+  
 
   const onLogin=()=>{
     setLoading(true)
@@ -57,6 +68,7 @@ const Login = () => {
 
 
 
+
   return (
     <div className=''>
       <Helmet>
@@ -78,6 +90,23 @@ const Login = () => {
                 <div className='text-sm font-extralight text-gray-400 font-Public'>Don't have account ?
                 <span className='ml-2 underline text-teal-500 hover:text-teal-600 text-sm font-bold font-Public' onClick={()=>navigate('/register')}>Sign Up</span>
                 </div>
+                <div className='flex justify-evenly lg:justify-around pt-4'>
+                                <div className='border border-gray-400 rounded-lg w-32 hover:bg-gray-300 h-12 lg:w-48'>
+                                    <button className='py-3 px-2 flex justify-center'
+                                    onClick={()=>window.open(`${API_URL}/api/user/google`,'_blank').focus()}
+                                    >
+                                        <FcGoogle size={20}/>
+                                        <div className='text-[13px] font-bold '><span className='hidden lg:inline-flex font-Public ml-2'>Sign in with </span> Google</div>
+                                    </button>
+                                </div>
+                                <div className='border bg-blue-700 border-blue-700 w-32 hover:bg-blue-900 rounded-lg h-12 lg:w-48 ml-2'>
+                                    <div className='py-3 flex justify-center '
+                                    >
+                                        <BsFacebook className='mr-2 fill-white' size={20}/>
+                                        <div className='text-[13px] text-white'><span className='hidden lg:inline-flex font-Public '>Sign in with </span> Facebook</div>
+                                    </div>
+                                </div>
+                            </div>
                   <form>
                     <label className='block mb-3 my-14'>
                       <span className='block text-sm font-medium text-gray-700 font-Public'>

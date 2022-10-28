@@ -404,13 +404,10 @@ module.exports = {
           success: false,
           message: 'error'
         })
-
       }
-
     } catch (error) {
       console.log(error)
       res.status(500).send(error)
-
     }
   },
 
@@ -418,8 +415,7 @@ module.exports = {
     try {
       if (req.dataToken.iduser) {
         await dbQuery(`UPDATE user set email=${dbConf.escape(req.dataToken.newEmail)} WHERE iduser=${dbConf.escape(req.dataToken.iduser)}`)
-        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus
-        WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
+        let resultUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus WHERE u.iduser=${dbConf.escape(req.dataToken.iduser)}`)
         let cartUser = await dbQuery(`Select u.iduser, p.idproduct, p.product_name, p.price,
         p.category_id, p.description, p.aturan_pakai, p.dosis,p.picture, p.netto_stock, p.netto_unit, p.default_unit,
         c.product_id, c. quantity, p.price*c.quantity as total_price from user u
@@ -447,6 +443,35 @@ module.exports = {
       console.log(error)
     }
   },
+
+  googleLogin : async (req,res)=>{
+    let availableEmail = await dbQuery(`Select email from user where email = ${dbConf.escape(req.user.emails[0].value)}`)
+    if(availableEmail.length >0){
+      let loginUser = await dbQuery(`Select u.iduser, u.fullname, u.username, u.email, u.role, u.phone_number, u.gender, u.birthdate, u.profile_pic, u.status_id, s.status_name from user u JOIN status s on u.status_id=s.idstatus WHERE u.email = ${dbConf.escape(req.user.emails[0].value) }`)
+      if(loginUser.length > 0){
+        let token = createToken ({...loginUser[0]})
+        res.redirect(process.env.FE_URL+`/login?_t=${token}`)
+      } 
+    }else{
+      let register = await dbQuery(`INSERT INTO user (fullname,username, email, phone_number, password)values(${dbConf.escape(req.user.displayName)}, ${dbConf.escape(req.user.name.givenName)}, ${dbConf.escape(req.user.emails[0].value)}, +62 ,${dbConf.escape(hashPassword(req.user.id))})`)
+      if(register.insertId){
+        let sqlGet = await dbQuery(`Select iduser, email, status_id from user where iduser=${register.insertId}`)
+        let token = createToken({ ...sqlGet[0] }, '1h')
+        // Send Email
+          var source = fs.readFileSync(path.join(__dirname, '../template-email/emailConfirmation.hbs'), 'utf-8')
+          var template = Handlebars.compile(source)
+          var data = { 'fullname': req.user.displayName, 'frontend': process.env.FE_URL, 'token': token }
+              await transport.sendMail({
+              from: 'MEDCARE ADMIN',
+              to: sqlGet[0].email,
+              subject: 'verification account',
+              html: template(data)
+              })
+              }
+              res.redirect(process.env.FE_URL)
+    }
+  },
+
 
 
 }

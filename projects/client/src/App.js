@@ -48,6 +48,7 @@ function App() {
           'Authorization': `Bearer ${medcarelog}`
         }
       }).then((res) => {
+        console.log(res)
         if (res.data.iduser) {
           localStorage.getItem('medcarelog', res.data.token)
           delete res.data.token
