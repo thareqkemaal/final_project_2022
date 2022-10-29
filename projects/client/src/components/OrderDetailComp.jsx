@@ -13,6 +13,7 @@ import bni from '../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
 import bca from '../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../assets/bri.png';
 import BankInfo from "./BankInfoAccordion";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const OrderDetail = ({ selected, showModal }) => {
 
