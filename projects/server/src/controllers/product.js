@@ -6,7 +6,7 @@ module.exports = {
         let product_name = req.query.product_name;
         let { limit, sort, offset } = req.body;
 
-        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product`,
+        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product where isDeleted='false'`,
             (err, results) => {
                 if (err) {
                     return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
