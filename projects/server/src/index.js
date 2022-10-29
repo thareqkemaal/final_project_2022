@@ -4,6 +4,8 @@ require('dotenv').config({ path: join(__dirname, '../.env') });
 const express = require("express");
 const cors = require("cors");
 const bearerToken = require('express-bearer-token')
+const session = require('express-session');
+const passport = require('passport');
 
 
 const PORT = process.env.PORT || 8000;
@@ -22,6 +24,19 @@ app.use(express.json());
 // #destination file storage(image/pdf/document)
 app.use("/", express.static(__dirname + "/public"));
 app.use(bearerToken())
+
+app.use(session({
+  resave:false,
+  saveUninitialized:true,
+  secret:'SECRET'
+}));
+
+
+// Config Passport
+require('./config/passport')
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 // DB Check Connection
 // const { dbConf } = require('./config/db')
