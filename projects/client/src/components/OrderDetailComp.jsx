@@ -14,6 +14,8 @@ import bca from '../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../assets/bri.png';
 import BankInfo from "./BankInfoAccordion";
 import { updateCart } from "../action/useraction";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { MdOutlineContentCopy } from "react-icons/md";
 
 const OrderDetail = ({ selected, showModal }) => {
 
@@ -34,6 +36,7 @@ const OrderDetail = ({ selected, showModal }) => {
     const [loadPic, setLoadPic] = React.useState(false);
     const [phone, setPhone] = React.useState('');
     const [userCartData, setUserCartData] = React.useState([]);
+    const [copied, setCopied] = React.useState(false);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -50,9 +53,10 @@ const OrderDetail = ({ selected, showModal }) => {
         console.log('selected', selected);
         setData(selected);
         setDetail(selected.transaction_detail);
-        console.log(selected.date_order);
+        console.log(selected.transaction_detail);
         setInvoice(selected.invoice_number)
         setDate(selected.date_order);
+        setCopied(false);
         setCourier(selected.shipping_courier.split('/')[0]);
         setDelivery(selected.shipping_courier.split('/')[1]);
         let ph = selected.user_phone_number;
@@ -61,7 +65,7 @@ const OrderDetail = ({ selected, showModal }) => {
             let temp = ph.split('');
             setPh = '0' + temp.splice(3, ph.length - 3).join('');
         };
-        setPhone(setPh);
+        setPhone('10011' + setPh);
     }, []);
 
     const printDetail = () => {
@@ -70,7 +74,9 @@ const OrderDetail = ({ selected, showModal }) => {
                 return (
                     <div className="border rounded-lg flex my-1" key={val.idtransaction_detail}>
                         <div className="w-1/6">
-                            <img src={val.product_image.includes('http') ? val.product_image : API_URL + val.product_image} alt={val.product_name} />
+                            <img src={val.product_image.includes('http') ? val.product_image : API_URL + val.product_image} alt={val.product_name} 
+                                onClick={() => navigate(`/product/detail?product_name=${val.product_name}`)}
+                            />
                         </div>
                         <div className="flex flex-col text-start h-full border-r w-3/6 p-2">
                             <p className="font-semibold">{val.product_name}</p>
@@ -510,7 +516,18 @@ const OrderDetail = ({ selected, showModal }) => {
                                                     <img src={bri} className='w-20' alt="brilogo" />
                                                 </div>
                                             </div>
-                                            <p className="text-start font-bold text-lg sm:text-2xl">10011{phone}</p>
+                                            <div className="flex justify-between items-center">
+                                                <p className="text-start font-bold text-lg sm:text-2xl">{phone}</p>
+                                                {
+                                                    copied ?
+                                                        <p className="text-main-500 font-semibold">Copied!</p>
+                                                        :
+                                                        <CopyToClipboard text={phone}
+                                                            onCopy={() => setCopied(true)}>
+                                                            <button className="text-main-500 text-lg"><MdOutlineContentCopy /></button>
+                                                        </CopyToClipboard>
+                                                }
+                                            </div>
                                             <BankInfo />
                                         </div>
                                         :
