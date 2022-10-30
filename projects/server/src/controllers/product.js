@@ -426,7 +426,7 @@ module.exports = {
     },
     updatecart: async (req, res) => {
         try {
-            console.log(req.body)
+            // console.log(req.body)
             if (req.body.selected) {
                 if (req.body.selectAll) {
                     // checkbox all
@@ -436,8 +436,14 @@ module.exports = {
                     await dbQuery(`UPDATE cart SET selected=${dbConf.escape(req.body.selected)} WHERE idcart=${dbConf.escape(req.body.idcart)};`);
                 }
             } else {
-                if (req.body.multiple){
-                    console.log(req.body);
+                if (req.body.multiple) {
+                    console.log('multiple exist', req.body);
+                    await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+
+                    req.body.exist.forEach(async (val, idx) => {
+                        await dbQuery(`UPDATE cart SET quantity = quantity + ${dbConf.escape(val.qty)}, selected = 'true' WHERE idcart=${dbConf.escape(val.idcart)};`);
+                    })
+
                 } else {
                     await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                     await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)}, selected = 'true' WHERE idcart=${dbConf.escape(req.body.idcart)};`);
@@ -455,11 +461,22 @@ module.exports = {
     },
     addCart: async (req, res) => {
         try {
-            console.log(req.body);
+            // console.log(req.body);
             // console.log(req.dataToken);
 
-            if (req.body.multiple){
-                console.log(req.body);
+            if (req.body.multiple) {
+                console.log('multiple new', req.body);
+
+                await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+
+                let comp = [];
+
+                req.body.new.forEach(async (val, idx) => {
+                    comp.push(`(${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(val.idproduct)}, ${dbConf.escape(val.qty)}, 'true')`);
+                });
+
+                await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES ${comp.join(', ')};`);
+                
             } else {
                 // single income data
                 await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);

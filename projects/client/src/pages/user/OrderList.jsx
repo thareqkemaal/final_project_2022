@@ -450,8 +450,8 @@ const UserOrderList = (props) => {
 
                                     </div>
                                 </div>
-                                <div className="h-1/4 flex">
-                                    <div className="border-b-2 w-full p-3">
+                                <div className="sm:h-1/4 flex">
+                                    <div className="border-b-2 w-full px-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
                                             onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
@@ -582,8 +582,8 @@ const UserOrderList = (props) => {
                                         <Currency price={val.transaction_detail[0].product_price * val.transaction_detail[0].product_qty} />
                                     </div>
                                 </div>
-                                <div className="h-1/4 flex">
-                                    <div className="border-b-2 w-full p-3">
+                                <div className="sm:h-1/4 flex">
+                                    <div className="border-b-2 w-full px-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
                                             onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
@@ -691,6 +691,7 @@ const UserOrderList = (props) => {
 
             if (patch.data.success) {
                 setTimeout(() => {
+                    setShowAccept(0);
                     setLoading(false);
                     toast.success('Thank you for your trust to buy in our shop!', {
                         theme: "colored",
@@ -792,39 +793,109 @@ const UserOrderList = (props) => {
                     }
                 }
             } else if (items.length > 1) {
+                setLoading(true);
                 let userToken = localStorage.getItem('medcarelog');
                 console.log('>1', items);
+                console.log('cart', userCartData);
+                let newArrItems = [];
+                let newArrCarts = [];
+
                 let existItem = [];
                 let newItem = [];
 
-                userCartData.map((val, idx) => {
-                    items.map((value, index) => {
-                        if (val.product_id === value.product_id) {
-                            if (!existItem.includes(value)) {
-                                return existItem.push(value);
-                            }
+                items.forEach((val, idx) => {
+                    newArrItems.push({ idproduct: val.product_id, qty: val.product_qty })
+                });
+
+                userCartData.forEach((val, idx) => {
+                    newArrCarts.push({ idproduct: val.product_id, qty: val.quantity })
+                })
+
+                console.log('newArrItems', newArrItems)
+                console.log('newArrCarts', newArrCarts)
+
+                newArrCarts.forEach((val, idx) => {
+                    newArrItems.forEach((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            existItem.push(value);
                         } else {
-                            if (!newItem.includes(value) && !existItem.includes(value)) {
-                                return newItem.push(value);
+                            if (!newItem.includes(value)) {
+                                newItem.push(value);
                             }
                         }
                     })
                 });
-                
-                let data = {
-                    multiple: true, 
-                    exist: existItem,
+
+                let ids = new Set(existItem.map(({ idproduct }) => idproduct));
+
+                newItem = newItem.filter(({ idproduct }) => !ids.has(idproduct));
+
+                let newArrExist = [];
+                existItem.map((val, idx) => {
+                    userCartData.map((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            newArrExist.push({ ...val, idcart: value.idcart })
+                        }
+                    })
+                });
+
+                console.log('new', newItem)
+                console.log('ext', existItem)
+                console.log('new ext', newArrExist)
+
+                let dataExist = {
+                    multiple: true,
+                    exist: newArrExist
+                };
+
+                let dataNew = {
+                    multiple: true,
                     new: newItem
                 }
 
-                let res = await axios.post(API_URL + '/api/product/addcart', data, {
-                    headers: {
-                        'Authorization': `Bearer ${userToken}`
-                    }
-                });
+                let success = [];
 
-                console.log('exist', existItem)
-                console.log('new', newItem)
+                if (newArrExist.length > 0) {
+                    let resUpd = await axios.patch(API_URL + '/api/product/updatecart', dataExist, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (resUpd.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (newItem.length > 0) {
+                    let res = await axios.post(API_URL + '/api/product/addcart', dataNew, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (success.length > 0) {
+                    toast.success('Item Added to Cart', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                    getUserCartData();
+                    setTimeout(() => {
+                        setLoading(false);
+                        navigate('/cart');
+                    }, 1000);
+                }
             }
         } catch (error) {
             console.log(error);

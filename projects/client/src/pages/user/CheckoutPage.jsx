@@ -629,8 +629,8 @@ const Checkout = (props) => {
                                                     <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                                         <div className='flex flex-col items-center py-10'>
                                                             <img src={success} className='max-w-xl' alt='successorder' />
-                                                            <p className='font-bold text-4xl text-main-500 my-2'>Checkout Success!</p>
-                                                            <p className='font-bold text-2xl text-main-600 my-2'>Your order will be process until your payment complete.</p>
+                                                            <p className='font-bold text-4xl text-main-500 my-2 text-center'>Checkout Success!</p>
+                                                            <p className='font-bold text-2xl text-main-600 my-2 text-center'>Your order will be process until your payment complete.</p>
                                                             <div className='my-2 flex justify-around w-2/3'>
                                                                 <button className='border-2 rounded-lg py-3 px-10 bg-white text-main-500 font-bold border-main-500 hover:bg-teal-50 focus:ring-2 focus:ring-main-500'
                                                                     onClick={() => {

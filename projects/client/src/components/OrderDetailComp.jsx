@@ -6,14 +6,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import Datetime from "./DatetimeConverter";
 import Currency from "./CurrencyComp";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingComponent from "./Loading";
 import placeholder from '../assets/placeholder.png';
 import bni from '../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
 import bca from '../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../assets/bri.png';
 import BankInfo from "./BankInfoAccordion";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { updateCart } from "../action/useraction";
 
 const OrderDetail = ({ selected, showModal }) => {
 
@@ -27,13 +27,16 @@ const OrderDetail = ({ selected, showModal }) => {
     const [showAccept, setShowAccept] = React.useState('');
     const [reason, setReason] = React.useState('');
     const [loading, setLoading] = React.useState(false);
+    const [invoice, setInvoice] = React.useState('');
 
     const [showPic, setShowPic] = React.useState('');
     const [paymentProofPic, setPaymentProofPic] = React.useState('');
     const [loadPic, setLoadPic] = React.useState(false);
     const [phone, setPhone] = React.useState('');
+    const [userCartData, setUserCartData] = React.useState([]);
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const fileRef = React.useRef();
 
     const { iduser, username } = useSelector((state) => {
@@ -48,6 +51,7 @@ const OrderDetail = ({ selected, showModal }) => {
         setData(selected);
         setDetail(selected.transaction_detail);
         console.log(selected.date_order);
+        setInvoice(selected.invoice_number)
         setDate(selected.date_order);
         setCourier(selected.shipping_courier.split('/')[0]);
         setDelivery(selected.shipping_courier.split('/')[1]);
@@ -260,6 +264,212 @@ const OrderDetail = ({ selected, showModal }) => {
         }
     };
 
+    React.useEffect(() => {
+        let userToken = localStorage.getItem('medcarelog');
+        if (userToken !== null) {
+            getUserCartData();
+        }
+    }, []);
+
+    const onBuyAgain = async (items) => {
+        try {
+            if (items.length === 1) {
+                console.log('=1', items);
+                let item = items;
+                let userToken = localStorage.getItem('medcarelog');
+                let findIndex = userCartData.find(val => val.idproduct === item[0].product_id);
+
+                console.log(findIndex)
+                if (findIndex === undefined) {
+                    console.log(true);
+
+                    let data = {
+                        idproduct: item[0].product_id,
+                        newQty: 1
+                    };
+
+                    setLoading(true);
+                    let res = await axios.post(API_URL + '/api/product/addcart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                        setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                        }, 1000);
+                    }
+                } else {
+                    let data = {
+                        idcart: findIndex.idcart,
+                        newQty: findIndex.quantity + item[0].product_qty
+                    };
+
+                    setLoading(true);
+                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                        setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                        }, 1000);
+                    }
+                }
+            } else if (items.length > 1) {
+                setLoading(true);
+                let userToken = localStorage.getItem('medcarelog');
+                console.log('>1', items);
+                console.log('cart', userCartData);
+                let newArrItems = [];
+                let newArrCarts = [];
+
+                let existItem = [];
+                let newItem = [];
+
+                items.forEach((val, idx) => {
+                    newArrItems.push({ idproduct: val.product_id, qty: val.product_qty })
+                });
+
+                userCartData.forEach((val, idx) => {
+                    newArrCarts.push({ idproduct: val.product_id, qty: val.quantity })
+                })
+
+                console.log('newArrItems', newArrItems)
+                console.log('newArrCarts', newArrCarts)
+
+                newArrCarts.forEach((val, idx) => {
+                    newArrItems.forEach((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            existItem.push(value);
+                        } else {
+                            if (!newItem.includes(value)) {
+                                newItem.push(value);
+                            }
+                        }
+                    })
+                });
+
+                let ids = new Set(existItem.map(({ idproduct }) => idproduct));
+
+                newItem = newItem.filter(({ idproduct }) => !ids.has(idproduct));
+
+                let newArrExist = [];
+                existItem.map((val, idx) => {
+                    userCartData.map((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            newArrExist.push({ ...val, idcart: value.idcart })
+                        }
+                    })
+                });
+
+                console.log('new', newItem)
+                console.log('ext', existItem)
+                console.log('new ext', newArrExist)
+
+                let dataExist = {
+                    multiple: true,
+                    exist: newArrExist
+                };
+
+                let dataNew = {
+                    multiple: true,
+                    new: newItem
+                }
+
+                let success = [];
+
+                if (newArrExist.length > 0) {
+                    let resUpd = await axios.patch(API_URL + '/api/product/updatecart', dataExist, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (resUpd.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (newItem.length > 0) {
+                    let res = await axios.post(API_URL + '/api/product/addcart', dataNew, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (success.length > 0) {
+                    toast.success('Item Added to Cart', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                    getUserCartData();
+                    setTimeout(() => {
+                        setLoading(false);
+                        navigate('/cart');
+                    }, 1000);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getUserCartData = async () => {
+        try {
+            let userToken = localStorage.getItem('medcarelog');
+            let get = await axios.get(API_URL + '/api/product/getcartdata', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
+
+            console.log('user cart', get.data);
+            setUserCartData(get.data);
+            dispatch(updateCart(get.data));
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
     return (
         <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 h-full">
             <div className="relative p-4 w-full md:w-4/5 lg:w-2/3 xl:w-1/2 h-full sm:h-auto">
@@ -396,8 +606,8 @@ const OrderDetail = ({ selected, showModal }) => {
                             <div className="w-full sm:w-1/3 px-7">
                                 <div className="flex flex-col my-1">
                                     {
-                                        data.status_id === 7 && data.prescription_pic === '' || data.status_id === 9 && data.prescription_pic === '' ?
-                                            <button type='button'
+                                        data.status_id === 7 && invoice.includes('/1/') || data.status_id === 9 && invoice.includes('/1/') ?
+                                            <button type='button' onClick={() => onBuyAgain(detail)}
                                                 className="border w-auto p-3 rounded-lg bg-main-500 text-white font-semibold hover:bg-main-600 focus:ring-2 focus:ring-main-500"
                                             >Buy Again ({detail.length} items)</button>
                                             :
