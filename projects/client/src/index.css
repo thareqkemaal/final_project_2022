@@ -39,3 +39,10 @@ code {
 .scroll::-webkit-scrollbar {
   display: none;
 }
+
+.overflow-hide-print {
+  overflow: auto;
+  overflow-x: hidden;
+  height: 500px;
+  width: 300px;
+}

@@ -334,7 +334,7 @@ const ReportPage = () => {
                             <div className='ml-5'>
                                 <p className="sm:text-2xl font-bold mt-5 mb-3 text-txt-500">Report</p>
                             </div>
-                            <div className='sm:flex'>
+                            <div className='sm:flex ml-5 sm:ml-0'>
                                 <button
                                     className='mt-3 sm:mt-0 sm:ml-5 bg-white border py-1 px-2'
                                     onClick={handleExportFile}
@@ -343,7 +343,7 @@ const ReportPage = () => {
                                 </button>
                                 <PrintReportComponent data={[revenueReport, transactionReport, userReport, productReport, listMonth, totalRevenue, month, totalProduct]} />
                             </div>
-                            <div className='sm:flex sm:justify-center ml-2 sm:ml-0 mb-10'>
+                            <div className='sm:flex sm:justify-center ml-5 sm:ml-0 mb-10'>
                                 <div className='inline'>
                                     <button onClick={() => setDropStartRev(!dropStartRev)} id="dropdownDefault" data-dropdown-toggle="dropdown"
                                         className="border border-main-500 sm:rounded-lg bg-white hover:bg-gray-400 hover:text-white font-thin w-24 sm:w-32 mr-3 pl-2 mt-5 h-5 sm:h-10 text-center inline-flex items-center" type="button">

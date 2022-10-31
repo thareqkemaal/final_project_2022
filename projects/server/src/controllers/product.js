@@ -6,7 +6,7 @@ module.exports = {
         let product_name = req.query.product_name;
         let { limit, sort, offset } = req.body;
 
-        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product`,
+        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product where isDeleted='false'`,
             (err, results) => {
                 if (err) {
                     return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
@@ -128,13 +128,7 @@ module.exports = {
                             );
                         })
                 } else {
-                    let resultFilter = `category_id=${filterCategory}`;
-
-                    console.log('query 4')
-
-                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
-                    ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-                    ${sort ? `order by ${sort} asc` : ``}`,
+                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id where p.isDeleted = 'false'`,
                         (err, results) => {
                             if (err) {
                                 return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
@@ -426,7 +420,7 @@ module.exports = {
     },
     updatecart: async (req, res) => {
         try {
-            //console.log(req.body)
+            // console.log(req.body)
             if (req.body.selected) {
                 if (req.body.selectAll) {
                     // checkbox all
@@ -436,7 +430,18 @@ module.exports = {
                     await dbQuery(`UPDATE cart SET selected=${dbConf.escape(req.body.selected)} WHERE idcart=${dbConf.escape(req.body.idcart)};`);
                 }
             } else {
-                await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)} WHERE idcart=${dbConf.escape(req.body.idcart)};`);
+                if (req.body.multiple) {
+                    console.log('multiple exist', req.body);
+                    await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+
+                    req.body.exist.forEach(async (val, idx) => {
+                        await dbQuery(`UPDATE cart SET quantity = quantity + ${dbConf.escape(val.qty)}, selected = 'true' WHERE idcart=${dbConf.escape(val.idcart)};`);
+                    })
+
+                } else {
+                    await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+                    await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)}, selected = 'true' WHERE idcart=${dbConf.escape(req.body.idcart)};`);
+                }
             }
 
             res.status(200).send({
@@ -453,8 +458,24 @@ module.exports = {
             // console.log(req.body);
             // console.log(req.dataToken);
 
-            // single income data
-            await dbQuery(`INSERT INTO cart (user_id, product_id, quantity) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)});`);
+            if (req.body.multiple) {
+                console.log('multiple new', req.body);
+
+                await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+
+                let comp = [];
+
+                req.body.new.forEach(async (val, idx) => {
+                    comp.push(`(${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(val.idproduct)}, ${dbConf.escape(val.qty)}, 'true')`);
+                });
+
+                await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES ${comp.join(', ')};`);
+                
+            } else {
+                // single income data
+                await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
+                await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)}, 'true');`);
+            }
 
             res.status(200).send({
                 success: true,
@@ -489,9 +510,9 @@ module.exports = {
 
                 if (results[0].stock_unit > stock_unit) {
                     // dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity, type, information) VALUES
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
 
-                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
+                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan')`,
                         (error, results) => {
@@ -518,8 +539,8 @@ module.exports = {
                             next()
                         })
                 } else if (results[0].stock_unit < stock_unit) {
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
-                (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
+                (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(req.body.data.stock_unit - results[0].stock_unit)},'Manual Update','Penambahan');`,
                         (error, results) => {
