@@ -315,6 +315,7 @@ const ProductDetail = () => {
                 <div className='bg-gradient-to-t from-teal-50 to-white'>
                     <ProductCategory
                         id={search.split('&')[1]}
+                        limit={10}
                     />
                 </div>
             </div>

@@ -19,6 +19,7 @@ const NavbarComponent = (props) => {
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
   const [disable, setDisable] = useState(false)
+  const [searchProduct,setSearchProduct]=useState('')
 
   const { status, email } = useSelector((state) => {
     return {
@@ -80,7 +81,13 @@ const NavbarComponent = (props) => {
       })
     }
   }
+  
 
+  const onSearch = (e) =>{
+    if(e.key === 'Enter'){
+      navigate(`/product?search=${searchProduct}`)
+    }
+  }
 
   return (
     <div>
@@ -103,11 +110,11 @@ const NavbarComponent = (props) => {
                 }, 1000)
               }}>
                 <img src={logo} className='h-9' alt='medcare.com' />
-                <span className='text-sm bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-extrabold bg-clip-text mt-2'>MedCare</span>
+                <span className='text-sm bg-gradient-to-r from-green-500 to-blue-600 text-transparent font-extrabold bg-clip-text mt-2 cursor-pointer'>MedCare</span>
               </div>
             </div>
             <div className='flex grow relative'>
-              <input placeholder='Search' className='grow mx-10 w-1/2 border border-slate-600 rounded-lg px-10' />
+              <input placeholder='Search' className='grow mx-10 w-1/2 border border-slate-600 rounded-lg px-10' type='search' onChange={(e)=>setSearchProduct(e.target.value)} onKeyDown={onSearch} />
               <BiSearchAlt2 className='absolute left-12 top-2 fill-slate-500' size={25} />
             </div>
             <div className='flex-none'>

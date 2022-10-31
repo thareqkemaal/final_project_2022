@@ -115,7 +115,7 @@ const LandingPages = () => {
           <div className='py-5'>
             <div className='flex justify-between my-2'>
               <p className='text-sm font-bold text-[#213360] '>Kategori</p>
-              <p className='text-xs font-bold  text-main-500' onClick={() => navigate('/product')}>Lihat Semua</p>
+              <p className='text-xs font-bold  text-main-500 cursor-pointer' onClick={() => navigate('/product')}>Lihat Semua</p>
             </div>
             <div className='overflow-y-auto w-full'>
               <div className='flex justify-between mx-auto py-5' >
@@ -155,12 +155,13 @@ const LandingPages = () => {
             </div>
             <div className='flex justify-between mt-8'>
               <p className='text-sm font-bold text-txt-500 font-Public'>Produk Populer</p>
-              <p className='text-xs font-bold  text-main-500 font-Public' onClick={() => navigate('/product')}>Lihat Semua</p>
+              <p className='text-xs font-bold  text-main-500 font-Public cursor-pointer' onClick={() => navigate('/product')}>Lihat Semua</p>
             </div>
             {/* Gunakan Produk Component */}
             <div className='bg-gradient-to-t from-white to-teal-50 mt-8'>
               <ProductCategory
                 id={2}
+                limit={10}
               />
             </div>
           </div>

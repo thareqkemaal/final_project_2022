@@ -31,7 +31,7 @@ const ProductCategory = (props) => {
         // After : getproduct
 
         axios.post(API_URL + `/api/product/getproduct?${props.id}`, {
-            limit: 5,
+            limit: props.limit,
             sort: '',
             offset: ''
         })
