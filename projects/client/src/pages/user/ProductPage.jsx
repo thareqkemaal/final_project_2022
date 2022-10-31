@@ -9,6 +9,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
 
 const ProductPage = (props) => {
+
     const [data, setData] = React.useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const [query, setQuery] = React.useState(10);
     const [category, setCategory] = React.useState([]);
@@ -19,14 +20,14 @@ const ProductPage = (props) => {
 
     const { state, search } = useLocation();    //perlu idcategory dari daniel
     let id = search.split('=');
-    // console.log('ini id', id[id.length - 1])
-    // console.log('ini typeof id', typeof id[id.length - 1])
-    const [filterName, setFilterName] = React.useState(typeof id[id.length - 1] == typeof 'string' ? id[id.length - 1] : '');
-    const [idPage, setIdPage] = React.useState(typeof id[id.length - 1] == typeof 3 ? id[id.length - 1] : undefined);
+    const [filterName, setFilterName] = React.useState(id[id.length - 1].length > 1 ? id[id.length - 1] : '');
+    const [idPage, setIdPage] = React.useState(search.includes('&') ? id[1].charAt(0) : undefined);
     const [defaultSort, setDefaultSort] = React.useState('Paling Sesuai');
-    const [filterNameOn, setFilterNameOn] = React.useState(false);
+    const [filterNameOn, setFilterNameOn] = React.useState(filterName ? true : false);
 
     const [loading, setLoading] = React.useState(false);
+    const [totalProduct, setTotalProduct] = React.useState('');
+    const [totalProductFilter, setTotalProductFilter] = React.useState('');
 
     const dispatch = useDispatch();
 
@@ -40,19 +41,19 @@ const ProductPage = (props) => {
 
     const getProduct = () => {
         let filter = '';
-        let newID = '';
+        // let newID = '';
 
-        if (search.includes('&')) {
-            let a = search.split('&');
-            let b = a[0].split('=');
-            newID = b[b.length - 1];
-            setIdPage(newID);
-        }
+        // if (search.includes('&')) {
+        //     let a = search.split('&');
+        //     let b = a[0].split('=');
+        //     newID = b[b.length - 1];
+        //     setIdPage(newID);
+        // }
 
-        if ((idPage || newID) && filterName) {
-            filter = `category_id=${idPage || newID}&product_name=${filterName}`
-        } else if (idPage || newID) {
-            filter = `category_id=${idPage || newID}`
+        if (idPage && filterName) {
+            filter = `category_id=${idPage}&product_name=${filterName}`
+        } else if (idPage) {
+            filter = `category_id=${idPage}`
         } else {
             filter = `product_name=${filterName}`
         }
@@ -65,6 +66,11 @@ const ProductPage = (props) => {
             .then((res) => {
                 // setData(res.data)
                 setData(res.data.results)
+                setTotalProduct(res.data.totalProduct);
+
+                if (res.data.totalProductFilter) {
+                    setTotalProductFilter(res.data.totalProductFilter);
+                } 
             })
             .catch((error) => {
                 console.log('getProduct error :', error)
@@ -467,7 +473,7 @@ const ProductPage = (props) => {
                                 </svg>
                             </button>
                             {/* <!-- Dropdown menu --> */}
-                            <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "115px auto auto 1180px" }}>
+                            <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "185px auto auto 1180px" }}>
                                 <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
                                     <li>
                                         <button onClick={() => { setLoading(false); setDefaultSort('Paling Sesuai'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paling Sesuai</button>
@@ -482,8 +488,8 @@ const ProductPage = (props) => {
                             </div>
                         </div>
                     </div>
-                   {
-                        sort || filterName ?
+                    {
+                        sort || filterNameOn ?
                             <>
                                 <div className="flex my-7">
                                     <button className="text-btn-500 font-bold text-sm mx-2" onClick={() => { onResetAllFilter(); setFilterNameOn(false) }}>Reset Semua Filter</button>
@@ -502,7 +508,7 @@ const ProductPage = (props) => {
                                             </>
                                     }
                                     {
-                                        filterName ?
+                                        filterNameOn ?
                                             <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
                                                 {filterName}
                                                 <AiFillCloseCircle onClick={() => { setFilterName(''); setLoading(false); navigate('/product'); setFilterNameOn(false) }} size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
@@ -539,7 +545,7 @@ const ProductPage = (props) => {
                     </div> */}
                     <div className="mx-auto">
                         {
-                            data.length == 0 || data.length < query
+                            data.length == 0 || data.length < query || data.length == totalProductFilter
                                 ? <></>
                                 : <button onClick={() => { setQuery(query + 10); setLoading(false) }} type="button" className="px-auto mt-7 mb-5 text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300
                                 font-bold rounded-lg text-sm w-44 ml-4 px-3 py-1.5 text-center">Selanjutnya</button>

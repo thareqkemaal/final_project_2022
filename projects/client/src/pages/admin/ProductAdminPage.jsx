@@ -5,10 +5,8 @@ import axios from "axios";
 import { API_URL } from "../../helper";
 import 'react-toastify/dist/ReactToastify.css';
 import { AiFillEdit, AiFillDelete, AiFillCloseCircle } from "react-icons/ai";
-import { ToastContainer, toast } from 'react-toastify';
 import ModalDetailProduct from "../../components/ModalDetailProduct";
 import ModalDeleteProduct from "../../components/ModalDeleteProduct";
-import DashboardPage from "./DashboardPage";
 import AdminComponent from "../../components/AdminComponent";
 import { useLocation, useNavigate } from "react-router";
 
@@ -29,18 +27,33 @@ const ProductAdminPage = (props) => {
     // const [filterName, setFilterName] = React.useState('');
     const { state, search } = useLocation();
     let id = search.split('=');
+    // console.log('ini id', id)
+    // console.log('ini id[id.length - 1]', id[id.length - 1])
+    // console.log('id[id.length - 1].length', id[id.length - 1].length)
+
+
     const [filterName, setFilterName] = React.useState(id[id.length - 1].length > 1 ? id[id.length - 1] : '');
+    // console.log('ini filterName', filterName)
+
     const [filterNameOn, setFilterNameOn] = React.useState(filterName ? true : false);
     // const [filterName, setFilterName] = React.useState(typeof id[id.length - 1] == typeof 'string' ? id[id.length - 1] : '');
 
     // console.log('ini id', id[id.length - 1])
     // console.log('ini typeof id', typeof id[id.length - 1])
     // const [idactive, setIdactive] = React.useState(typeof id[id.length - 1] == typeof 1 ? id[id.length - 1] : 1);
-    const [idactive, setIdactive] = React.useState(id[id.length - 1].length == 1 ? id[id.length - 1] : 1);
+    
+    // const [idactive, setIdactive] = React.useState(id[id.length - 1].length == 1 ? id[id.length - 1] : 1);
+    const [idactive, setIdactive] = React.useState(search.includes('&') ? id[1].charAt(0) : 1);
+
+    // console.log('ini idactive', idactive)
+    // console.log('ini Boolean(idactive>1)', Boolean(idactive>1))
+
+
     // const [offset, setOffset] = React.useState(0);
     // const [offset, setOffset] = React.useState(typeof id[id.length - 1] == typeof 1 ? 10 * ((id[id.length - 1]) - 1) : 0);
+    const [offset, setOffset] = React.useState(idactive > 1 ? (10 * (idactive - 1)) : 0);
 
-    const [offset, setOffset] = React.useState(id[id.length - 1].length == 1 ? 10 * ((id[id.length - 1]) - 1) : 0);
+    // const [offset, setOffset] = React.useState(id[id.length - 1].length == 1 ? 10 * ((id[id.length - 1]) - 1) : 0);
     const [pagination, setPagination] = React.useState([1, 2, 3, 4, 5]);
     const [totalProduct, setTotalProduct] = React.useState('');
     const [totalProductFilter, setTotalProductFilter] = React.useState('');
@@ -54,8 +67,17 @@ const ProductAdminPage = (props) => {
     const [productChecked, setProductChecked] = React.useState([]);
     const [allChecked, setAllChecked] = React.useState(false);
     const [totalChecked, setTotalChecked] = React.useState('');
+    // const [doc, setDoc] = React.useState(allChecked ? document.getElementById(`selectall`).checked = true : document.getElementById(`selectall`).checked = false);
 
     const getProduct = () => {
+        // let newID = '';
+
+        // if (search.includes('&')) {
+        //     let a = search.split('&');
+        //     let b = a[0].split('=');
+        //     newID = b[b.length - 1];
+        //     setIdactive(newID);
+        // }
 
         if (categoryChecked.length > 0) {
             setDefaultFilterCategory(categoryChecked.length + ' kategori terpilih')
@@ -135,6 +157,32 @@ const ProductAdminPage = (props) => {
         }
     }, [loading, categoryChecked])
 
+    const onDelete = (val) => {
+        if (val.idproduct) {
+            setModalDeleteOn(true);
+            setIdproduct([val.idproduct]);
+            setNameDeleted(val.product_name);
+        } else {
+            // alert('yoi');
+            setModalDeleteOn(true);
+            let resultID = [];
+            let resultName = [];
+
+            productChecked.forEach((val, idx) => {
+                data.forEach((value, index) => {
+                    if (value.idproduct == val) {
+                        resultID.push(value.idproduct);
+                        resultName.push(value.product_name);
+                    }
+                })
+            })
+
+            setIdproduct(resultID);
+            setNameDeleted(resultName);
+
+        }
+    }
+
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
@@ -196,7 +244,7 @@ const ProductAdminPage = (props) => {
                         }} className="w-8 border border-btn-500 text-btn-500 rounded-md py-1 font-bold">
                             {<AiFillEdit size={16} className="mx-2" />}
                         </button>
-                        <button type="button" onClick={() => { setModalDeleteOn(true); setIdproduct(val.idproduct); setNameDeleted(val.product_name) }} className="ml-3 w-8 bg-btn-500 text-white rounded-md py-1 font-bold">
+                        <button type="button" onClick={() => onDelete(val)} className="ml-3 w-8 bg-btn-500 text-white rounded-md py-1 font-bold">
                             {<AiFillDelete size={16} className="mx-2" />}
                         </button>
                     </td>
@@ -242,18 +290,25 @@ const ProductAdminPage = (props) => {
 
     const onPagination = (idx) => {
         setLoading(false);
-        setFilterName('');
         setIdactive(idx + 1);
         setOffset(10 * idx);
 
+        if (!filterName) {
+            setFilterName('');
+        }
+
         if (idx + 1 != 1) {
             if (filterName) {
-                navigate(`/admin/product?search=${filterName}&page=${idx + 1}`)
+                navigate(`/admin/product?page=${idx + 1}&search=${filterName}`)
             } else {
                 navigate(`/admin/product?page=${idx + 1}`)
             }
         } else {
-            navigate(`/admin/product`)
+            if(!filterName){
+                navigate(`/admin/product`)
+            } else {
+                navigate(`/admin/product?search=${filterName}`)
+            }
         }
     }
 
@@ -290,8 +345,29 @@ const ProductAdminPage = (props) => {
             setLoading(false)
             if (categoryChecked.length > 0) {
                 setCategoryChecked([...categoryChecked, idcategory])
+
+                // let result = [...categoryChecked, idcategory];
+                // let tes = '';
+
+                // if (result.length > 1) {
+                //     let banyakCategory = result.map((val, idx) => {
+                //         return `category=${val}`
+                //     })
+
+                //     tes = banyakCategory.join('&')
+
+                // } else if (result.length == 1) {
+
+                //     tes = `category=${result}`
+
+                // }
+
+                // navigate(`/admin/product?${tes}`)
+
             } else {
                 setCategoryChecked([idcategory])
+                // let tes = `category=${idcategory}`
+                // navigate(`/admin/product?${tes}`)
             }
         } else {
             if (categoryChecked.length > 0) {
@@ -338,8 +414,6 @@ const ProductAdminPage = (props) => {
             }
         }
     }
-
-    // console.log('ini productChecked',productChecked)
 
     const checkedAllProduct = () => {
         if (document.getElementById('selectall').checked) {
@@ -395,6 +469,12 @@ const ProductAdminPage = (props) => {
                 {category[categoryChecked - 1].category_name}
                 <AiFillCloseCircle onClick={() => { setCategoryChecked([]); setTotalProductFilter('');; setLoading(false) }} size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
             </button>
+        }
+    }
+
+    const onClose = (info) => {
+        if (info == "false") {
+            document.getElementById(`selectall`).checked = false
         }
     }
 
@@ -516,7 +596,7 @@ const ProductAdminPage = (props) => {
                                                         </>
                                                 }
                                                 {
-                                                    filterName ?
+                                                    filterNameOn ?
                                                         <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
                                                             {filterName}
                                                             <AiFillCloseCircle onClick={() => { setFilterName(''); setLoading(false); setFilterNameOn(false) }} size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
@@ -552,7 +632,7 @@ const ProductAdminPage = (props) => {
                                                                             {totalChecked} / {data.length} produk dipilih
                                                                         </p>
                                                                         <button className="font-bold mx-2">
-                                                                            {<AiFillDelete size={16} className="mx-2" />}
+                                                                            {<AiFillDelete onClick={() => onDelete(productChecked)} size={16} className="mx-2" />}
                                                                         </button>
                                                                     </th>
                                                                 </>
@@ -649,20 +729,9 @@ const ProductAdminPage = (props) => {
 
                             </div>
                         </div>
-                        <ToastContainer
-                            position="bottom-center"
-                            autoClose={2000}
-                            hideProgressBar
-                            newestOnTop={false}
-                            closeOnClick
-                            rtl={false}
-                            pauseOnFocusLoss
-                            draggable
-                            pauseOnHover
-                        />
 
                         {modalDetailProductOn && <ModalDetailProduct setModalDetailProductOn={setModalDetailProductOn} dataproduct={dataproduct} setLoading={setLoading} />}
-                        {modalDeleteOn && <ModalDeleteProduct setModalDeleteOn={setModalDeleteOn} idproduct={idproduct} nameDeleted={nameDeleted} setLoading={setLoading} />}
+                        {modalDeleteOn && <ModalDeleteProduct setModalDeleteOn={setModalDeleteOn} idproduct={idproduct} nameDeleted={nameDeleted} setLoading={setLoading} setAllChecked={setAllChecked} setProductChecked={setProductChecked} onClose={onClose} />}
                     </div>
                 </div>
             </div>
