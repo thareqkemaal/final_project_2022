@@ -84,7 +84,9 @@ const UserCart = (props) => {
                     </div>
                     <div className='w-full flex flex-col sm:flex-row'>
                         <div className='flex justify-center items-center'>
-                            <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name} />
+                            <img src={val.picture} style={{ maxWidth: '8rem' }} alt={val.product_name} 
+                                onClick={() => navigate(`/product/detail?product_name=${val.product_name}`)}
+                            />
                         </div>
                         <div className='w-full flex flex-col'>
                             <div className='flex flex-col sm:flex-row justify-between h-2/3'>
