@@ -47,6 +47,7 @@ const ProductDetail = () => {
                 // Before : setProductDetail(res.data)
                 // After : setProductDetail(res.data.results)
 
+                console.log(res.data.results)
                 setProductDetail(res.data.results)
             })
             .catch((err) => {
@@ -275,19 +276,50 @@ const ProductDetail = () => {
                         getUserCartData();
                     }
                 } else {
-                    let data = {
-                        idcart: findIndex.idcart,
-                        newQty: findIndex.quantity + counter
-                    };
 
-                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
-                        headers: {
-                            'Authorization': `Bearer ${userToken}`
+                    let checkStockQty = 0;
+                    let checkCartQty = 0;
+
+                    productDetail.forEach((val, idx) => {
+                        if (val.idproduct === id) {
+                            checkStockQty = val.stock_unit
                         }
                     });
 
-                    if (res.data.success) {
-                        toast.success('Item Added to Cart', {
+                    userCartData.forEach((val, idx) => {
+                        if (val.product_id === id) {
+                            checkCartQty = val.quantity
+                        }
+                    });
+
+                    if ((checkCartQty + counter) <= checkStockQty){
+                        
+                        let data = {
+                            idcart: findIndex.idcart,
+                            newQty: findIndex.quantity + counter
+                        };
+    
+                        let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`
+                            }
+                        });
+    
+                        if (res.data.success) {
+                            toast.success('Item Added to Cart', {
+                                theme: "colored",
+                                position: "top-center",
+                                autoClose: 2000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: false,
+                                progress: undefined,
+                            });
+                            getUserCartData();
+                        }
+                    } else {
+                        toast.error('Stock has been reach maximum', {
                             theme: "colored",
                             position: "top-center",
                             autoClose: 2000,
@@ -297,8 +329,8 @@ const ProductDetail = () => {
                             draggable: false,
                             progress: undefined,
                         });
-                        getUserCartData();
                     }
+
                 }
             }
         } catch (error) {
