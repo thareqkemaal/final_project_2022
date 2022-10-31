@@ -13,11 +13,13 @@ import format from 'date-fns/format';
 import nodata from '../../assets/nodata.png';
 import OrderDetail from "../../components/OrderDetailComp";
 import LoadingComponent from "../../components/Loading";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import BankInfo from "../../components/BankInfoAccordion";
 import bni from '../../assets/Bank BNI Logo (PNG-1080p) - FileVector69.png';
 import bca from '../../assets/Bank BCA Logo (PNG-1080p) - FileVector69.png';
 import bri from '../../assets/bri.png';
+import { Helmet } from "react-helmet";
+import { updateCart } from "../../action/useraction";
 
 const UserOrderList = (props) => {
 
@@ -51,7 +53,10 @@ const UserOrderList = (props) => {
         }
     ]);
 
+    const [userCartData, setUserCartData] = React.useState([]);
+
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const { search } = useLocation();
 
     const { username } = useSelector((state) => {
@@ -130,7 +135,7 @@ const UserOrderList = (props) => {
                     temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
                 };
 
-                if (search.includes('keyword')){
+                if (search.includes('keyword')) {
                     temp.push(`keyword=${inputKeyword}`);
                 }
 
@@ -320,6 +325,10 @@ const UserOrderList = (props) => {
                 }
             }
 
+            if (inputKeyword !== '') {
+                temp.push(`keyword=${inputKeyword}`);
+            }
+
             if (activePage >= 1) {
                 temp.push(`limit=5`);
                 temp.push(`offset=${(activePage - 1) * 5}`)
@@ -401,36 +410,38 @@ const UserOrderList = (props) => {
         return userTransactionData.map((val, idx) => {
             if (val.prescription_pic) {
                 return (
-                    <div key={val.idtransaction} className='px-10 py-5 my-4 border rounded-lg shadow-md'>
-                        <div className="border-b-2 flex justify-between pb-3 items-center">
-                            <div className="w-1/2 flex">
-                                <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
-                                <p className="mx-4 font-semibold">{val.invoice_number}</p>
+                    <div key={val.idtransaction} className='px-5 md:px-10 py-5 my-4 border rounded-lg shadow-md'>
+                        <div className="border-b-2 flex flex-col sm:flex-row justify-between pb-3 items-center">
+                            <div className="w-full sm:w-3/4 2xl:w-1/2 flex flex-col 2xl:flex-row">
+                                <Datetime value={val.date_order} />
+                                <p className="2xl:mx-4 font-semibold">{val.invoice_number}</p>
                             </div>
-                            {
-                                val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
-                                    <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
-                                    <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 7 ?
-                                    <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
+                            <div className='self-start 2xl:self-center'>
+                                {
+                                    val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
+                                        <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
+                                        <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 7 ?
+                                        <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                            </div>
                         </div>
-                        <div className="flex my-2">
-                            <div className="w-1/5">
+                        <div className="flex flex-col sm:flex-row my-2">
+                            <div className="w-1/2 sm:w-1/5 self-center">
                                 <img src={API_URL + val.prescription_pic} className="w-full p-1" alt='prescription' />
                             </div>
-                            <div className="w-4/5">
+                            <div className="w-full sm:w-4/5">
                                 <div className="h-2/4 flex">
                                     <div className="w-2/3 px-3 py-1">
                                         <p className="font-semibold">Doctor's Prescription</p>
@@ -439,8 +450,8 @@ const UserOrderList = (props) => {
 
                                     </div>
                                 </div>
-                                <div className="h-1/4 flex">
-                                    <div className="border-b-2 w-full p-3">
+                                <div className="sm:h-1/4 flex">
+                                    <div className="border-b-2 w-full px-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
                                             onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
@@ -478,7 +489,6 @@ const UserOrderList = (props) => {
 
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                         <div className="flex justify-end">
@@ -499,8 +509,8 @@ const UserOrderList = (props) => {
                         </div>
                         {
                             showAccept === val.idtransaction ?
-                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                    <div className="relative p-4 w-full max-w-md h-auto">
                                         <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                             <div className="p-6 text-center">
                                                 <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
@@ -525,36 +535,38 @@ const UserOrderList = (props) => {
                 )
             } else {
                 return (
-                    <div key={val.idtransaction} className='px-10 py-5 my-4 border rounded-lg shadow-md'>
-                        <div className="border-b-2 flex justify-between pb-2 items-center">
-                            <div className="w-1/2 flex">
-                                <Datetime value={parseInt(val.invoice_number.split('/')[2])} />
-                                <p className="mx-4 font-semibold">{val.invoice_number}</p>
+                    <div key={val.idtransaction} className='px-5 md:px-10 py-5 my-4 border rounded-lg shadow-md'>
+                        <div className="border-b-2 flex flex-col sm:flex-row justify-between pb-3 items-center">
+                            <div className="w-full sm:w-3/4 2xl:w-1/2 flex flex-col 2xl:flex-row">
+                                <Datetime value={val.date_order} />
+                                <p className="2xl:mx-4 font-semibold">{val.invoice_number}</p>
                             </div>
-                            {
-                                val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
-                                    <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
-                                    <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
-                            {
-                                val.status_id === 7 ?
-                                    <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
-                                    :
-                                    ""
-                            }
+                            <div className='self-start 2xl:self-center'>
+                                {
+                                    val.status_id === 3 || val.status_id === 4 || val.status_id === 5 ?
+                                        <p className="border-2 py-1 px-2 text-orange-50 font-semibold bg-orange-300 border-orange-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 6 || val.status_id === 8 || val.status_id === 9 ?
+                                        <p className="border-2 py-1 px-2 text-green-600 font-semibold bg-green-300 border-green-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                                {
+                                    val.status_id === 7 ?
+                                        <p className="border-2 py-1 px-2 text-red-600 font-semibold bg-red-300 border-red-400 rounded-md">{val.status_name}</p>
+                                        :
+                                        ""
+                                }
+                            </div>
                         </div>
-                        <div className="flex my-2">
-                            <div className="w-1/5">
+                        <div className="flex flex-col sm:flex-row my-2">
+                            <div className="w-1/2 sm:w-1/5 self-center">
                                 <img src={val.transaction_detail[0].product_image} className="w-full p-1" alt='product_image' />
                             </div>
-                            <div className="w-4/5">
+                            <div className="w-full sm:w-4/5">
                                 <div className="h-2/4 flex">
                                     <div className="w-2/3 px-3 py-1">
                                         <p className="font-semibold">{val.transaction_detail[0].product_name}</p>
@@ -570,8 +582,8 @@ const UserOrderList = (props) => {
                                         <Currency price={val.transaction_detail[0].product_price * val.transaction_detail[0].product_qty} />
                                     </div>
                                 </div>
-                                <div className="h-1/4 flex">
-                                    <div className="border-b-2 w-full p-3">
+                                <div className="sm:h-1/4 flex">
+                                    <div className="border-b-2 w-full px-3">
                                         <button type='button' className="text-sm text-main-500 hover:underline focus:underline"
                                             onClick={() => { setShowDetail(true); setSelectedDetail(val) }}
                                         >See Order Detail</button>
@@ -618,15 +630,16 @@ const UserOrderList = (props) => {
 
                             {
                                 val.status_id === 9 ?
-                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500">Buy Again</button>
+                                    <button type='button' className="px-4 py-2 text-white font-semibold bg-main-500 border rounded-lg hover:bg-main-600 focus:ring-2 focus:ring-main-500"
+                                        onClick={() => onBuyAgain(val.transaction_detail)}>Buy Again</button>
                                     :
                                     ""
                             }
                         </div>
                         {
                             showAccept === val.idtransaction ?
-                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                    <div className="relative p-4 w-full max-w-md h-full md:h-auto">
+                                <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                    <div className="relative p-4 w-full max-w-md h-auto">
                                         <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
                                             <div className="p-6 text-center">
                                                 <p className="text-lg font-normal text-black mb-4">Are you sure the package has been delivered to you?</p>
@@ -678,6 +691,7 @@ const UserOrderList = (props) => {
 
             if (patch.data.success) {
                 setTimeout(() => {
+                    setShowAccept(0);
                     setLoading(false);
                     toast.success('Thank you for your trust to buy in our shop!', {
                         theme: "colored",
@@ -699,308 +713,521 @@ const UserOrderList = (props) => {
         }
     };
 
+    React.useEffect(() => {
+        let userToken = localStorage.getItem('medcarelog');
+        if (userToken !== null) {
+            getUserCartData();
+        }
+    }, []);
 
+    const onBuyAgain = async (items) => {
+        try {
+            if (items.length === 1) {
+                console.log('=1', items);
+                let item = items;
+                let userToken = localStorage.getItem('medcarelog');
+                let findIndex = userCartData.find(val => val.idproduct === item[0].product_id);
+
+                console.log(findIndex)
+                if (findIndex === undefined) {
+                    console.log(true);
+
+                    let data = {
+                        idproduct: item[0].product_id,
+                        newQty: 1
+                    };
+
+                    setLoading(true);
+                    let res = await axios.post(API_URL + '/api/product/addcart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                        setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                        }, 1000);
+                    }
+                } else {
+                    let data = {
+                        idcart: findIndex.idcart,
+                        newQty: findIndex.quantity + item[0].product_qty
+                    };
+
+                    setLoading(true);
+                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        toast.success('Item Added to Cart', {
+                            theme: "colored",
+                            position: "top-center",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: false,
+                            progress: undefined,
+                        });
+                        getUserCartData();
+                        setTimeout(() => {
+                            setLoading(false);
+                            navigate('/cart');
+                        }, 1000);
+                    }
+                }
+            } else if (items.length > 1) {
+                setLoading(true);
+                let userToken = localStorage.getItem('medcarelog');
+                console.log('>1', items);
+                console.log('cart', userCartData);
+                let newArrItems = [];
+                let newArrCarts = [];
+
+                let existItem = [];
+                let newItem = [];
+
+                items.forEach((val, idx) => {
+                    newArrItems.push({ idproduct: val.product_id, qty: val.product_qty })
+                });
+
+                userCartData.forEach((val, idx) => {
+                    newArrCarts.push({ idproduct: val.product_id, qty: val.quantity })
+                })
+
+                console.log('newArrItems', newArrItems)
+                console.log('newArrCarts', newArrCarts)
+
+                newArrCarts.forEach((val, idx) => {
+                    newArrItems.forEach((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            existItem.push(value);
+                        } else {
+                            if (!newItem.includes(value)) {
+                                newItem.push(value);
+                            }
+                        }
+                    })
+                });
+
+                let ids = new Set(existItem.map(({ idproduct }) => idproduct));
+
+                newItem = newItem.filter(({ idproduct }) => !ids.has(idproduct));
+
+                let newArrExist = [];
+                existItem.map((val, idx) => {
+                    userCartData.map((value, index) => {
+                        if (val.idproduct === value.idproduct) {
+                            newArrExist.push({ ...val, idcart: value.idcart })
+                        }
+                    })
+                });
+
+                console.log('new', newItem)
+                console.log('ext', existItem)
+                console.log('new ext', newArrExist)
+
+                let dataExist = {
+                    multiple: true,
+                    exist: newArrExist
+                };
+
+                let dataNew = {
+                    multiple: true,
+                    new: newItem
+                }
+
+                let success = [];
+
+                if (newArrExist.length > 0) {
+                    let resUpd = await axios.patch(API_URL + '/api/product/updatecart', dataExist, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (resUpd.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (newItem.length > 0) {
+                    let res = await axios.post(API_URL + '/api/product/addcart', dataNew, {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`
+                        }
+                    });
+
+                    if (res.data.success) {
+                        success.push(true);
+                    }
+                }
+
+                if (success.length > 0) {
+                    toast.success('Item Added to Cart', {
+                        theme: "colored",
+                        position: "top-center",
+                        autoClose: 2000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: false,
+                        progress: undefined,
+                    });
+                    getUserCartData();
+                    setTimeout(() => {
+                        setLoading(false);
+                        navigate('/cart');
+                    }, 1000);
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const getUserCartData = async () => {
+        try {
+            let userToken = localStorage.getItem('medcarelog');
+            let get = await axios.get(API_URL + '/api/product/getcartdata', {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`
+                }
+            });
+
+            console.log('user cart', get.data);
+            setUserCartData(get.data);
+            dispatch(updateCart(get.data));
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
     return (
-        <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
-            <div className="p-5 flex flex-col justify-center items-center">
-                <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
-                <div className="border-2 rounded-lg my-8 w-3/4 px-16 py-5 shadow-lg">
-                    <div className="border-b-2">
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: '', sort: 'new' });
-                            setTab('all');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+        <div>
+            <Helmet>
+                <title>List order</title>
+                <meta name="description" content='list order' />
+            </Helmet>
+            <div className={showDetail ? "overflow-y-hidden container mx-auto h-[40vh]" : "container mx-auto"}>
+                <div className="py-5 px-1 lg:px-5 flex flex-col justify-center items-center">
+                    <p className="font-bold text-main-500 text-2xl">ORDER LIST</p>
+                    <div className="border-2 rounded-lg my-8 w-full lg:w-3/4 px-4 sm:px-8 lg:px-16 py-5 shadow-lg">
+                        <div className="border-b-2 flex overflow-x-auto sm:overflow-x-hidden">
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: '', sort: 'new' });
+                                setTab('all');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: '', sort: 'new' }
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'all' || tab === '' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
-                        >All</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'waiting', sort: 'new' });
-                            setTab('waiting');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: '', sort: 'new' }
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'all' || tab === '' ? "py-4 px-6 border-b-2 border-b-main-500 text-main-500 font-semibold" : "py-4 px-6 font-semibold"}
+                            >All</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'waiting', sort: 'new' });
+                                setTab('waiting');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'waiting', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Waiting</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'process', sort: 'new' });
-                            setTab('process');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'waiting', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'waiting' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Waiting</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'process', sort: 'new' });
+                                setTab('process');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'process', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'))
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >In Process</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'delivery', sort: 'new' });
-                            setTab('delivery');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'process', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'))
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'process' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >In Process</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'delivery', sort: 'new' });
+                                setTab('delivery');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'delivery', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >On Delivery</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'finished', sort: 'new' });
-                            setTab('finished');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'delivery', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'delivery' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >On Delivery</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'finished', sort: 'new' });
+                                setTab('finished');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'finished', sort: 'new' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Finished</button>
-                        <button type="button" onClick={() => {
-                            setSelected({ ...selected, tab: 'cancel' });
-                            setTab('cancel');
-                            setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                            setActivePage(1);
-                            setInputKeyword('');
+                                let query = { ...selected, tab: 'finished', sort: 'new' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'finished' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Finished</button>
+                            <button type="button" onClick={() => {
+                                setSelected({ ...selected, tab: 'cancel' });
+                                setTab('cancel');
+                                setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                setActivePage(1);
+                                setInputKeyword('');
 
-                            let query = { ...selected, tab: 'cancel' };
-                            console.log('selected', selected);
-                            console.log('query', query);
-                            let temp = [];
-                            for (let key in query) {
-                                if (query[key] !== '') {
-                                    temp.push(`${key}=${query[key]}`);
-                                }
-                            };
-                            console.log(temp.join('&'));
-                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                        }}
-                            className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
-                        >Canceled</button>
-                    </div>
-                    <div className="my-3 p-2 flex justify-between">
-                        <div className="flex w-4/5 items-center">
-                            <p className="w-1/6 font-semibold text-main-500">Type of Order</p>
-                            <div className="w-3/6 flex justify-between">
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: '' });
-                                    setType('all');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: '' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "all" || type === "" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >All Type</button>
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: 'prescription' });
-                                    setType('prescription');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: 'prescription' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "prescription" ? "border px-4 py-2 mx-4 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >Prescription</button>
-                                <button type="button" onClick={() => {
-                                    setSelected({ ...selected, type: 'free' });
-                                    setType('free');
-                                    setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
-                                    setActivePage(1);
-                                    setInputKeyword('');
-
-                                    let query = { ...selected, type: 'free' };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-                                    console.log(temp.join('&'));
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                }}
-                                    className={type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
-                                >Free Drugs</button>
-                            </div>
+                                let query = { ...selected, tab: 'cancel' };
+                                console.log('selected', selected);
+                                console.log('query', query);
+                                let temp = [];
+                                for (let key in query) {
+                                    if (query[key] !== '') {
+                                        temp.push(`${key}=${query[key]}`);
+                                    }
+                                };
+                                console.log(temp.join('&'));
+                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                            }}
+                                className={tab === 'cancel' ? "p-4 border-b-2 border-b-main-500 text-main-500 font-semibold" : "p-4 font-semibold"}
+                            >Canceled</button>
                         </div>
-                        <div className="flex items-center w-1/5 justify-between">
-                            <p className="font-semibold text-main-500">Sort by:</p>
-                            <select className="border rounded-lg border-main-500 text-gray-500"
-                                onChange={(e) => {
-                                    setSelected({ ...selected, sort: e.target.value });
-                                    setSort(e.target.value);
-                                    setActivePage(1);
-                                    setInputKeyword('');
+                        <div className="2xl:mt-3 p-2 flex flex-col 2xl:flex-row justify-between">
+                            <div className="flex w-full  2xl:w-3/4 items-center">
+                                <p className="w-1/3 2xl:w-1/6 font-semibold text-main-500">Type of Order</p>
+                                <div className="w-2/3 2xl:w-3/6 sm:flex sm:flex-row 2xl:justify-between">
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: '' });
+                                        setType('all');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
 
-                                    let query = { ...selected, sort: e.target.value };
-                                    console.log('selected', selected);
-                                    console.log('query', query);
-                                    let temp = [];
-                                    for (let key in query) {
-                                        if (query[key] !== '') {
-                                            temp.push(`${key}=${query[key]}`);
-                                        }
-                                    };
-
-                                    if (range[0].startDate !== '') {
-                                        let data = range[0];
-                                        for (let key in data) {
-                                            console.log(key, data[key]);
-                                            if (key === 'startDate') {
-                                                temp.push(`start=${data[key].toLocaleString('sv-SE')}`);
-                                            } else if (key === 'endDate') {
-                                                temp.push(`end=${data[key].toLocaleDateString('sv-SE')} 23:59:59`);
+                                        let query = { ...selected, type: '' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
                                             }
-                                        }
-                                    };
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "all" || type === "" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >All Type</button>
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: 'prescription' });
+                                        setType('prescription');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
 
-                                    console.log(temp.join('&'))
-                                    navigate(`/${username}/transaction?${temp.join('&')}`);
-                                    getUserTransactionData(`?${temp.join('&')}`);
-                                }}
-                                value={sort}>
-                                <option value="new">Newest</option>
-                                <option value="old">Oldest</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="p-2 flex items-center">
-                            <div className="flex w-4/5">
-                                <div className="flex w-1/6">
-                                    <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                        let query = { ...selected, type: 'prescription' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "prescription" ? "border px-4 py-2 sm:mx-1 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 sm:mx-1 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >Prescription</button>
+                                    <button type="button" onClick={() => {
+                                        setSelected({ ...selected, type: 'free' });
+                                        setType('free');
+                                        setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
+                                        setActivePage(1);
+                                        setInputKeyword('');
+
+                                        let query = { ...selected, type: 'free' };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
+                                        console.log(temp.join('&'));
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                    }}
+                                        className={type === "free" ? "border px-4 py-2 rounded-full bg-main-500 font-semibold text-white" : "border px-4 py-2 rounded-full bg-transparent font-semibold text-main-500 border-main-500"}
+                                    >Free Drugs</button>
                                 </div>
-                                <div className="flex w-5/6">
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
-                                        <input
-                                            value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
-                                            className="text-center"
-                                            placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                            onClick={() => setShowFilterDate(true)}
-                                        />
-                                    </div>
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
-                                        <input
-                                            value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
-                                            className="text-center"
-                                            placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select Date Range'}
-                                            onClick={() => setShowFilterDate(true)}
-                                        />
-                                    </div>
-                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                        onClick={() => {
-                                            setSort('new');
-                                            setActivePage(1); handleFilter();
-                                        }}>Filter</button>
-                                    <button type="button" className="ml-2 hover:underline"
-                                        onClick={() => {
-                                            setRange([{
-                                                startDate: '',
-                                                endDate: '',
-                                                key: 'selection',
-                                                color: 'teal'
-                                            }]);
-                                            setStart('');
-                                            setEnd('');
-                                            setSort('new');
+                            </div>
+                            <div className="flex mt-3 2xl:mt-0 items-center 2xl:w-1/4 2xl:justify-between">
+                                <p className="w-1/3 font-semibold text-main-500">Sort by:</p>
+                                <select className="border rounded-lg border-main-500 text-gray-500"
+                                    onChange={(e) => {
+                                        setSelected({ ...selected, sort: e.target.value });
+                                        setSort(e.target.value);
+                                        setActivePage(1);
 
-                                            setSelected({ ...selected });
-                                            setActivePage(1);
-                                            setInputKeyword('');
+                                        let query = { ...selected, sort: e.target.value };
+                                        console.log('selected', selected);
+                                        console.log('query', query);
+                                        let temp = [];
+                                        for (let key in query) {
+                                            if (query[key] !== '') {
+                                                temp.push(`${key}=${query[key]}`);
+                                            }
+                                        };
 
-                                            let query = { ...selected, sort: 'new' }
-                                            console.log('selected', selected)
-                                            console.log('query', query)
-                                            let temp = [];
-                                            for (let key in query) {
-                                                if (query[key] !== '') {
-                                                    temp.push(`${key}=${query[key]}`)
+                                        if (inputKeyword !== '') {
+                                            temp.push(`keyword=${inputKeyword}`);
+                                        }
+
+                                        if (range[0].startDate !== '') {
+                                            let data = range[0];
+                                            for (let key in data) {
+                                                console.log(key, data[key]);
+                                                if (key === 'startDate') {
+                                                    temp.push(`start=${data[key].toLocaleString('sv-SE')}`);
+                                                } else if (key === 'endDate') {
+                                                    temp.push(`end=${data[key].toLocaleDateString('sv-SE')} 23:59:59`);
                                                 }
                                             }
-                                            console.log('clear', temp.join('&'))
-                                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                                        }}
-                                    >Clear</button>
+                                        };
+
+                                        console.log(temp.join('&'))
+                                        navigate(`/${username}/transaction?${temp.join('&')}`);
+                                        getUserTransactionData(`?${temp.join('&')}`);
+                                    }}
+                                    value={sort}>
+                                    <option value="new">Newest</option>
+                                    <option value="old">Oldest</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="p-2 flex items-center">
+                            <div className="flex w-full 2xl:w-4/5">
+                                <div className="flex w-1/3 2xl:w-1/6">
+                                    <p className="font-semibold text-main-500 mr-2">Filter by Date :</p>
+                                </div>
+                                <div className="flex flex-col 2xl:flex-row w-2/3 sm:w-1/3 2xl:w-5/6">
+                                    <div className="p-1 border border-main-500 rounded 2xl:flex mx-1">
+                                        <input
+                                            value={range[0].startDate !== '' ? `${format(range[0].startDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center w-full"
+                                            placeholder={search.includes('start') ? start.split(' ')[0].split('-').join('/') : 'Select Start Date'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
+                                    </div>
+                                    <div className="p-1 border border-main-500 rounded 2xl:flex mx-1 mt-1 2xl:mt-0">
+                                        <input
+                                            value={range[0].endDate !== '' ? `${format(range[0].endDate, "MM/dd/yyyy")}` : ''}
+                                            className="text-center w-full"
+                                            placeholder={search.includes('end') ? end.split(' ')[0].split('-').join('/') : 'Select End Date'}
+                                            onClick={() => setShowFilterDate(true)}
+                                        />
+                                    </div>
+                                    <div className="flex">
+                                        <button type="button" className="text-start ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => {
+                                                setSort('new');
+                                                setActivePage(1); handleFilter();
+                                            }}>Filter</button>
+                                        <button type="button" className="text-start ml-2 hover:underline"
+                                            onClick={() => {
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setStart('');
+                                                setEnd('');
+                                                setSort('new');
+
+                                                setSelected({ ...selected });
+                                                setActivePage(1);
+                                                setInputKeyword('');
+
+                                                let query = { ...selected, sort: 'new' }
+                                                console.log('selected', selected)
+                                                console.log('query', query)
+                                                let temp = [];
+                                                for (let key in query) {
+                                                    if (query[key] !== '') {
+                                                        temp.push(`${key}=${query[key]}`)
+                                                    }
+                                                }
+                                                console.log('clear', temp.join('&'))
+                                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                                            }}
+                                        >Clear</button>
+                                    </div>
                                 </div>
                                 {
                                     showFilterDate ?
@@ -1029,132 +1256,148 @@ const UserOrderList = (props) => {
                                 }
                             </div>
                         </div>
-                    </div>
-                    <div>
                         <div className="p-2 flex items-center">
-                            <div className="flex w-4/5">
-                                <div className="flex w-1/6">
+                            <div className="flex w-full 2xl:w-4/5">
+                                <div className="flex w-1/3 2xl:w-1/6">
                                     <p className="font-semibold text-main-500 mr-2">Search :</p>
                                 </div>
-                                <div className="flex w-5/6">
-                                    <div className="p-1 border border-main-500 rounded flex mx-1">
+                                <div className="flex flex-col 2xl:flex-row w-2/3 sm:w-1/3 2xl:w-5/6">
+                                    <div className="p-1 border border-main-500 rounded mx-1">
                                         <input
                                             value={inputKeyword}
-                                            className="text-center"
+                                            className="text-center w-full"
                                             placeholder='Keyword'
                                             onChange={(e) => setInputKeyword(e.target.value)}
                                         />
                                     </div>
-                                    <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
-                                        onClick={() => {
-                                            setActivePage(1);
-                                            handleKeyword();
-                                        }}>Search</button>
-                                    <button type="button" className="ml-2 hover:underline"
-                                        onClick={() => {
-                                            setInputKeyword('');
-                                            setRange([{
-                                                startDate: '',
-                                                endDate: '',
-                                                key: 'selection',
-                                                color: 'teal'
-                                            }]);
-                                            setStart('');
-                                            setEnd('');
-                                            setSort('new');
+                                    <div className="flex items-center justify-start">
+                                        <button type="button" className="ml-2 text-main-500 hover:underline focus:underline font-semibold"
+                                            onClick={() => {
+                                                setActivePage(1);
+                                                handleKeyword();
+                                            }}>Search</button>
+                                        <button type="button" className="ml-2 hover:underline"
+                                            onClick={() => {
+                                                setInputKeyword('');
+                                                setRange([{
+                                                    startDate: '',
+                                                    endDate: '',
+                                                    key: 'selection',
+                                                    color: 'teal'
+                                                }]);
+                                                setStart('');
+                                                setEnd('');
+                                                setSort('new');
 
-                                            setSelected({ ...selected });
-                                            setActivePage(1);
-                                            setInputKeyword('');
+                                                setSelected({ ...selected });
+                                                setActivePage(1);
+                                                setInputKeyword('');
 
-                                            let query = { ...selected, sort: 'new' }
-                                            console.log('selected', selected)
-                                            console.log('query', query)
-                                            let temp = [];
-                                            for (let key in query) {
-                                                if (query[key] !== '') {
-                                                    temp.push(`${key}=${query[key]}`)
+                                                let query = { ...selected, sort: 'new' }
+                                                console.log('selected', selected)
+                                                console.log('query', query)
+                                                let temp = [];
+                                                for (let key in query) {
+                                                    if (query[key] !== '') {
+                                                        temp.push(`${key}=${query[key]}`)
+                                                    }
                                                 }
-                                            }
-                                            console.log('clear', temp.join('&'))
-                                            navigate(`/${username}/transaction?${temp.join('&')}`);
-                                        }}
-                                    >Clear</button>
+                                                console.log('clear', temp.join('&'))
+                                                navigate(`/${username}/transaction?${temp.join('&')}`);
+                                            }}
+                                        >Clear</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    {
-                        userTransactionData.length > 0 ?
-                            <>
-                                <div>
-                                    {printTransaction()}
-                                </div>
-                                <div className="text-center my-3">
-                                    <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage === totalPage ? totalData : activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
-                                </div>
-                                <div className="w-full flex justify-center items-center">
-                                    <ul className="list-none flex">
-                                        {
-                                            activePage === 1 ?
-                                                <li className="border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
-                                                :
-                                                <li className="border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                    type='button' onClick={() => setActivePage(activePage - 1)}
-                                                >Previous</li>
-                                        }
-                                        {printPagination()}
-                                        {
-                                            activePage === totalPage ?
-                                                <li className="border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
-                                                :
-                                                <li className="border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                    type='button' onClick={() => setActivePage(activePage + 1)}
-                                                >Next</li>
-                                        }
-                                    </ul>
-                                </div>
-                                {/* MODAL SELECT PAYMENT */}
-                                {
-                                    showPayment ?
-                                        <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-modal md:h-full">
-                                            <div className="relative p-4 w-1/3 h-full md:h-auto">
-                                                <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
-                                                    <div className="p-6 text-center">
-                                                        <div>
-                                                            <p className='text-2xl font-bold text-main-500'>How to Pay</p>
-                                                        </div>
-                                                        <div className='flex w-full my-4 items-center justify-center'>
-                                                            <img src={bni} className='w-20' alt="bnilogo" />
-                                                            <img src={bca} className='w-20 mx-4' alt="bcalogo" />
-                                                            <img src={bri} className='w-28' alt="brilogo" />
-                                                        </div>
-                                                        <p className='text-lg font-bold text-main-500'>See virtual account number on order detail</p>
-                                                        <BankInfo />
-                                                        <div className='w-full flex justify-center'>
-                                                            <div className='w-1/2 flex justify-evenly items-center'>
-                                                                <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
-                                                                    onClick={() => setShowPayment(false)}>Close</button>
+                        {
+                            userTransactionData.length > 0 ?
+                                <>
+                                    <div>
+                                        {printTransaction()}
+                                    </div>
+                                    <div className="text-center my-3">
+                                        <p>Show <a className="font-bold">{(activePage * 5) - 4}</a> to <a className="font-bold">{activePage === totalPage ? totalData : activePage * 5}</a> of <a className="font-bold">{totalData}</a> Entries</p>
+                                    </div>
+                                    <div className="w-full flex justify-center items-center">
+                                        <ul className="list-none flex">
+                                            {
+                                                activePage === 1 ?
+                                                    <li className="hidden sm:block border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
+                                                    :
+                                                    <li className="hidden sm:block border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                    >Previous</li>
+                                            }
+                                            {
+                                                activePage === 1 ?
+                                                    <li className="sm:hidden border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'<'}</li>
+                                                    :
+                                                    <li className="sm:hidden border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                    >{'<'}</li>
+                                            }
+                                            {printPagination()}
+                                            {
+                                                activePage === totalPage ?
+                                                    <li className="sm:hidden border border-gray-300 rounded-r-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'>'}</li>
+                                                    :
+                                                    <li className="sm:hidden border border-main-500 rounded-r-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                    >{'>'}</li>
+                                            }
+                                            {
+                                                activePage === totalPage ?
+                                                    <li className="hidden sm:block border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
+                                                    :
+                                                    <li className="hidden sm:block border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
+                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                    >Next</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    {/* MODAL SELECT PAYMENT */}
+                                    {
+                                        showPayment ?
+                                            <div tabIndex={-1} className="overflow-y-auto overflow-x-hidden backdrop-blur-sm fixed right-0 left-0 top-0 flex justify-center items-center z-50 md:inset-0 h-full">
+                                                <div className="relative p-4 w-full md:w-2/3 lg:w-1/2 h-full sm:h-auto">
+                                                    <div className="relative border-2 bg-white rounded-lg shadow border-main-500">
+                                                        <div className="p-6 text-center">
+                                                            <div>
+                                                                <p className='text-2xl font-bold text-main-500'>How to Pay</p>
+                                                            </div>
+                                                            <div className='flex w-full my-4 items-center justify-center'>
+                                                                <img src={bni} className='w-20' alt="bnilogo" />
+                                                                <img src={bca} className='w-20 mx-4' alt="bcalogo" />
+                                                                <img src={bri} className='w-28' alt="brilogo" />
+                                                            </div>
+                                                            <p className='text-lg font-bold text-main-500'>See virtual account number on order detail</p>
+                                                            <BankInfo />
+                                                            <div className='w-full flex justify-center'>
+                                                                <div className='w-1/2 flex justify-evenly items-center'>
+                                                                    <button type="button" className="text-black bg-white focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-8 py-2.5 focus:z-10 "
+                                                                        onClick={() => setShowPayment(false)}>Close</button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        :
-                                        ""
-                                }
-                            </>
-                            :
-                            <div className="flex flex-col justify-center items-center text-center my-5">
-                                <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
-                                <img src={nodata} className="w-2/3" alt='placeholder' />
-                            </div>
-                    }
+                                            :
+                                            ""
+                                    }
+                                </>
+                                :
+                                <div className="flex flex-col justify-center items-center text-center my-5">
+                                    <p className="font-bold text-2xl drop-shadow-lg text-main-500">You don't have any data yet</p>
+                                    <img src={nodata} className="w-2/3" alt='placeholder' />
+                                </div>
+                        }
+                    </div>
                 </div>
+                <ToastContainer />
+                <LoadingComponent loading={loading} />
             </div>
-            <ToastContainer />
-            <LoadingComponent loading={loading} />
         </div>
     )
 };

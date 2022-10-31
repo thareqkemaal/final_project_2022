@@ -40,6 +40,7 @@ const ProductCategory = (props) => {
                 // Before : setProductByCategory(res.data)
                 // After : setProductByCategory(res.data.results)
 
+                // console.log(res.data.results)
                 setProductByCategory(res.data.results)
             })
             .catch((err) => {
@@ -114,19 +115,49 @@ const ProductCategory = (props) => {
                             getUserCartData();
                         }
                     } else {
-                        let data = {
-                            idcart: findIndex.idcart,
-                            newQty: findIndex.quantity + 1
-                        };
 
-                        let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
-                            headers: {
-                                'Authorization': `Bearer ${userToken}`
+                        let checkStockQty = 0;
+                        let checkCartQty = 0;
+
+                        productByCategory.forEach((val, idx) => {
+                            if (val.idproduct === id) {
+                                checkStockQty = val.stock_unit
                             }
                         });
 
-                        if (res.data.success) {
-                            toast.success('Item Added to Cart', {
+                        userCartData.forEach((val, idx) => {
+                            if (val.product_id === id) {
+                                checkCartQty = val.quantity
+                            }
+                        });
+
+                        if (checkCartQty < checkStockQty) {
+                            let data = {
+                                idcart: findIndex.idcart,
+                                newQty: findIndex.quantity + 1
+                            };
+
+                            let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                                headers: {
+                                    'Authorization': `Bearer ${userToken}`
+                                }
+                            });
+
+                            if (res.data.success) {
+                                toast.success('Item Added to Cart', {
+                                    theme: "colored",
+                                    position: "top-center",
+                                    autoClose: 2000,
+                                    hideProgressBar: false,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: false,
+                                    progress: undefined,
+                                });
+                                getUserCartData();
+                            }
+                        } else {
+                            toast.error('Stock has been reach maximum', {
                                 theme: "colored",
                                 position: "top-center",
                                 autoClose: 2000,
@@ -136,7 +167,6 @@ const ProductCategory = (props) => {
                                 draggable: false,
                                 progress: undefined,
                             });
-                            getUserCartData();
                         }
                     }
                 } catch (error) {
@@ -171,7 +201,7 @@ const ProductCategory = (props) => {
     const printData = () => {
         return productByCategory.map((val, idx) => {
             return (
-                <div className='w-48 h-[350px] rounded-lg shadow-[16px] mx-4 my-4 bg-white grid-cols-8 hover:-translate-y-1 hover:scale-110 duration-500 delay-300 hover:shadow-2xl hover:shadow-main-500'  key={val.idproduct} >
+                <div className='w-48 h-[350px] rounded-lg shadow-[16px] mx-4 my-4 bg-white grid-cols-8 hover:-translate-y-1 hover:scale-110 duration-500 delay-300 hover:shadow-2xl hover:shadow-main-500' key={val.idproduct} >
                     <Link to={`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`}>
                         <div className=''>
                             <div className='flex justify-center min-w-full h-[147px] object-none mt-2'>

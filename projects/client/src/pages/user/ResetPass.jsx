@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useParams, useNavigate} from 'react-router-dom'
 import Loading from '../../components/Loading';
+import { Helmet } from 'react-helmet';
 
 
 const ResetPass = () => {
@@ -89,7 +90,11 @@ const onSubmit = async ()=>{
 }
 
   return (
-    <div>
+  <div>
+    <Helmet>
+      <title>Reset Password</title>
+      <meta name="description" content="Reset password"/>
+    </Helmet>
     <div className='container mx-auto px-96 mt-10 '>
       <label className=' block mb-3 '>
         <span className='block text-sm font-medium text-slate-700 mb-1 font-Public'>Password</span>

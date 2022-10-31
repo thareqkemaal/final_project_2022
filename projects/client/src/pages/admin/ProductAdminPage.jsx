@@ -9,6 +9,7 @@ import ModalDetailProduct from "../../components/ModalDetailProduct";
 import ModalDeleteProduct from "../../components/ModalDeleteProduct";
 import AdminComponent from "../../components/AdminComponent";
 import { useLocation, useNavigate } from "react-router";
+import { Helmet } from "react-helmet";
 
 const ProductAdminPage = (props) => {
     const navigate = useNavigate();
@@ -512,7 +513,11 @@ const ProductAdminPage = (props) => {
 
     return (
         // <div className={`${loading ? 'overflow-hide scroll ' : ""}`}  >
+        
         <div>
+            <Helmet>
+                <title>Admin Product</title>
+            </Helmet>
             <div className='flex'>
                 {/* <DashboardPage page={window.location.pathname} /> */}
 

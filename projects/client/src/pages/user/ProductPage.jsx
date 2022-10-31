@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
+import { Helmet } from "react-helmet";
 
 const ProductPage = (props) => {
 
@@ -64,7 +65,7 @@ const ProductPage = (props) => {
             sort
         })
             .then((res) => {
-                // setData(res.data)
+                console.log(res.data.results)
                 setData(res.data.results)
                 setTotalProduct(res.data.totalProduct);
 
@@ -91,15 +92,15 @@ const ProductPage = (props) => {
     const printProduct = () => {
         return data.map((val, idx) => {
             if (loading) {
-                return <div key={val.idproduct} className="row-span-3" onClick={() => navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)}>
-                    <div className="max-w-sm px-4 pb-3 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-72" >
-                        {
-                            val.picture.includes('http') ?
-                                <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} />
-                                :
-                                <img className="w-full pt-1 mb-2" src={API_URL + val.picture} alt={val.idproduct} />
-                        }
-                        <div className="" >
+                return <div key={val.idproduct} className="row-span-3" >
+                    <div className="max-w-sm px-4 bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mx-1 mt-3 md:h-full" >
+                        <div className="" onClick={() => navigate(`/product/detail?product_name=${val.product_name}&category_id=${val.category_id}`)}>
+                            {
+                                val.picture.includes('http') ?
+                                    <img className="w-full pt-1 mb-2" src={val.picture} alt={val.idproduct} />
+                                    :
+                                    <img className="w-full pt-1 mb-2" src={API_URL + val.picture} alt={val.idproduct} />
+                            }
                             {val.product_name.length <= 21
                                 ?
                                 <div className="font-bold text-xs h-6 text-txt-500">
@@ -323,19 +324,49 @@ const ProductPage = (props) => {
                         getUserCartData();
                     }
                 } else {
-                    let data = {
-                        idcart: findIndex.idcart,
-                        newQty: findIndex.quantity + 1
-                    };
 
-                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
-                        headers: {
-                            'Authorization': `Bearer ${userToken}`
+                    let checkStockQty = 0;
+                    let checkCartQty = 0;
+
+                    data.forEach((val, idx) => {
+                        if (val.idproduct === id) {
+                            checkStockQty = val.stock_unit
                         }
                     });
 
-                    if (res.data.success) {
-                        toast.success('Item Added to Cart', {
+                    userCartData.forEach((val, idx) => {
+                        if (val.product_id === id) {
+                            checkCartQty = val.quantity
+                        }
+                    });
+
+                    if (checkCartQty < checkStockQty) {
+                        let submit = {
+                            idcart: findIndex.idcart,
+                            newQty: findIndex.quantity + 1
+                        };
+
+                        let res = await axios.patch(API_URL + '/api/product/updatecart', submit, {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`
+                            }
+                        });
+
+                        if (res.data.success) {
+                            toast.success('Item Added to Cart', {
+                                theme: "colored",
+                                position: "top-center",
+                                autoClose: 2000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: false,
+                                progress: undefined,
+                            });
+                            getUserCartData();
+                        }
+                    } else {
+                        toast.error('Stock has been reach maximum', {
                             theme: "colored",
                             position: "top-center",
                             autoClose: 2000,
@@ -345,7 +376,6 @@ const ProductPage = (props) => {
                             draggable: false,
                             progress: undefined,
                         });
-                        getUserCartData();
                     }
                 }
             }
@@ -354,113 +384,118 @@ const ProductPage = (props) => {
         }
     };
 
-    return <div className="container mx-auto">
+    return (
+        <div>
+            <Helmet>
+                <title>Product</title>
+                <meta name="description" content="Get information on all medicine" />
+            </Helmet>
+            <div className="container mx-auto">
 
-        <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
-            <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
-            <button className="flex-none" onClick={() => onResetAllFilter()}>Obat</button>
-        </div>
+                <div className="hidden md:flex space-x-2 text-btn-500 font-bold mt-10">
+                    <button className="flex-none text-md text-txt-500" onClick={() => navigate('/')}>Beranda /</button>
+                    <button className="flex-none" onClick={() => onResetAllFilter()}>Obat</button>
+                </div>
 
-        <div className="grid grid-flow-col gap-4">
-            <div className="hidden md:row-span-3 md:inline">
-                <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mt-5 h-fit w-64">
-                    <div className="px-4 pt-4 pb-2">
-                        <div className="font-bold text-md mb-3 text-txt-500">CARI OBAT</div>
-                        <form className="mb-5">
-                            <div className="flex">
-                                <div className="relative w-full">
-                                    <input id="searchsm" onChange={(e) => setFilterName(e.target.value)} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                    <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
-                                        {/* <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
-                                        {/* <button onClick={() => setLoading(false)} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
-                                        <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                        <span className="sr-only">Search</span>
-                                    </button>
-                                </div>
+                <div className="grid grid-flow-col gap-4">
+                    <div className="hidden md:row-span-3 md:inline">
+                        <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mt-5 h-fit w-64">
+                            <div className="px-4 pt-4 pb-2">
+                                <div className="font-bold text-md mb-3 text-txt-500">CARI OBAT</div>
+                                <form className="mb-5">
+                                    <div className="flex">
+                                        <div className="relative w-full">
+                                            <input id="searchsm" onChange={(e) => setFilterName(e.target.value)} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
+                                            <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                                {/* <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+                                                {/* <button onClick={() => setLoading(false)} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+                                                <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                                <span className="sr-only">Search</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                        </form>
-                    </div>
-                </div>
-                <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mt-5 h-fit w-64">
-                    <div className="px-4 py-4">
-                        <div className="font-bold text-md mb-4 text-txt-500">KATEGORI</div>
-                        {idPage == undefined ?
-                            <button onClick={() => onResetAllFilter()} className="font-bold text-md mb-2 text-btn-500">
-                                Semua Produk
-                            </button>
-                            :
-                            <button onClick={() => onResetAllFilter()} className="text-md mb-2">
-                                Semua Produk
-                            </button>
-                        }
-                        {printCategory()}
-                    </div>
-                </div>
-            </div>
-
-            <div className="col-span-4 ml-5">
-                <div className="grid grid-cols-1 justify-between">
-
-                    {/* Mobile category */}
-                    <div className="md:hidden text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
-                        <ul className="flex flex-wrap -mb-px">
-                            {idPage == undefined ?
-                                <li className="mr-2">
-                                    <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                        </div>
+                        <div className="max-w-sm bg-white rounded-lg border border-gray-200 shadow-lg overflow-hidden mt-5 h-fit w-64">
+                            <div className="px-4 py-4">
+                                <div className="font-bold text-md mb-4 text-txt-500">KATEGORI</div>
+                                {idPage == undefined ?
+                                    <button onClick={() => onResetAllFilter()} className="font-bold text-md mb-2 text-btn-500">
                                         Semua Produk
                                     </button>
-                                </li>
-                                :
-                                <li className="mr-2">
-                                    <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                                    :
+                                    <button onClick={() => onResetAllFilter()} className="text-md mb-2">
                                         Semua Produk
                                     </button>
-                                </li>
-                            }
-                            {printCategory()}
-                        </ul>
-                    </div>
-
-                    {/* Mobile search & sort */}
-                    <div className="md:hidden flex justify-between mt-3 mr-5">
-                        <form>
-                            <div className="flex">
-                                <div className="relative w-full">
-                                    <input id="search" onChange={(e) => setFilterName(e.target.value)} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                    {/* <button onClick={() => {setLoading(false); navigate(`/product?search=${filterName}`); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
-
-                                    <button onClick={() => { setLoading(false); document.getElementById("search").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
-                                        <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                        <span className="sr-only">Search</span>
-                                    </button>
-                                </div>
+                                }
+                                {printCategory()}
                             </div>
-                        </form>
-
-                        <button onClick={() => setDrop(!drop)} id="dropdownDefault" data-dropdown-toggle="dropdown" className="flex px-auto text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300
-                                font-bold rounded-lg text-xs w-fit px-2 items-center text-center" type="button">
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
-
-                            {defaultSort}
-
-                        </button>
-
-                        {/* <!-- Dropdown menu --> */}
-                        <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "103px auto auto 164px" }}>
-                            <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
-                                <li>
-                                    <button onClick={() => { setLoading(false); setDefaultSort('Paling Sesuai'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paling Sesuai</button>
-                                </li>
-                                <li>
-                                    <button onClick={() => { setLoading(false); setDefaultSort('Nama : A - Z'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama : A - Z</button>
-                                </li>
-                                <li>
-                                    <button onClick={() => { setLoading(false); setDefaultSort('Harga Terendah'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Harga Terendah</button>
-                                </li>
-                            </ul>
                         </div>
                     </div>
 
+                    <div className="col-span-4 ml-5">
+                        <div className="grid grid-cols-1 justify-between">
+
+                            {/* Mobile category */}
+                            <div className="md:hidden text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+                                <ul className="flex flex-wrap -mb-px">
+                                    {idPage == undefined ?
+                                        <li className="mr-2">
+                                            <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 text-btn-500 font-bold rounded-t-lg border-b-2 border-btn-500 active">
+                                                Semua Produk
+                                            </button>
+                                        </li>
+                                        :
+                                        <li className="mr-2">
+                                            <button type="button" onClick={() => onResetAllFilter()} className="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
+                                                Semua Produk
+                                            </button>
+                                        </li>
+                                    }
+                                    {printCategory()}
+                                </ul>
+                            </div>
+
+                            {/* Mobile search & sort */}
+                            <div className="md:hidden flex justify-between mt-3 mr-5">
+                                <form>
+                                    <div className="flex">
+                                        <div className="relative w-full">
+                                            <input id="search" onChange={(e) => setFilterName(e.target.value)} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
+                                            {/* <button onClick={() => {setLoading(false); navigate(`/product?search=${filterName}`); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+
+                                            <button onClick={() => { setLoading(false); document.getElementById("search").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                                <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                                <span className="sr-only">Search</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <button onClick={() => setDrop(!drop)} id="dropdownDefault" data-dropdown-toggle="dropdown" className="flex px-auto text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300
+                                font-bold rounded-lg text-xs w-fit px-2 items-center text-center" type="button">
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+
+                                    {defaultSort}
+
+                                </button>
+
+                                {/* <!-- Dropdown menu --> */}
+                                <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "103px auto auto 164px" }}>
+                                    <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+                                        <li>
+                                            <button onClick={() => { setLoading(false); setDefaultSort('Paling Sesuai'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Paling Sesuai</button>
+                                        </li>
+                                        <li>
+                                            <button onClick={() => { setLoading(false); setDefaultSort('Nama : A - Z'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Nama : A - Z</button>
+                                        </li>
+                                        <li>
+                                            <button onClick={() => { setLoading(false); setDefaultSort('Harga Terendah'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Harga Terendah</button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                     {/* Desktop sort */}
                     <div className="hidden md:flex justify-between items-center">
                         <p className="text-2xl font-bold mt-5 mb-3 text-txt-500">OBAT</p>
@@ -527,20 +562,21 @@ const ProductPage = (props) => {
                     }
 
                     <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" />
+                            <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
-                    {
-                        data.length > 0 ?
-                            <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
-                                {printProduct()}
-                            </div>
-                            :
-                            <div className="text-center text-txt-500 font-bold text-lg">
-                                Data Not Found
-                                <img src={require('../admin/NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
-                            </div>
-                    }
+                            {
+                                data.length > 0 ?
+                                    <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
+                                        {printProduct()}
+                                    </div>
+                                    :
+                                    <div className="text-center text-txt-500 font-bold text-lg">
+                                        Data Not Found
+                                        <img src={require('../admin/NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
+                                    </div>
+                            }
 
-                    {/* <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
+                            {/* <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
                         {printProduct()}
                     </div> */}
                     <div className="mx-auto">
@@ -549,13 +585,16 @@ const ProductPage = (props) => {
                                 ? <></>
                                 : <button onClick={() => { setQuery(query + 10); setLoading(false) }} type="button" className="px-auto mt-7 mb-5 text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300
                                 font-bold rounded-lg text-sm w-44 ml-4 px-3 py-1.5 text-center">Selanjutnya</button>
-                        }
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <ToastContainer />
             </div>
         </div>
-        <ToastContainer />
-    </div>
+    )
+
 }
 
 export default ProductPage;

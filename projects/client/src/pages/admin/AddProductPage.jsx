@@ -11,6 +11,7 @@ import ModalAddMainUnit from "../../components/ModalAddMainUnit";
 import ModalAddNettoUnit from "../../components/ModalAddNettoUnit";
 import ModalSettingCategory from "../../components/ModalSettingCategory";
 import SpinnerComp from "../../components/Spinner";
+import { Helmet } from "react-helmet";
 
 const AddProductPage = () => {
     const navigate = useNavigate();
@@ -140,6 +141,9 @@ const AddProductPage = () => {
 
     return (
         <div>
+            <Helmet>
+                <title>Add Product</title>
+            </Helmet>
             {/* <div className={`${loading ? 'overflow-hide scroll ' : ""}`}  > */}
             <div className='flex'>
                 {/* <DashboardPage page={window.location.pathname} /> */}

@@ -34,6 +34,7 @@ import EmailVerification from './pages/user/EmailVerification';
 import UserOrderList from './pages/user/OrderList';
 import ChangePassword from './components/ChangePassword';
 import AddressComponent from './components/AdressComponent';
+import {Helmet} from "react-helmet";
 
 function App() {
   const dispatch = useDispatch()
@@ -47,6 +48,7 @@ function App() {
           'Authorization': `Bearer ${medcarelog}`
         }
       }).then((res) => {
+        console.log(res)
         if (res.data.iduser) {
           localStorage.getItem('medcarelog', res.data.token)
           delete res.data.token
@@ -70,6 +72,10 @@ function App() {
 
   return (
     <div>
+      <Helmet>
+        <title>Medcare</title>
+        <meta name="description" content="Meet your health needs" />
+      </Helmet>
       <div>
         <Navbar loading={loading} />
       </div>

@@ -12,6 +12,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { updateCart } from '../../action/useraction';
 import { useDispatch, useSelector } from 'react-redux';
 import LoadingComponent from '../../components/Loading';
+import { Helmet } from 'react-helmet';
+
 
 const ProductDetail = () => {
 
@@ -29,6 +31,7 @@ const ProductDetail = () => {
             status: state.userReducer.status_name
         }
     })
+    console.log(search)
 
     const getDetailProduct = () => {
         // Tika Change #1 : mengganti mw api
@@ -44,21 +47,22 @@ const ProductDetail = () => {
                 // Before : setProductDetail(res.data)
                 // After : setProductDetail(res.data.results)
 
+                console.log(res.data.results)
                 setProductDetail(res.data.results)
             })
             .catch((err) => {
                 console.log(err)
             })
-            .then((res) => {
-                // Tika Change #3 : mengganti setProductDetail
-                // Before : setProductDetail(res.data)
-                // After : setProductDetail(res.data.results)
+            // .then((res) => {
+            //     // Tika Change #3 : mengganti setProductDetail
+            //     // Before : setProductDetail(res.data)
+            //     // After : setProductDetail(res.data.results)
                 
-                setProductDetail(res.data.results)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+            //     setProductDetail(res.data.results)
+            // })
+            // .catch((err) => {
+            //     console.log(err)
+            // })
     }
 
     useEffect(() => {
@@ -74,8 +78,12 @@ const ProductDetail = () => {
             let desc = val.description.split(' ')
             let index = [0, 1, 2, 3]
             return (
-                <div>
-                    <div className='py-5 divide-y divide-[#F8F8F8] md:grid md:grid-cols-3' key={val.idproduct}>
+                <div key={val.idproduct}>
+                    <Helmet>
+                        <title>{val.product_name}</title>
+                        <meta name="description" content={val.description}/>
+                    </Helmet>
+                    <div className='py-5 divide-y divide-[#F8F8F8] md:grid md:grid-cols-3' >
                         <div className='bg-white  max-w-full max-h-[184-x] lg:px-20'>
                             <div className='w-full h-[200px] top-[100px] shadow-lg rounded-2xl mb-5'>
                                 {/* <img src={val.picture} className='w-[206.52px] h-[159.34px] mx-auto ' /> */}
@@ -274,19 +282,50 @@ const ProductDetail = () => {
                         getUserCartData();
                     }
                 } else {
-                    let data = {
-                        idcart: findIndex.idcart,
-                        newQty: findIndex.quantity + counter
-                    };
 
-                    let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
-                        headers: {
-                            'Authorization': `Bearer ${userToken}`
+                    let checkStockQty = 0;
+                    let checkCartQty = 0;
+
+                    productDetail.forEach((val, idx) => {
+                        if (val.idproduct === id) {
+                            checkStockQty = val.stock_unit
                         }
                     });
 
-                    if (res.data.success) {
-                        toast.success('Item Added to Cart', {
+                    userCartData.forEach((val, idx) => {
+                        if (val.product_id === id) {
+                            checkCartQty = val.quantity
+                        }
+                    });
+
+                    if ((checkCartQty + counter) <= checkStockQty){
+                        
+                        let data = {
+                            idcart: findIndex.idcart,
+                            newQty: findIndex.quantity + counter
+                        };
+    
+                        let res = await axios.patch(API_URL + '/api/product/updatecart', data, {
+                            headers: {
+                                'Authorization': `Bearer ${userToken}`
+                            }
+                        });
+    
+                        if (res.data.success) {
+                            toast.success('Item Added to Cart', {
+                                theme: "colored",
+                                position: "top-center",
+                                autoClose: 2000,
+                                hideProgressBar: false,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: false,
+                                progress: undefined,
+                            });
+                            getUserCartData();
+                        }
+                    } else {
+                        toast.error('Stock has been reach maximum', {
                             theme: "colored",
                             position: "top-center",
                             autoClose: 2000,
@@ -296,8 +335,8 @@ const ProductDetail = () => {
                             draggable: false,
                             progress: undefined,
                         });
-                        getUserCartData();
                     }
+
                 }
             }
         } catch (error) {
@@ -307,6 +346,7 @@ const ProductDetail = () => {
 
     return (
         <div>
+
             <div className=' container mx-auto md:px-10'>
                 {printProductDetail()}
                 <p className='mt-28 text-sm font-Public font-bold text-txt-500'>Product Terkait</p>
