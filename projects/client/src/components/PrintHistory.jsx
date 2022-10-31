@@ -48,7 +48,7 @@ const PrintHistoryComponent = (data) => {
         >
             Print Data
         </button>
-        <div className='absolute -z-30 overflow-hide-modal'>
+        <div className='absolute -z-30 overflow-hide-print'>
             <div ref={componentRef}>
                 <div className='mt-5 mb-3'>
                     <p className="text-3xl text-center font-bold mt-5 mb-3 text-txt-500">Stock Log</p>

@@ -6,7 +6,7 @@ module.exports = {
         let product_name = req.query.product_name;
         let { limit, sort, offset } = req.body;
 
-        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product`,
+        dbConf.query(`SELECT COUNT(idproduct) as totalProduct FROM product where isDeleted='false'`,
             (err, results) => {
                 if (err) {
                     return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
@@ -128,13 +128,7 @@ module.exports = {
                             );
                         })
                 } else {
-                    let resultFilter = `category_id=${filterCategory}`;
-
-                    console.log('query 4')
-
-                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
-                    ${filterCategory || product_name ? 'where' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-                    ${sort ? `order by ${sort} asc` : ``}`,
+                    dbConf.query(`Select p.*, c.category_name, s.* from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id where p.isDeleted = 'false'`,
                         (err, results) => {
                             if (err) {
                                 return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
@@ -489,9 +483,9 @@ module.exports = {
 
                 if (results[0].stock_unit > stock_unit) {
                     // dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity, type, information) VALUES
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
 
-                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
+                    (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan')`,
                         (error, results) => {
@@ -518,8 +512,8 @@ module.exports = {
                             next()
                         })
                 } else if (results[0].stock_unit < stock_unit) {
-                    dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
-                (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
+                    dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity,date, type, information) VALUES
+                (${dbConf.escape(results[0].product_name)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(stock_unit - results[0].stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Penambahan');`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(req.body.data.stock_unit - results[0].stock_unit)},'Manual Update','Penambahan');`,
                         (error, results) => {
