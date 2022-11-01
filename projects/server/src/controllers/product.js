@@ -410,6 +410,7 @@ module.exports = {
             JOIN product p ON c.product_id = p.idproduct 
             JOIN stock s ON s.product_id = p.idproduct
             WHERE c.user_id = ${dbConf.escape(req.dataToken.iduser)}
+            AND s.isDefault = 'true'
             ORDER BY c.idcart DESC;`);
 
             res.status(200).send(getSql);
