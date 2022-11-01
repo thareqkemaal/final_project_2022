@@ -19,7 +19,6 @@ const NavbarComponent = (props) => {
   const [dropdown, setDropdown] = useState(false)
   const [loading, setLoading] = useState(false);
   const [disable, setDisable] = useState(false)
-  const [searchProduct,setSearchProduct]=useState('')
 
   const { status, email } = useSelector((state) => {
     return {
