@@ -83,12 +83,6 @@ const NavbarComponent = (props) => {
   }
   
 
-  const onSearch = (e) =>{
-    if(e.key === 'Enter'){
-      navigate(`/product?search=${searchProduct}`)
-    }
-  }
-
   return (
     <div>
       {
@@ -114,7 +108,7 @@ const NavbarComponent = (props) => {
               </div>
             </div>
             <div className='flex grow relative'>
-              <input placeholder='Search' className='grow mx-10 w-1/2 border border-slate-600 rounded-lg px-10' type='search' onChange={(e)=>setSearchProduct(e.target.value)} onKeyDown={onSearch} />
+              <input placeholder='Search' className='grow mx-10 w-1/2 border border-slate-600 rounded-lg px-10' />
               <BiSearchAlt2 className='absolute left-12 top-2 fill-slate-500' size={25} />
             </div>
             <div className='flex-none'>
