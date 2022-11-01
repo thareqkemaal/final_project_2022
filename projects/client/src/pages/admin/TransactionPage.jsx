@@ -135,7 +135,6 @@ const TransactionPages = () => {
   const getProduct = () => {
     axios.post(API_URL + `/api/product/getproduct`, { offset: '' })
       .then((res) => {
-        console.log(res.data)
         setProduct(res.data.results)
       })
       .catch((error) => {
