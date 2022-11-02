@@ -490,7 +490,6 @@ module.exports = {
                 if (results[0].stock_unit > stock_unit) {
                     // dbConf.query(`INSERT INTO history_stock (product_name, user_id, unit, quantity, type, information) VALUES
                     dbConf.query(`INSERT INTO history_stock (product_name,product_id, user_id, unit, quantity,date, type, information) VALUES
-
                     (${dbConf.escape(results[0].product_name)},${dbConf.escape(idproduct)},${dbConf.escape(iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - stock_unit)},'${new Date().toLocaleDateString('en-CA')} ${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}','Manual Update','Pengurangan')`,
 
                         // (${dbConf.escape(results[0].product_name)},${dbConf.escape(req.body.data.iduser)},${dbConf.escape(results[0].unit)},${dbConf.escape(results[0].stock_unit - req.body.data.stock_unit)},'Manual Update','Pengurangan')`,
