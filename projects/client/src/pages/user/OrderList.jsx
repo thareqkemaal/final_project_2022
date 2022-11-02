@@ -125,7 +125,7 @@ const UserOrderList = (props) => {
                     temp.push('date_order=asc');
                 };
 
-                if (activePage >= 1) {
+                if (search.includes('page')) {
                     temp.push(`limit=5`);
                     temp.push(`offset=${(activePage - 1) * 5}`);
                 };
@@ -330,8 +330,7 @@ const UserOrderList = (props) => {
             }
 
             if (activePage >= 1) {
-                temp.push(`limit=5`);
-                temp.push(`offset=${(activePage - 1) * 5}`)
+                temp.push(`page=${activePage}`);
             }
 
             console.log(temp);
@@ -393,8 +392,7 @@ const UserOrderList = (props) => {
             }
 
             if (activePage >= 1) {
-                temp.push(`limit=5`);
-                temp.push(`offset=${(activePage - 1) * 5}`)
+                temp.push(`page=${activePage}`);
             }
 
 
@@ -671,13 +669,81 @@ const UserOrderList = (props) => {
             if (activePage === val) {
                 return (
                     <li key={idx} className="border border-main-500 px-3 py-1 bg-main-500 text-white hover:cursor-default"
-                        type='button' onClick={() => setActivePage(parseInt(val))}
+                        type='button' onClick={() => {
+                            setActivePage(parseInt(val))
+
+                            let query = selected;
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+
+                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                if (range[0].startDate === range[0].endDate) {
+                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                } else {
+                                    if (range[0].startDate !== '') {
+                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                    }
+
+                                    if (range[0].endDate !== '') {
+                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                    }
+                                }
+                            };
+
+                            if (inputKeyword !== '') {
+                                temp.push(`keyword=${inputKeyword}`);
+                            };
+
+                            temp.push(`page=${val}`);
+
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
                     >{val}</li>
                 )
             } else {
                 return (
                     <li key={idx} className="border border-main-500 px-3 py-1 text-main-500 hover:cursor-pointer"
-                        type='button' onClick={() => setActivePage(parseInt(val))}
+                        type='button' onClick={() => {
+                            setActivePage(parseInt(val))
+
+                            let query = selected;
+                            let temp = [];
+                            for (let key in query) {
+                                if (query[key] !== '') {
+                                    temp.push(`${key}=${query[key]}`);
+                                }
+                            };
+
+                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                if (range[0].startDate === range[0].endDate) {
+                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                } else {
+                                    if (range[0].startDate !== '') {
+                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                    }
+
+                                    if (range[0].endDate !== '') {
+                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                    }
+                                }
+                            };
+
+                            if (inputKeyword !== '') {
+                                temp.push(`keyword=${inputKeyword}`);
+                            };
+
+                            temp.push(`page=${val}`);
+
+                            console.log(temp.join('&'));
+                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                        }}
                     >{val}</li>
                 )
             }
@@ -986,6 +1052,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1007,6 +1074,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1028,6 +1096,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'))
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1049,6 +1118,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1070,6 +1140,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1091,6 +1162,7 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                             }}
@@ -1117,6 +1189,7 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
                                     }}
@@ -1138,6 +1211,7 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
                                     }}
@@ -1159,6 +1233,7 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
                                     }}
@@ -1199,7 +1274,7 @@ const UserOrderList = (props) => {
                                                 }
                                             }
                                         };
-
+                                        temp.push(`page=1`);
                                         console.log(temp.join('&'))
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
                                         getUserTransactionData(`?${temp.join('&')}`);
@@ -1262,7 +1337,8 @@ const UserOrderList = (props) => {
                                                     if (query[key] !== '') {
                                                         temp.push(`${key}=${query[key]}`)
                                                     }
-                                                }
+                                                };
+                                                temp.push(`page=1`);
                                                 console.log('clear', temp.join('&'))
                                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                                             }}
@@ -1341,7 +1417,8 @@ const UserOrderList = (props) => {
                                                     if (query[key] !== '') {
                                                         temp.push(`${key}=${query[key]}`)
                                                     }
-                                                }
+                                                };
+                                                temp.push(`page=1`);
                                                 console.log('clear', temp.join('&'))
                                                 navigate(`/${username}/transaction?${temp.join('&')}`);
                                             }}
