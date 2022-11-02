@@ -99,14 +99,6 @@ const TransactionPages = () => {
       let firstPage = split.filter((val) => val.includes('page'))
       let firstStart = split.filter((val) => val.includes('start'))
       let firstEnd = split.filter((val) => val.includes('end'))
-      console.log('ini first', first)
-      console.log('ini split', split)
-      console.log('ini firstInvoice', firstInvoice)
-      console.log('ini firstSort', firstSort)
-      console.log('ini firstStatus', firstStatus)
-      console.log('ini firstPage', firstPage)
-      console.log('ini firstStart', firstStart)
-      console.log('ini firstEnd', firstEnd)
       if (firstInvoice.length != 0 || firstStart.length != 0) {
         if (firstInvoice.length != 0 && firstStart.length == 0) {
           setInvoice(firstInvoice[0].split('=')[1])
