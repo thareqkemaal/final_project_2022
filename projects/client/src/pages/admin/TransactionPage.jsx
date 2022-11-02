@@ -532,7 +532,7 @@ const TransactionPages = () => {
       <Helmet>
         <title>Admin transaction</title>
       </Helmet>
-      <div className={`${loading || modalDetail || modalPayment ? 'overflow-hide scroll ' : ""}`}  >
+      <div className={`${loading || modalDetail || modalPayment || modalAccept || modalCancel || modalConv || modalNote || modalRecipe ? 'overflow-hide scroll ' : ""}`}  >
         <div className='flex'>
           <AdminComponent page={window.location.pathname} />
           <div className='w-screen' style={{ background: "linear-gradient(155.7deg, #D6F5F3 -46%, #F7FCFC 100%, #F1F5FC 118%)" }}>
