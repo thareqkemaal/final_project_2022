@@ -47,7 +47,6 @@ const EditProfile = () => {
         phone_number: ''
     })
     const[newProfilPict, setNewProfilPict]=useState('')
-console.log(typeof input.phone_number)
 
 
     useEffect(()=>{
@@ -63,7 +62,7 @@ console.log(typeof input.phone_number)
 
     const updateProfile = ()=>{
         setLoading(true)
-        if(input.fullname.length > 0 && input.username.length > 0 && input.email.length>0 && input.phone_number !== 'undefined'){
+        if(input.fullname.length > 0 && input.username.length > 0 && input.email.length>0 && input.phone_number !== 'undefined' && input.birthdate.length>0){
 
             let medcarelog = localStorage.getItem('medcarelog')
             let formData = new FormData()
@@ -167,7 +166,7 @@ console.log(typeof input.phone_number)
 
     const onChangeNewProfilePic = (files) => {
         if(files.size>=1000000 ){
-            return toast.error(`Max 1 Mb`, {
+            return toast.error(`File size max 1 Mb`, {
                 theme: "colored",
                 position: "top-center",
                 autoClose: 2000,
@@ -184,7 +183,7 @@ console.log(typeof input.phone_number)
                     case'gif':
                 return setNewProfilPict(files)
             }
-            return toast.error(`Wrong file format`, {
+            return toast.error(`Format file must jpg,png,gif`, {
                 theme: "colored",
                 position: "top-center",
                 autoClose: 2000,
