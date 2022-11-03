@@ -165,28 +165,42 @@ module.exports = {
         let image = `/imgProductPict/${req.files[0].filename}`;
         let { product_name, price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit } = JSON.parse(req.body.data);
 
-        dbConf.query(`Insert into product (product_name, price, category_id, netto_stock, netto_unit, default_unit, picture, description, dosis, aturan_pakai) 
-        values (${dbConf.escape(product_name)},${dbConf.escape(price)},${dbConf.escape(category_id)},${dbConf.escape(netto_stock)},${dbConf.escape(netto_unit)},${dbConf.escape(default_unit)},${dbConf.escape(image)},${dbConf.escape(description)},${dbConf.escape(dosis)},${dbConf.escape(aturan_pakai)})`,
-            (err, results) => {
+        dbConf.query(`Select * from product where product_name=${dbConf.escape(product_name)}`,
+            (err, result) => {
                 if (err) {
-                    return res.status(500).send(`Middlewear addProduct failed, error : ${err}`)
+                    return res.status(500).send('Middlewear addProduct failed, error', err)
                 }
 
-                dbConf.query(`Select idproduct from product where product_name='${product_name}'`,
-                    (e, r) => {
-                        if (e) {
-                            return res.status(500).send(`Middlewear addProduct failed, error : ${e}`)
-                        }
+                if (JSON.stringify(result) == '[]') {
+                    dbConf.query(`Insert into product (product_name, price, category_id, netto_stock, netto_unit, default_unit, picture, description, dosis, aturan_pakai) 
+                    values (${dbConf.escape(product_name)},${dbConf.escape(price)},${dbConf.escape(category_id)},${dbConf.escape(netto_stock)},${dbConf.escape(netto_unit)},${dbConf.escape(default_unit)},${dbConf.escape(image)},${dbConf.escape(description)},${dbConf.escape(dosis)},${dbConf.escape(aturan_pakai)})`,
+                        (err, results) => {
+                            if (err) {
+                                return res.status(500).send(`Middlewear addProduct failed, error : ${err}`)
+                            }
 
-                        resultAddproduct = {
-                            product_id: r[0].idproduct,
-                            stock_unit,
-                            unit: default_unit
-                        };
+                            dbConf.query(`Select idproduct from product where product_name='${product_name}'`,
+                                (e, r) => {
+                                    if (e) {
+                                        return res.status(500).send(`Middlewear addProduct failed, error : ${e}`)
+                                    }
 
-                        next()
+                                    resultAddproduct = {
+                                        product_id: r[0].idproduct,
+                                        stock_unit,
+                                        unit: default_unit
+                                    };
 
+                                    next()
+
+                                })
+                        })
+                } else {
+                    res.status(200).send({
+                        success: false,
+                        message: 'Product already existed, please input another name'
                     })
+                }
             })
     },
     addStock: (req, res) => {
@@ -409,12 +423,11 @@ module.exports = {
             let getSql = await dbQuery(`SELECT * FROM cart c 
             JOIN product p ON c.product_id = p.idproduct 
             JOIN stock s ON s.product_id = p.idproduct
-            WHERE c.user_id = ${dbConf.escape(req.dataToken.iduser)} 
-            and s.isDefault='true' 
+            WHERE c.user_id = ${dbConf.escape(req.dataToken.iduser)}
+            AND s.isDefault = 'true'
             ORDER BY c.idcart DESC;`);
 
             res.status(200).send(getSql);
-
         } catch (error) {
             console.log(error)
             res.status(500).send(error)
@@ -424,7 +437,6 @@ module.exports = {
         try {
             console.log(req.params)
             await dbQuery(`DELETE FROM cart WHERE idcart=${dbConf.escape(req.params.idcart)};`);
-
             res.status(200).send({
                 success: true,
                 message: 'Delete Success'
@@ -449,17 +461,14 @@ module.exports = {
                 if (req.body.multiple) {
                     console.log('multiple exist', req.body);
                     await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
-
                     req.body.exist.forEach(async (val, idx) => {
                         await dbQuery(`UPDATE cart SET quantity = quantity + ${dbConf.escape(val.qty)}, selected = 'true' WHERE idcart=${dbConf.escape(val.idcart)};`);
                     })
-
                 } else {
                     await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                     await dbQuery(`UPDATE cart SET quantity=${dbConf.escape(req.body.newQty)}, selected = 'true' WHERE idcart=${dbConf.escape(req.body.idcart)};`);
                 }
             }
-
             res.status(200).send({
                 success: true,
                 message: 'Update Success'
@@ -473,18 +482,13 @@ module.exports = {
         try {
             // console.log(req.body);
             // console.log(req.dataToken);
-
             if (req.body.multiple) {
                 console.log('multiple new', req.body);
-
                 await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
-
                 let comp = [];
-
                 req.body.new.forEach(async (val, idx) => {
                     comp.push(`(${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(val.idproduct)}, ${dbConf.escape(val.qty)}, 'true')`);
                 });
-
                 await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES ${comp.join(', ')};`);
 
             } else {
@@ -492,12 +496,10 @@ module.exports = {
                 await dbQuery(`UPDATE cart SET selected = 'false' WHERE user_id = ${dbConf.escape(req.dataToken.iduser)};`);
                 await dbQuery(`INSERT INTO cart (user_id, product_id, quantity, selected) VALUES (${dbConf.escape(req.dataToken.iduser)}, ${dbConf.escape(req.body.idproduct)}, ${dbConf.escape(req.body.newQty)}, 'true');`);
             }
-
             res.status(200).send({
                 success: true,
                 message: 'Product Added'
             })
-
         } catch (error) {
             console.log(error);
             res.status(500).send(error);
