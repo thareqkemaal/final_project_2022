@@ -393,7 +393,7 @@ const ProductPage = (props) => {
 
     return (
         // <div>
-        <div className="mx-auto md:w-fit-navbarmd lg:w-fit-navbarlg xl:w-fit-navbarxl">
+        <div className="mx-auto md:w-fit-navbarmd lg:w-fit-navbarlg xl:w-fit-navbarxl 2xl:w-fit-navbar2xl">
             {/* <div style={{width:"1168px"}} className="mx-auto"> */}
             <Helmet>
                 <title>Medicine</title>
@@ -504,7 +504,7 @@ const ProductPage = (props) => {
                             </div>
                             {/* Desktop sort */}
                             {/* <div className="hidden md:flex justify-between items-center"> */}
-                            <div className="hidden xl:w-fit-productxl md:flex justify-between items-center">
+                            <div className="hidden 2xl:w-fit-product2xl xl:w-fit-productxl md:flex justify-between items-center">
                                 {/* <div className="hidden md:flex justify-between items-center" style={{width:"876px"}}> */}
                                 <p className="text-2xl font-bold mt-5 mb-3 text-txt-500">MEDICINE</p>
                                 {
@@ -576,7 +576,7 @@ const ProductPage = (props) => {
                             {
                                 data.length > 0 ?
                                     // <div className="grid grid-cols-4 gap-2">
-                                    <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-2 mr-4 md:mr-0 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-2">
                                         {/* <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2"> */}
                                         {printProduct()}
                                     </div>
