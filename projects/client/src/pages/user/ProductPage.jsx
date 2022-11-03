@@ -176,15 +176,6 @@ const ProductPage = (props) => {
                         </div>
                     </div>
                 }
-            } else {
-                return <div className="col-span-4 ml-5">
-                    <div className="grid grid-cols-1 justify-between">
-                        <div className="text-center text-txt-500 font-bold text-lg">
-                            Data Not Found
-                            <img src={require('../admin/NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
-                        </div>
-                    </div>
-                </div>
             }
         })
     }
