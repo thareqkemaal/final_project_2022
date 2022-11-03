@@ -68,7 +68,7 @@ const LandingPages = () => {
 
   React.useEffect(() => {
     getCategory()
-  })
+  }, [category])
 
   useEffect(() => {
     toastGoogleSigin()

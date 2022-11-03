@@ -114,6 +114,14 @@ const TransactionPages = () => {
           ])
           setFilter(`${firstStart[0]}&${firstEnd[0]}`)
         } else {
+          setRange([
+            {
+              startDate: new Date(`${firstStart[0].split('=')[1]}`),
+              endDate: new Date(`${firstEnd[0].split('=')[1]}`),
+              key: 'selection',
+              color: 'teal'
+            }
+          ])
           setInvoice(firstInvoice[0].split('=')[1])
           setFilter(`${firstInvoice[0]}&${firstStart[0]}&${firstEnd[0]}`)
         }
@@ -749,7 +757,7 @@ const TransactionPages = () => {
                     In Delivery
                   </button>
                   <button
-                    className={`${status == 'status=completed' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
+                    className={`${status == 'status=finished' ? "bg-main-500 text-white" : "bg-white text-gray-400"} border-teal-500 rounded-lg  hover:bg-main-500 hover:text-white font-medium w-36 h-10 text-center items-center mx-3`} onClick={() => {
                       handleStatus('finished')
                       setDefaultStatus('Order Completed')
                     }} type="button">

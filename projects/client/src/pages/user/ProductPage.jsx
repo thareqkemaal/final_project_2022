@@ -136,7 +136,7 @@ const ProductPage = (props) => {
                                                     progress: undefined,
                                                 });
                                             }
-                                        }}>Cart</button>
+                                        }}>Add to cart</button>
                                     : <button type="button" className="my-1 md:my-3 w-full text-btn-500 hover:text-white border
                                 border-btn-500 hover:bg-btn-500 font-bold rounded-lg text-sm py-1.5 text-center" onClick={() => {
                                             if (status !== 'Unverified') {
@@ -153,7 +153,7 @@ const ProductPage = (props) => {
                                                     progress: undefined,
                                                 });
                                             }
-                                        }}>Cart</button>
+                                        }}>Add to cart</button>
                             }
 
                         </div>
