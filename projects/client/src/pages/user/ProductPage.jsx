@@ -8,6 +8,7 @@ import { updateCart } from '../../action/useraction';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from "react-helmet";
+import { IoIosArrowDown } from "react-icons/io";
 
 const ProductPage = (props) => {
 
@@ -511,14 +512,35 @@ const ProductPage = (props) => {
                                     data.length > 0 ?
                                         <div className="flex items-center">
                                             <p className="text-sm text-cyan-900 mr-2">Sort: </p>
-                                            <button onClick={() => setDrop(!drop)} id="dropdownDefault" data-dropdown-toggle="dropdown" className="text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-4 h-8 mr-1 text-center inline-flex items-center" type="button">
+                                            <div className="topnav mr-3" id="myTopnav">
+                                                <div className="dropdown">
+                                                    <button className="dropbtn flex text-xs border rounded-lg pl-2">
+                                                        {defaultSort}
+                                                        <IoIosArrowDown size={13} className="w-7 h-7 py-2 ml-3.5 rounded-r-lg bg-gray-200 text-sm hover:bg-gray-400 hover:text-white" />
+                                                    </button>
+                                                    <div className="dropdown-content w-44 pt-3 pb-3 mr-2">
+                                                        <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
+                                                            <li>
+                                                                <button onClick={() => { setLoading(false); setDefaultSort('Most Relevant'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Most Relevant</button>
+                                                            </li>
+                                                            <li>
+                                                                <button onClick={() => { setLoading(false); setDefaultSort('Name : A - Z'); setSort('product_name'); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Name : A - Z</button>
+                                                            </li>
+                                                            <li>
+                                                                <button onClick={() => { setLoading(false); setDefaultSort('Lowest Price'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lowest Price</button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {/* <button onClick={() => setDrop(!drop)} id="dropdownDefault" data-dropdown-toggle="dropdown" className="text-white bg-btn-500 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-xs px-4 h-8 mr-1 text-center inline-flex items-center" type="button">
                                                 {defaultSort}
                                                 <svg className="ml-2 w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
-                                            </button>
+                                            </button> */}
                                             {/* <!-- Dropdown menu --> */}
-                                            <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "185px auto auto 1124px" }}>
+                                            {/* <div id="dropdown" className={`${drop == true ? 'hidden' : ''} z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700`} style={{ position: "absolute", inset: "185px auto auto 1124px" }}>
                                                 <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefault">
                                                     <li>
                                                         <button onClick={() => { setLoading(false); setDefaultSort('Most Relevant'); setSort(''); setDrop(!drop) }} className="block py-2 pl-4 pr-16 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Most Relevant</button>
@@ -530,7 +552,7 @@ const ProductPage = (props) => {
                                                         <button onClick={() => { setLoading(false); setDefaultSort('Lowest Price'); setSort('price'); setDrop(!drop) }} href="#" className="block py-2 pl-4 pr-12 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Lowest Price</button>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         :
                                         <>
