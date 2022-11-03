@@ -1041,7 +1041,7 @@ const UserOrderList = (props) => {
                                 setTab('all');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: '', sort: 'new' }
                                 console.log('selected', selected);
@@ -1052,6 +1052,10 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1063,7 +1067,7 @@ const UserOrderList = (props) => {
                                 setTab('waiting');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: 'waiting', sort: 'new' };
                                 console.log('selected', selected);
@@ -1074,6 +1078,9 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1085,7 +1092,7 @@ const UserOrderList = (props) => {
                                 setTab('process');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: 'process', sort: 'new' };
                                 console.log('selected', selected);
@@ -1096,6 +1103,9 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'))
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1107,7 +1117,7 @@ const UserOrderList = (props) => {
                                 setTab('delivery');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: 'delivery', sort: 'new' };
                                 console.log('selected', selected);
@@ -1118,6 +1128,9 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1129,7 +1142,7 @@ const UserOrderList = (props) => {
                                 setTab('finished');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: 'finished', sort: 'new' };
                                 console.log('selected', selected);
@@ -1140,6 +1153,9 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1151,7 +1167,7 @@ const UserOrderList = (props) => {
                                 setTab('cancel');
                                 setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                 setActivePage(1);
-                                setInputKeyword('');
+                                setInputKeyword(inputKeyword);
 
                                 let query = { ...selected, tab: 'cancel' };
                                 console.log('selected', selected);
@@ -1162,6 +1178,9 @@ const UserOrderList = (props) => {
                                         temp.push(`${key}=${query[key]}`);
                                     }
                                 };
+                                if (inputKeyword !== '') {
+                                    temp.push(`keyword=${inputKeyword}`)
+                                }
                                 temp.push(`page=1`);
                                 console.log(temp.join('&'));
                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1178,7 +1197,7 @@ const UserOrderList = (props) => {
                                         setType('all');
                                         setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                         setActivePage(1);
-                                        setInputKeyword('');
+                                        setInputKeyword(inputKeyword);
 
                                         let query = { ...selected, type: '' };
                                         console.log('selected', selected);
@@ -1189,6 +1208,9 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        if (inputKeyword !== '') {
+                                            temp.push(`keyword=${inputKeyword}`)
+                                        }
                                         temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1200,7 +1222,7 @@ const UserOrderList = (props) => {
                                         setType('prescription');
                                         setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                         setActivePage(1);
-                                        setInputKeyword('');
+                                        setInputKeyword(inputKeyword);
 
                                         let query = { ...selected, type: 'prescription' };
                                         console.log('selected', selected);
@@ -1211,6 +1233,9 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        if (inputKeyword !== '') {
+                                            temp.push(`keyword=${inputKeyword}`)
+                                        }
                                         temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1222,7 +1247,7 @@ const UserOrderList = (props) => {
                                         setType('free');
                                         setRange([{ startDate: '', endDate: '', key: 'selection', color: 'teal' }]);
                                         setActivePage(1);
-                                        setInputKeyword('');
+                                        setInputKeyword(inputKeyword);
 
                                         let query = { ...selected, type: 'free' };
                                         console.log('selected', selected);
@@ -1233,6 +1258,9 @@ const UserOrderList = (props) => {
                                                 temp.push(`${key}=${query[key]}`);
                                             }
                                         };
+                                        if (inputKeyword !== '') {
+                                            temp.push(`keyword=${inputKeyword}`)
+                                        }
                                         temp.push(`page=1`);
                                         console.log(temp.join('&'));
                                         navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1248,6 +1276,7 @@ const UserOrderList = (props) => {
                                         setSelected({ ...selected, sort: e.target.value });
                                         setSort(e.target.value);
                                         setActivePage(1);
+                                        setInputKeyword(inputKeyword)
 
                                         let query = { ...selected, sort: e.target.value };
                                         console.log('selected', selected);
@@ -1327,7 +1356,7 @@ const UserOrderList = (props) => {
 
                                                 setSelected({ ...selected });
                                                 setActivePage(1);
-                                                setInputKeyword('');
+                                                setInputKeyword(inputKeyword);
 
                                                 let query = { ...selected, sort: 'new' }
                                                 console.log('selected', selected)
@@ -1338,6 +1367,9 @@ const UserOrderList = (props) => {
                                                         temp.push(`${key}=${query[key]}`)
                                                     }
                                                 };
+                                                if (inputKeyword !== '') {
+                                                    temp.push(`keyword=${inputKeyword}`);
+                                                }
                                                 temp.push(`page=1`);
                                                 console.log('clear', temp.join('&'))
                                                 navigate(`/${username}/transaction?${temp.join('&')}`);
@@ -1443,7 +1475,41 @@ const UserOrderList = (props) => {
                                                     <li className="hidden sm:block border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">Previous</li>
                                                     :
                                                     <li className="hidden sm:block border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                        type='button' onClick={() => {
+                                                            setActivePage(activePage - 1);
+
+                                                            let query = selected;
+                                                            let temp = [];
+                                                            for (let key in query) {
+                                                                if (query[key] !== '') {
+                                                                    temp.push(`${key}=${query[key]}`);
+                                                                }
+                                                            };
+
+                                                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                                                if (range[0].startDate === range[0].endDate) {
+                                                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                                                } else {
+                                                                    if (range[0].startDate !== '') {
+                                                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                                                    }
+
+                                                                    if (range[0].endDate !== '') {
+                                                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                                                    }
+                                                                }
+                                                            };
+
+                                                            if (inputKeyword !== '') {
+                                                                temp.push(`keyword=${inputKeyword}`);
+                                                            };
+
+                                                            temp.push(`page=${activePage - 1}`);
+
+                                                            console.log(temp.join('&'));
+                                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                                        }}
                                                     >Previous</li>
                                             }
                                             {
@@ -1451,7 +1517,40 @@ const UserOrderList = (props) => {
                                                     <li className="sm:hidden border border-gray-300 rounded-l-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'<'}</li>
                                                     :
                                                     <li className="sm:hidden border border-main-500 rounded-l-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                        type='button' onClick={() => setActivePage(activePage - 1)}
+                                                        type='button' onClick={() => {
+                                                            setActivePage(activePage - 1)
+                                                            let query = selected;
+                                                            let temp = [];
+                                                            for (let key in query) {
+                                                                if (query[key] !== '') {
+                                                                    temp.push(`${key}=${query[key]}`);
+                                                                }
+                                                            };
+
+                                                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                                                if (range[0].startDate === range[0].endDate) {
+                                                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                                                } else {
+                                                                    if (range[0].startDate !== '') {
+                                                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                                                    }
+
+                                                                    if (range[0].endDate !== '') {
+                                                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                                                    }
+                                                                }
+                                                            };
+
+                                                            if (inputKeyword !== '') {
+                                                                temp.push(`keyword=${inputKeyword}`);
+                                                            };
+
+                                                            temp.push(`page=${activePage - 1}`);
+
+                                                            console.log(temp.join('&'));
+                                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                                        }}
                                                     >{'<'}</li>
                                             }
                                             {printPagination()}
@@ -1460,7 +1559,40 @@ const UserOrderList = (props) => {
                                                     <li className="sm:hidden border border-gray-300 rounded-r-full px-3 py-1 font-semibold text-gray-300 hover:cursor-default">{'>'}</li>
                                                     :
                                                     <li className="sm:hidden border border-main-500 rounded-r-full px-3 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                        type='button' onClick={() => {
+                                                            setActivePage(activePage + 1)
+                                                            let query = selected;
+                                                            let temp = [];
+                                                            for (let key in query) {
+                                                                if (query[key] !== '') {
+                                                                    temp.push(`${key}=${query[key]}`);
+                                                                }
+                                                            };
+
+                                                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                                                if (range[0].startDate === range[0].endDate) {
+                                                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                                                } else {
+                                                                    if (range[0].startDate !== '') {
+                                                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                                                    }
+
+                                                                    if (range[0].endDate !== '') {
+                                                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                                                    }
+                                                                }
+                                                            };
+
+                                                            if (inputKeyword !== '') {
+                                                                temp.push(`keyword=${inputKeyword}`);
+                                                            };
+
+                                                            temp.push(`page=${activePage + 1}`);
+
+                                                            console.log(temp.join('&'));
+                                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                                        }}
                                                     >{'>'}</li>
                                             }
                                             {
@@ -1468,7 +1600,40 @@ const UserOrderList = (props) => {
                                                     <li className="hidden sm:block border border-gray-300 rounded-r-full px-5 py-1 font-semibold text-gray-300 hover:cursor-default">Next</li>
                                                     :
                                                     <li className="hidden sm:block border border-main-500 rounded-r-full px-5 py-1 font-semibold text-main-500 hover:cursor-pointer"
-                                                        type='button' onClick={() => setActivePage(activePage + 1)}
+                                                        type='button' onClick={() => {
+                                                            setActivePage(activePage + 1)
+                                                            let query = selected;
+                                                            let temp = [];
+                                                            for (let key in query) {
+                                                                if (query[key] !== '') {
+                                                                    temp.push(`${key}=${query[key]}`);
+                                                                }
+                                                            };
+
+                                                            if (range[0].startDate !== '' || range[0].endDate !== '') {
+                                                                if (range[0].startDate === range[0].endDate) {
+                                                                    temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`);
+                                                                    temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`);
+                                                                } else {
+                                                                    if (range[0].startDate !== '') {
+                                                                        temp.push(`start=${range[0].startDate.toLocaleString("sv-SE")}`)
+                                                                    }
+
+                                                                    if (range[0].endDate !== '') {
+                                                                        temp.push(`end=${range[0].endDate.toLocaleDateString("sv-SE") + ' ' + '23:59:59'}`)
+                                                                    }
+                                                                }
+                                                            };
+
+                                                            if (inputKeyword !== '') {
+                                                                temp.push(`keyword=${inputKeyword}`);
+                                                            };
+
+                                                            temp.push(`page=${activePage + 1}`);
+
+                                                            console.log(temp.join('&'));
+                                                            navigate(`/${username}/transaction?${temp.join('&')}`);
+                                                        }}
                                                     >Next</li>
                                             }
                                         </ul>
