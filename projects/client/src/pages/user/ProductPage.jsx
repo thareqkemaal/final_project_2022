@@ -45,14 +45,6 @@ const ProductPage = (props) => {
 
     const getProduct = () => {
         let filter = '';
-        // let newID = '';
-
-        // if (search.includes('&')) {
-        //     let a = search.split('&');
-        //     let b = a[0].split('=');
-        //     newID = b[b.length - 1];
-        //     setIdPage(newID);
-        // }
 
         if (idPage && filterName) {
             filter = `category_id=${idPage}&product_name=${filterName}`
@@ -260,6 +252,14 @@ const ProductPage = (props) => {
         })
     }
 
+    const onSearch = (idelement) => {
+        setBoxFilterName(filterName); 
+        setLoading(false); 
+        document.getElementById(`${idelement}`).value = null; 
+        navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); 
+        setFilterNameOn(true) 
+    }
+
     // kemal add to cart APKG2-26
     const getUserCartData = async () => {
         try {
@@ -416,9 +416,7 @@ const ProductPage = (props) => {
                                     <div className="flex">
                                         <div className="relative w-full">
                                             <input id="searchsm" onChange={(e) => setFilterName(e.target.value)} type="search" className="block p-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                            <button onClick={() => { setBoxFilterName(filterName); setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
-                                                {/* <button onClick={() => { setLoading(false); document.getElementById("searchsm").value = null; navigate(`/product?search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
-                                                {/* <button onClick={() => setLoading(false)} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
+                                            <button onClick={() => { onSearch('searchsm') }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                                 <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                                 <span className="sr-only">Search</span>
                                             </button>
@@ -473,9 +471,7 @@ const ProductPage = (props) => {
                                     <div className="flex">
                                         <div className="relative w-full">
                                             <input id="search" onChange={(e) => setFilterName(e.target.value)} type="search" className="block w-52 p-2 text-xs text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-btn-500 focus:border-btn-500" placeholder="Example : Sanmol" required="" />
-                                            {/* <button onClick={() => {setLoading(false); navigate(`/product?search=${filterName}`); document.getElementById("search").value = null }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300"> */}
-
-                                            <button onClick={() => { setBoxFilterName(filterName); setLoading(false); document.getElementById("search").value = null; navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); setFilterNameOn(true) }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
+                                            <button onClick={() => { onSearch('search') }} type="button" className="absolute top-0 right-0 p-2 text-sm font-medium text-white bg-btn-500 rounded-r-lg border border-btn-600 hover:bg-btn-600 focus:ring-4 focus:outline-none focus:ring-green-300">
                                                 <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                                 <span className="sr-only">Search</span>
                                             </button>
@@ -546,10 +542,6 @@ const ProductPage = (props) => {
                                     <>
                                         <div className="flex my-4">
                                             <button className="text-btn-500 font-bold text-sm mx-2" onClick={() => { onResetAllFilter(); setFilterNameOn(false) }}>Reset All Filter</button>
-                                            {/* <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
-                                    {defaultFilterCategory}
-                                    <AiFillCloseCircle size={15} className="w-8 h-8 py-2 ml-3.5 rounded-r-lg text-sm hover:bg-gray-400 hover:text-white" />
-                                </button> */}
                                             {
                                                 sort ?
                                                     <button className="flex text-xs items-center text-gray-500 border rounded-lg pl-2 ml-3">
@@ -580,7 +572,6 @@ const ProductPage = (props) => {
                             }
 
                             <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" />
-                            {/* <hr className="hidden md:flex my-2 h-px bg-gray-200 border-0 dark:bg-gray-700" /> */}
 
                             {
                                 data.length > 0 ?
@@ -596,9 +587,6 @@ const ProductPage = (props) => {
                                     </div>
                             }
 
-                            {/* <div className="grid grid-cols-2 mr-4 md:mr-0 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 gap-2">
-                        {printProduct()}
-                    </div> */}
                             <div className="mx-auto">
                                 {
                                     data.length == 0 || data.length < query || data.length == totalProductFilter

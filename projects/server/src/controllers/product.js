@@ -16,7 +16,7 @@ module.exports = {
                 let totalProduct = results[0].totalProduct
 
                 if (filterCategory) {
-                    if (filterCategory[1]) {
+                    if (typeof filterCategory == typeof {}) {
 
                         let resultFilter = filterCategory.map((val, idx) => {
                             if (idx == 0) {
@@ -165,7 +165,7 @@ module.exports = {
         let image = `/imgProductPict/${req.files[0].filename}`;
         let { product_name, price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit } = JSON.parse(req.body.data);
 
-        dbConf.query(`Select * from product where product_name=${dbConf.escape(product_name)}`,
+        dbConf.query(`Select * from product where product_name=${dbConf.escape(product_name)} and isDeleted="false"`,
             (err, result) => {
                 if (err) {
                     return res.status(500).send('Middlewear addProduct failed, error', err)
@@ -405,9 +405,15 @@ module.exports = {
                 }
 
                 if (results.affectedRows) {
-                    res.status(200).send(
-                        {
-                            message: true
+                    dbConf.query(`Update product set isDeleted="true" where category_id=${dbConf.escape(idcategory)}`,
+                        (err, result) => {
+                            if (err) {
+                                return res.status(500).send(`Middlewear query delete gagal di update isDeleted : ${error}`)
+                            }
+                            res.status(200).send(
+                                {
+                                    message: true
+                                })
                         })
                 } else {
                     res.status(200).send(
