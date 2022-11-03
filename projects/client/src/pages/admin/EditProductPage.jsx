@@ -280,9 +280,9 @@ const EditProductPage = () => {
 
                                                         {/* <!-- Modal content --> */}
                                                         <div className="py-5 text-center items-center">
-                                                            <h3 className="text-md font-bold text-gray-900">Anda belum memilih produk untuk diedit, silahkan kembali ke
+                                                            <h3 className="text-md font-bold text-gray-900">You don't choose any product to be edited, please go back to
                                                                 <button className="text-btn-500 ml-1" onClick={() => navigate('/admin/product')}>
-                                                                    menu daftar obat
+                                                                    product list page
                                                                 </button>
                                                             </h3>
                                                             {/* <input disabled defaultValue={nameDeleted} type="text" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Anjuran dosis penggunaan obat" required />

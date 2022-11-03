@@ -176,6 +176,15 @@ const ProductPage = (props) => {
                         </div>
                     </div>
                 }
+            } else {
+                return <div className="col-span-4 ml-5">
+                    <div className="grid grid-cols-1 justify-between">
+                        <div className="text-center text-txt-500 font-bold text-lg">
+                            Data Not Found
+                            <img src={require('../admin/NoData.png')} className='w-96 text-center mx-auto' alt='medcare.com' />
+                        </div>
+                    </div>
+                </div>
             }
         })
     }
@@ -253,11 +262,11 @@ const ProductPage = (props) => {
     }
 
     const onSearch = (idelement) => {
-        setBoxFilterName(filterName); 
-        setLoading(false); 
-        document.getElementById(`${idelement}`).value = null; 
-        navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`); 
-        setFilterNameOn(true) 
+        setBoxFilterName(filterName);
+        setLoading(false);
+        document.getElementById(`${idelement}`).value = null;
+        navigate(`/product?${idPage ? `id=${idPage}&` : ``}search=${filterName}`);
+        setFilterNameOn(true);
     }
 
     // kemal add to cart APKG2-26
