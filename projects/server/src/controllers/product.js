@@ -109,23 +109,23 @@ module.exports = {
 
                     // ${filterCategory || product_name ? 'where s.isDefault="true"' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
 
-                    dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
-                    where s.isDefault="true" ${filterCategory || product_name ? 'and' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
-                    order by ${sort ? `${sort} asc` : `idproduct desc`} 
+                            dbConf.query(`Select p.*, c.category_name, s.stock_unit from product p join category c on c.idcategory = p.category_id join stock s on p.idproduct=s.product_id
+                    where s.isDefault="true" and p.isDeleted="false" ${filterCategory || product_name ? 'and' : ''} ${product_name ? `product_name like ('%${product_name}%')` : ''} ${product_name && filterCategory ? 'and' : ''} ${filterCategory ? resultFilter : ''}
+                    order by ${sort ? `${sort} asc` : limit ? `s.stock_unit desc` : `p.idproduct desc`} 
                     ${typeof offset == typeof 'string' ? `limit ${dbConf.escape(limit)}` : `limit 10 offset ${dbConf.escape(offset)}`}`,
-                        (err, results) => {
-                            if (err) {
-                                return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
-                            }
+                                (err, results) => {
+                                    if (err) {
+                                        return res.status(500).send(`Middlewear getProduct failed, error : ${err}`)
+                                    }
 
-                            // console.log('results query 3', results)
-
-                            res.status(200).send(
-                                {
-                                    results,
-                                    totalProduct
-                                }
-                            );
+                                    res.status(200).send(
+                                        {
+                                            results,
+                                            totalProduct,
+                                            totalProductFilter
+                                        }
+                                    );
+                                })
                         })
                 } else {
                     let resultFilter = `category_id=${filterCategory}`;
@@ -154,28 +154,42 @@ module.exports = {
         let image = `/imgProductPict/${req.files[0].filename}`;
         let { product_name, price, category_id, netto_stock, netto_unit, default_unit, description, dosis, aturan_pakai, stock_unit } = JSON.parse(req.body.data);
 
-        dbConf.query(`Insert into product (product_name, price, category_id, netto_stock, netto_unit, default_unit, picture, description, dosis, aturan_pakai) 
-        values (${dbConf.escape(product_name)},${dbConf.escape(price)},${dbConf.escape(category_id)},${dbConf.escape(netto_stock)},${dbConf.escape(netto_unit)},${dbConf.escape(default_unit)},${dbConf.escape(image)},${dbConf.escape(description)},${dbConf.escape(dosis)},${dbConf.escape(aturan_pakai)})`,
-            (err, results) => {
+        dbConf.query(`Select * from product where product_name=${dbConf.escape(product_name)}`,
+            (err, result) => {
                 if (err) {
-                    return res.status(500).send(`Middlewear addProduct failed, error : ${err}`)
+                    return res.status(500).send('Middlewear addProduct failed, error', err)
                 }
 
-                dbConf.query(`Select idproduct from product where product_name='${product_name}'`,
-                    (e, r) => {
-                        if (e) {
-                            return res.status(500).send(`Middlewear addProduct failed, error : ${e}`)
-                        }
+                if (JSON.stringify(result) == '[]') {
+                    dbConf.query(`Insert into product (product_name, price, category_id, netto_stock, netto_unit, default_unit, picture, description, dosis, aturan_pakai) 
+                    values (${dbConf.escape(product_name)},${dbConf.escape(price)},${dbConf.escape(category_id)},${dbConf.escape(netto_stock)},${dbConf.escape(netto_unit)},${dbConf.escape(default_unit)},${dbConf.escape(image)},${dbConf.escape(description)},${dbConf.escape(dosis)},${dbConf.escape(aturan_pakai)})`,
+                        (err, results) => {
+                            if (err) {
+                                return res.status(500).send(`Middlewear addProduct failed, error : ${err}`)
+                            }
 
-                        resultAddproduct = {
-                            product_id: r[0].idproduct,
-                            stock_unit,
-                            unit: default_unit
-                        };
+                            dbConf.query(`Select idproduct from product where product_name='${product_name}'`,
+                                (e, r) => {
+                                    if (e) {
+                                        return res.status(500).send(`Middlewear addProduct failed, error : ${e}`)
+                                    }
 
-                        next()
+                                    resultAddproduct = {
+                                        product_id: r[0].idproduct,
+                                        stock_unit,
+                                        unit: default_unit
+                                    };
 
+                                    next()
+
+                                })
+                        })
+                } else {
+                    res.status(200).send({
+                        success: false,
+                        message: 'Product already existed, please input another name'
                     })
+                }
             })
     },
     addStock: (req, res) => {
