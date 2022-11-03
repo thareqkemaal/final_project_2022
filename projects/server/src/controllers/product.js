@@ -304,7 +304,7 @@ module.exports = {
         let unit_type = req.query.unit_type;
         let unit = req.body.unit;
 
-        dbConf.query(`Select * from unit where unit=${dbConf.escape(unit)} `,
+        dbConf.query(`Select * from unit where unit=${dbConf.escape(unit)} and unit_type=${dbConf.escape(unit_type)}`,
             (err, results) => {
                 if (err) {
                     return res.status(500).send('Middlewear getUnit failed. Error :', err)

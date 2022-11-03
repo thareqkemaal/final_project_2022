@@ -1146,7 +1146,7 @@ const TransactionPages = () => {
                 <div className='flex justify-between'>
                   <p />
                   <div>
-                    <button className={`${modalAccept.status_id == 3 ? '' : 'hidden'}transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20`} onClick={() => {
+                    <button className={`${modalAccept.status_id == 3 ? 'transition mr-4 bg-white border border-main-500 focus:ring-main-500 text-main-500 rounded-lg py-1 px-2 mt-1 hover:-translate-y-1 hover:bg-gray-100 w-20' : 'hidden'}`} onClick={() => {
                       setModalRecipe(modalAccept)
                       setModalAccept('')
                     }}>Back</button>
