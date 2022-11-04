@@ -114,6 +114,14 @@ const TransactionPages = () => {
           ])
           setFilter(`${firstStart[0]}&${firstEnd[0]}`)
         } else {
+          setRange([
+            {
+              startDate: new Date(`${firstStart[0].split('=')[1]}`),
+              endDate: new Date(`${firstEnd[0].split('=')[1]}`),
+              key: 'selection',
+              color: 'teal'
+            }
+          ])
           setInvoice(firstInvoice[0].split('=')[1])
           setFilter(`${firstInvoice[0]}&${firstStart[0]}&${firstEnd[0]}`)
           setRange([
