@@ -30,7 +30,7 @@ const UserCart = (props) => {
 
     const getCartData = async () => {
         try {
-            setLoading(true)
+            // setLoading(true)
             let userToken = localStorage.getItem('medcarelog');
             let getCart = await axios.get(API_URL + '/api/product/getcartdata', {
                 headers: {
@@ -65,7 +65,7 @@ const UserCart = (props) => {
                 } else {
                     setIsCheckAll('false')
                 }
-                setLoading(false)
+                // setLoading(false)
             }
 
         } catch (error) {

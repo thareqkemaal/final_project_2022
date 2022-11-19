@@ -62,14 +62,10 @@ const Prescription = (props) => {
                 let getSelectedAddress = getAddress.data.find((val, idx) => val.selected === "true");
                 let getPrimaryAddress = getAddress.data.find((val, idx) => val.status_name === "Primary");
 
-                if (selectedAddress === {}) {
+                if (getSelectedAddress === undefined) {
                     setSelectedAddress(getPrimaryAddress);
                 } else {
-                    if (getSelectedAddress === getPrimaryAddress) {
-                        setSelectedAddress(getPrimaryAddress);
-                    } else {
-                        setSelectedAddress(getSelectedAddress);
-                    }
+                    setSelectedAddress(getSelectedAddress);
                 }
             } else {
                 setSelectedAddress(null);
